@@ -1,0 +1,134 @@
+# Акниет — запуск на сервере
+
+Стек в Docker Compose:
+
+| Сервис    | Что делает |
+|-----------|------------|
+| `nginx`   | Отдаёт сайт (`index-stone.html` → главная), админку `/admin`, проксирует `/api`, HTTPS |
+| `backend` | Node.js + TypeScript (Express): заявки, контент, Telegram |
+| `db`      | PostgreSQL 16, наружу не открыта |
+| `certbot` | Продлевает сертификат Let's Encrypt раз в 12 часов |
+
+## Первый запуск
+
+1. На сервере нужны Docker и Docker Compose, порты 80 и 443 открыты. В DNS домена `akniet-home.kg` нужны две A-записи на IP сервера: `akniet-home.kg` (`@`) и `www.akniet-home.kg` (`www`). Адрес с www перенаправляется на основной.
+2. Скопировать проект на сервер и создать `.env`:
+   ```sh
+   cp .env.example .env
+   nano .env   # пароли, LETSENCRYPT_EMAIL, при желании Telegram
+   ```
+3. Поднять стек — сайт сразу заработает по HTTP:
+   ```sh
+   docker compose up -d --build
+   ```
+4. Выпустить сертификат — после этого nginx сам переключится на HTTPS:
+   ```sh
+   ./scripts/init-letsencrypt.sh
+   ```
+
+## Обновление сайта
+
+После правок `index-stone.html`, картинок или админки:
+```sh
+docker compose up -d --build nginx
+```
+После правок backend: `docker compose up -d --build backend`.
+
+## Смена домена
+
+Поменять `DOMAIN` в `.env` (без `www`), затем `docker compose up -d nginx backend` и снова `./scripts/init-letsencrypt.sh`. Если `SITE_URL` задан вручную — поменять и его, иначе canonical и sitemap останутся со старым адресом.
+
+Если запись `www` добавили в DNS уже после выпуска сертификата — просто ещё раз запустить `./scripts/init-letsencrypt.sh`, он добавит www в сертификат.
+
+## Админка
+
+`https://<домен>/admin/` — логин и пароль из `ADMIN_USER` / `ADMIN_PASSWORD` (basic auth в nginx).
+После смены пароля в `.env`: `docker compose up -d nginx`.
+
+| Вкладка | Что редактируется |
+|---------|-------------------|
+| Заявки | Заявки с сайта, статусы: новая / в работе / готово / спам |
+| Основное | Цена за м², гарантия (лет), средний и минимальный срок стройки (мес), домов построено, лет строим, подписчики Instagram |
+| Контакты | Телефон, WhatsApp, Telegram (номер или @username), почта, Instagram, TikTok, Threads — меняются во всех местах сайта |
+| Материалы | 10 карточек раздела «Дерево и камень…»: фото, категория, название, подзаголовок. Карточки по номерам, «Вернуть стоковую карточку» — сброс |
+| Галерея | 6 фото «Тёплых кадров» с подписями, по номерам. Текстовые плитки и анимация раздела не меняются |
+| Карта | Точки на карте «Строим по всему Кыргызстану»: населённый пункт (рус/кыр), домов построено, общая площадь м². Нажатие на карту ставит точку, на точку — выбирает её |
+
+- Пустое поле = значение из вёрстки (стоковое). Слова «год / года / лет», «месяц / месяцев» сайт подбирает сам.
+- Фото загружаются с компьютера или телефона (JPG, PNG, WebP до 15 МБ); сервер сжимает их в WebP и хранит в томе `uploads`.
+- Сайт подхватывает изменения в течение минуты.
+
+Технически: числа на странице помечены `data-cms="<ключ>"`, ссылки — `data-contact="<ключ>"`, карточки — `data-slot="<номер>"`.
+Новое поле: описать в `backend/src/content.ts` и пометить элемент в `index-stone.html`.
+
+## SEO и серверный рендеринг
+
+`/` и `/ky/` отдаёт backend: он берёт страницу (`index-stone.html`, `ky/index.html`), подставляет данные из админки
+(цены, сроки, контакты, адрес, карточки, галерею, точки карты) и добавляет в `<head>`:
+
+- `canonical`, `hreflang` (ru, ky, x-default), Open Graph и Twitter-карточки (картинки `assets/og/og-ru.jpg`, `og-ky.jpg`);
+- JSON-LD: компания (`GeneralContractor`: адрес, координаты, часы работы, телефон, соцсети, цена за м²), сайт, страница, FAQ;
+- коды подтверждения Google Search Console и Яндекс.Вебмастера, Google Analytics 4 и Яндекс.Метрику — если заданы в `.env`.
+
+Страница кэшируется и пересобирается после любого сохранения в админке. Если backend недоступен, nginx отдаёт статическую копию — сайт продолжает работать.
+
+Также: `robots.txt` и `sitemap.xml` (генерирует backend по `SITE_URL`), страница 404, иконки и `site.webmanifest`,
+шрифты с собственного сервера (`assets/fonts`), 3D-сцена загружается после показа страницы.
+
+После запуска на реальном домене:
+1. Задать `SITE_URL` (или `DOMAIN`) в `.env`, при необходимости коды `GOOGLE_SITE_VERIFICATION`, `YANDEX_VERIFICATION`, `GA4_ID`, `YANDEX_METRIKA_ID`; затем `docker compose up -d backend`.
+2. Добавить сайт в Google Search Console и Яндекс.Вебмастер, отправить `https://<домен>/sitemap.xml`.
+3. Проверить разметку: https://search.google.com/test/rich-results и https://validator.schema.org.
+
+## Кыргызская версия (/ky/)
+
+Русская страница `index-stone.html` — единственный исходник. Кыргызская `ky/index.html` собирается из неё и словаря `i18n/ky.json`:
+
+```sh
+node scripts/build-ky.mjs            # собрать и показать строки без перевода
+node scripts/build-ky.mjs --extract  # строки без перевода в формате JSON — вставить в ky.json
+```
+
+При `docker compose up -d --build nginx` страница собирается автоматически.
+
+- Поменяли русский текст в `index-stone.html` — добавьте перевод новой строки в `i18n/ky.json` (раздел `text`), иначе на /ky/ она останется по-русски; скрипт перечислит такие строки.
+- `html` — фразы целиком вместе с тегами, где в кыргызском другой порядок слов; ключ — русский фрагмент как в исходнике.
+- `js` — тексты для скриптов: окно планировки, калькулятор, сообщения формы.
+- В админке у каждого текста карточек материалов и галереи два поля: РУС и КЫР. Пустое кыргызское поле при заполненном русском — на /ky/ показывается русский текст, а карточка помечена «нет перевода».
+- Заявки с /ky/ помечены в админке «КЫР», в Telegram — «с кыргызской версии сайта».
+
+## Telegram-бот
+
+1. Создать бота у [@BotFather](https://t.me/BotFather), токен — в `TELEGRAM_BOT_TOKEN`.
+2. Добавить бота в чат менеджеров, узнать id чата (например, через `https://api.telegram.org/bot<токен>/getUpdates` после любого сообщения в чате) — в `TELEGRAM_CHAT_ID`.
+3. `docker compose up -d backend`. В админке индикатор сменится на «Telegram подключён».
+
+Пока переменные пустые, заявки только сохраняются в БД (в логах backend: `[telegram stub]`).
+
+Для команд бота есть заготовка webhook `POST /api/telegram/webhook` (`backend/src/routes/telegram.ts`).
+Подключение: задать `TELEGRAM_WEBHOOK_SECRET` и вызвать
+`https://api.telegram.org/bot<токен>/setWebhook?url=https://<домен>/api/telegram/webhook&secret_token=<секрет>`.
+
+## API
+
+| Метод | Путь | Доступ |
+|-------|------|--------|
+| POST  | `/api/leads` | публичный, 10 заявок в минуту с IP |
+| GET   | `/api/content` | публичный |
+| GET   | `/api/health` | публичный |
+| GET   | `/api/admin/me`, `/api/admin/leads`, `/api/admin/content` | basic auth |
+| PUT   | `/api/admin/content` | basic auth |
+| PATCH | `/api/admin/leads/:id` | basic auth |
+
+## Полезное
+
+```sh
+docker compose logs -f backend                   # логи
+docker compose exec db psql -U akniet akniet     # консоль БД
+docker compose exec db pg_dump -U akniet akniet > backup.sql   # бэкап БД
+docker run --rm -v akniet_uploads:/u -v "$PWD":/b alpine tar czf /b/uploads.tgz -C /u .   # бэкап фото
+```
+
+(`akniet_` — имя папки проекта на сервере; точное имя тома: `docker volume ls`.)
+
+Миграции БД лежат в `backend/migrations/*.sql` и применяются автоматически при старте backend.

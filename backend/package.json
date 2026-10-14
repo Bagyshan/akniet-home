@@ -1,0 +1,23 @@
+{
+  "name": "akniet-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p .",
+    "start": "node dist/index.js",
+    "dev": "tsc -p . --watch"
+  },
+  "dependencies": {
+    "express": "5.1.0",
+    "linkedom": "0.18.5",
+    "pg": "8.13.1",
+    "sharp": "0.33.5"
+  },
+  "devDependencies": {
+    "@types/express": "5.0.1",
+    "@types/node": "22.10.2",
+    "@types/pg": "8.11.10",
+    "typescript": "5.7.2"
+  }
+}

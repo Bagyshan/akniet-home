@@ -1,0 +1,8 @@
+**/node_modules
+backend/dist
+assets/stone-backgrounds
+assets/3d-models/*.glb
+*.png
+!assets/*.png
+.env
+ky/

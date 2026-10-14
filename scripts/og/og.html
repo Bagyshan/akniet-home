@@ -1,0 +1,23 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500&family=Onest:wght@500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}
+body{width:1200px;height:630px;overflow:hidden;background:#211e22;color:#fff8ec;font-family:Onest,sans-serif;position:relative}
+.bg{position:absolute;inset:0;background:url(../../assets/map/relief.webp) 62% 40%/170% auto no-repeat}
+.veil{position:absolute;inset:0;background:linear-gradient(90deg,#211e22 0%,rgba(33,30,34,.94) 38%,rgba(33,30,34,.35) 75%,rgba(33,30,34,.55) 100%)}
+.in{position:absolute;inset:0;padding:64px 72px;display:flex;flex-direction:column;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:14px;font-family:Unbounded;font-weight:500;font-size:24px;letter-spacing:.2em}
+.logo img{width:44px}
+h1{font-family:Unbounded;font-weight:400;font-size:62px;line-height:1.05;letter-spacing:-.03em;max-width:13ch}
+h1 span{color:#d5a039}
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.chips b{padding:10px 18px;border-radius:999px;font-weight:600;font-size:20px;background:rgba(255,248,236,.1);border:1px solid rgba(255,248,236,.22)}
+.chips b.g{background:#d5a039;color:#312d32;border-color:transparent}
+</style></head><body><div class="bg"></div><div class="veil"></div>
+<div class="in"><div class="logo"><img src="../../assets/mark-gold.png">АКНИЕТ</div>
+<h1 id="h"></h1><div class="chips" id="c"></div></div>
+<script>
+const L={ru:{h:'Барнхаусы и A&#8209;frame <span>под ключ</span>',c:['По всему Кыргызстану','Металлический каркас','Строим круглый год']},
+ky:{h:'<span>Ачкычка чейин</span> барнхаус жана A&#8209;frame',c:['Бүт Кыргызстан боюнча','Металл каркас','Жыл бою курабыз']}}[location.hash.slice(1)];
+document.getElementById('h').innerHTML=L.h;document.getElementById('c').innerHTML=L.c.map((t,i)=>`<b class="${i?'':'g'}">${t}</b>`).join('');
+</script></body></html>

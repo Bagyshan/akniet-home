@@ -1,0 +1,34 @@
+const env = (name: string, fallback?: string): string => {
+  const v = process.env[name] ?? fallback;
+  if (v === undefined) throw new Error(`Missing env ${name}`);
+  return v;
+};
+
+export const config = {
+  port: Number(env('PORT', '3000')),
+  // shared with nginx, which serves it at /uploads/
+  uploadDir: env('UPLOAD_DIR', '/data/uploads'),
+  // page templates for server rendering (index.html, ky/index.html)
+  siteDir: env('SITE_DIR', '/app/site'),
+  // absolute address of the site, for canonical / hreflang / sitemap
+  siteUrl: (process.env.SITE_URL || 'https://' + env('DOMAIN', 'localhost')).replace(/\/$/, ''),
+  seo: {
+    googleVerification: env('GOOGLE_SITE_VERIFICATION', ''),
+    yandexVerification: env('YANDEX_VERIFICATION', ''),
+    ga4: env('GA4_ID', ''),
+    metrika: env('YANDEX_METRIKA_ID', ''),
+  },
+  db: {
+    host: env('POSTGRES_HOST', 'db'),
+    port: Number(env('POSTGRES_PORT', '5432')),
+    database: env('POSTGRES_DB'),
+    user: env('POSTGRES_USER'),
+    password: env('POSTGRES_PASSWORD'),
+  },
+  telegram: {
+    // пусто — бот не подключён, заявки только сохраняются в БД (заглушка)
+    token: env('TELEGRAM_BOT_TOKEN', ''),
+    chatId: env('TELEGRAM_CHAT_ID', ''),
+    webhookSecret: env('TELEGRAM_WEBHOOK_SECRET', ''),
+  },
+};

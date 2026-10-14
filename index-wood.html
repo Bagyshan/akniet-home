@@ -1,0 +1,1057 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Акниет — журнал о доме</title>
+<meta name="description" content="Акниет — проектирование и строительство барнхаусов и A-frame домов под ключ. Выпуск №01: дерево, свет и тишина леса.">
+<link rel="icon" type="image/png" href="assets/mark-gold.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://images.pexels.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,800;1,400;1,500&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#312d32;--cream:#fff8ec;--gold:#d5a039;
+  --forest:#1d2620;--forest-deep:#151b17;--moss:#33402f;--walnut:#5b3e2b;--oak:#b98a5e;
+  --gold-ink:#8a6114;--paper:#fbf3e4;
+  --w-walnut:none;--w-oak:none;--w-pine:none;--w-char:none;--w-oak-h:none;--w-walnut-h:none;
+  --fg:var(--ink);--dim:rgba(49,45,50,.72);--faint:rgba(49,45,50,.5);--line:rgba(49,45,50,.18);--accent:var(--gold-ink);
+  --gutter:clamp(16px,4vw,56px);
+  --ease:cubic-bezier(.19,1,.22,1);
+  --f-display:"Playfair Display",Georgia,serif;
+  --f-text:"Golos Text",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+.dark{--fg:var(--cream);--dim:rgba(255,248,236,.68);--faint:rgba(255,248,236,.42);--line:rgba(255,248,236,.16);--accent:var(--gold);background:var(--forest);color:var(--fg)}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+body{margin:0;background:var(--paper);color:var(--fg);font-family:var(--f-text);font-size:16px;line-height:1.65;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body.loading{overflow:hidden}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button,input,textarea{font:inherit;color:inherit}
+::selection{background:var(--gold);color:var(--ink)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;line-height:1.02;margin:0;letter-spacing:-.015em}
+p{margin:0}
+em{font-style:italic;color:var(--accent)}
+.wrap{padding:0 var(--gutter);max-width:1560px;margin:0 auto}
+.mono{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.kicker{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.rule{border:0;border-top:1px solid var(--fg);margin:0;opacity:.9}
+.rule.thin{border-top-color:var(--line);opacity:1}
+.grain{position:fixed;inset:-50%;width:200%;height:200%;pointer-events:none;z-index:90;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* ---------- Preloader: issue cover counter ---------- */
+.loader{position:fixed;inset:0;z-index:200;background:var(--forest-deep);color:var(--cream);display:grid;place-items:center;transition:clip-path 1.2s var(--ease);clip-path:inset(0 0 0 0)}
+.loader.done{clip-path:inset(0 0 100% 0)}
+.loader-inner{display:grid;justify-items:center;gap:18px;text-align:center}
+.loader .issue{font-family:var(--f-display);font-style:italic;font-size:clamp(64px,10vw,140px);line-height:1}
+.loader .issue span{color:var(--gold)}
+.loader .mono{color:rgba(255,248,236,.6)}
+.loader-bar{width:200px;height:1px;background:rgba(255,248,236,.15);overflow:hidden}
+.loader-bar i{display:block;height:100%;background:var(--gold);transform:scaleX(0);transform-origin:left}
+
+/* ---------- Cursor ---------- */
+.cursor{position:fixed;top:0;left:0;z-index:150;pointer-events:none;display:none;mix-blend-mode:normal}
+.cursor .dot{position:absolute;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:var(--gold)}
+.cursor .ring{position:absolute;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;border:1px solid var(--gold);display:grid;place-items:center;transition:width .4s var(--ease),height .4s var(--ease),margin .4s var(--ease),background-color .4s}
+.cursor .ring span{font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);opacity:0;transition:opacity .3s}
+.cursor.hover .ring{width:60px;height:60px;margin:-30px 0 0 -30px}
+.cursor.view .ring{width:92px;height:92px;margin:-46px 0 0 -46px;background:var(--gold)}
+.cursor.view .ring span{opacity:1}
+.cursor.view .dot{opacity:0}
+@media (hover:hover) and (pointer:fine){.cursor{display:block}body.has-cursor,body.has-cursor a,body.has-cursor button{cursor:none}}
+
+/* ---------- Header (slim masthead) ---------- */
+.header{position:fixed;inset:0 0 auto;z-index:100;background:rgba(251,243,228,.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(49,45,50,.14);color:var(--ink);transition:transform .6s var(--ease)}
+.header.hidden{transform:translateY(-100%)}
+.header-in{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:60px;padding:0 var(--gutter)}
+.logo{display:flex;align-items:center;gap:12px;justify-self:center}
+.logo img{width:26px}
+.logo span{font-family:var(--f-display);font-weight:600;font-size:18px;letter-spacing:.32em}
+.header .mono{color:rgba(49,45,50,.7)}
+.header nav{display:flex;gap:24px;justify-self:end;align-items:center}
+.header nav a{font-size:13px;font-weight:500;position:relative;padding:8px 0}
+.header nav a::after{content:"";position:absolute;left:0;right:0;bottom:2px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right;transition:transform .5s var(--ease)}
+.header nav a:hover::after{transform:scaleX(1);transform-origin:left}
+.menu-btn{background:none;border:1px solid rgba(49,45,50,.3);border-radius:999px;padding:8px 16px;cursor:pointer;font-size:13px;font-weight:500;min-height:40px}
+.menu-btn:hover{background:var(--ink);color:var(--cream)}
+
+/* ---------- Overlay menu: table of contents ---------- */
+.overlay{position:fixed;inset:0;z-index:95;background:var(--forest-deep);color:var(--cream);clip-path:inset(0 0 100% 0);transition:clip-path 1s var(--ease);visibility:hidden;overflow:auto}
+.menu-open .overlay{clip-path:inset(0 0 0 0);visibility:visible}
+.overlay .wrap{padding-top:110px;padding-bottom:60px}
+.overlay a.toc{display:grid;grid-template-columns:80px 1fr auto;gap:24px;align-items:baseline;padding:18px 0;border-bottom:1px solid rgba(255,248,236,.14);opacity:0;transform:translateY(30px);transition:opacity .8s var(--ease),transform .8s var(--ease),color .3s}
+.overlay a.toc b{font-family:var(--f-display);font-weight:400;font-size:clamp(32px,5vw,72px);line-height:1.05}
+.overlay a.toc:hover{color:var(--gold)}
+.overlay a.toc:hover b{font-style:italic}
+.menu-open .overlay a.toc{opacity:1;transform:none}
+.menu-open .overlay a.toc:nth-child(3){transition-delay:.05s}.menu-open .overlay a.toc:nth-child(4){transition-delay:.1s}.menu-open .overlay a.toc:nth-child(5){transition-delay:.15s}.menu-open .overlay a.toc:nth-child(6){transition-delay:.2s}.menu-open .overlay a.toc:nth-child(7){transition-delay:.25s}
+.overlay .mono{color:rgba(255,248,236,.55)}
+
+/* ---------- Cover ---------- */
+.cover{padding:84px 0 clamp(40px,6vw,80px)}
+.wordmark{font-family:var(--f-display);font-weight:800;font-size:clamp(76px,19.6vw,300px);line-height:.82;letter-spacing:-.03em;text-align:center;margin:clamp(10px,2vw,24px) 0 0;white-space:nowrap}
+.wordmark .ch{display:inline-block;transform:translateY(105%)}
+.wordmark-clip{overflow:hidden;padding-bottom:.04em}
+.cover-meta{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;padding:12px 0;border-top:2px solid var(--ink);border-bottom:1px solid var(--ink);margin-top:clamp(10px,1.4vw,18px)}
+.cover-meta>:nth-child(2){text-align:center}
+.cover-meta>:last-child{text-align:right}
+.cover-grid{display:grid;grid-template-columns:5fr 7fr;gap:clamp(24px,4vw,64px);margin-top:clamp(28px,4vw,56px);align-items:stretch}
+.cover-lines{display:flex;flex-direction:column;justify-content:space-between;gap:36px}
+.cover-title{font-size:clamp(44px,5.4vw,96px);line-height:.98}
+.cover-title em{font-weight:400}
+.cover-lead{font-size:17px;color:var(--dim);max-width:40ch;margin-top:24px}
+.in-issue{list-style:none;margin:0;padding:0;border-top:1px solid var(--ink)}
+.in-issue li a{display:grid;grid-template-columns:44px 1fr auto;gap:14px;align-items:baseline;padding:14px 0;border-bottom:1px solid var(--line);transition:padding .5s var(--ease)}
+.in-issue li a:hover{padding-left:10px}
+.in-issue b{font-family:var(--f-display);font-weight:500;font-size:22px}
+.in-issue .mono:first-child{color:var(--accent)}
+.cover-figure{margin:0;display:grid;gap:12px}
+.frame{position:relative;aspect-ratio:5/4;background:radial-gradient(110% 80% at 50% 25%,#27342b 0%,var(--forest-deep) 75%);overflow:hidden;box-shadow:0 0 0 1px var(--ink),12px 12px 0 0 var(--oak)}
+.frame canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.frame .fallback{position:absolute;inset:0;background:center/cover url("https://images.pexels.com/photos/9209878/pexels-photo-9209878.jpeg?auto=compress&cs=tinysrgb&w=1400");opacity:0}
+.no-webgl .frame .fallback{opacity:1}
+.frame .tag{position:absolute;left:16px;top:16px;z-index:2;background:var(--gold);color:var(--ink);font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:6px 10px}
+.frame .hint{position:absolute;right:16px;bottom:14px;z-index:2;color:rgba(255,248,236,.7)}
+@media (hover:none){.frame .hint{display:none}}
+figcaption{display:flex;justify-content:space-between;gap:16px;padding-top:14px}
+.fade-in{opacity:0}
+
+/* ---------- Editor's letter ---------- */
+.letter{padding:clamp(90px,12vw,170px) 0}
+.letter-grid{display:grid;grid-template-columns:3fr 6fr 3fr;gap:clamp(24px,4vw,64px)}
+.letter h2{font-size:clamp(40px,4.6vw,76px)}
+.letter-body{columns:2;column-gap:40px;font-size:17px;line-height:1.75}
+.letter-body p+p{margin-top:1em}
+.letter-body p:first-child::first-letter{font-family:var(--f-display);float:left;font-size:5.4em;line-height:.82;padding:6px 12px 0 0;color:var(--walnut);font-weight:600}
+.sign{margin-top:32px;display:flex;align-items:center;gap:14px}
+.sign img{width:40px}
+.sign b{font-family:var(--f-display);font-style:italic;font-weight:400;font-size:22px}
+.facts{border-top:2px solid var(--ink);display:grid}
+.facts div{padding:16px 0;border-bottom:1px solid var(--line)}
+.facts b{display:block;font-family:var(--f-display);font-size:44px;line-height:1;font-weight:500}
+.facts b em{font-size:.5em}
+.facts span{font-size:13px;color:var(--dim)}
+
+/* ---------- Pull quote ---------- */
+.pull{padding:clamp(70px,9vw,130px) 0;text-align:center}
+.pull p{font-family:var(--f-display);font-style:italic;font-size:clamp(34px,4.8vw,80px);line-height:1.1;max-width:20ch;margin:0 auto}
+.pull .w{opacity:.15}
+.pull .mono{display:block;margin-top:28px}
+
+/* ---------- Wooden bands (section divider) ---------- */
+.bands{position:relative;height:clamp(180px,20vw,280px);overflow:hidden;background:linear-gradient(var(--paper) 50%,var(--forest) 50%)}
+.band{position:absolute;left:-10%;width:120%;height:clamp(60px,6vw,86px);display:flex;align-items:center;overflow:hidden;box-shadow:0 24px 40px -18px rgba(0,0,0,.55)}
+.band.oak{top:20%;transform:rotate(-2.4deg);background:var(--oak) var(--w-oak-h) 0 0/auto 200%;z-index:2}
+.band.walnut{top:46%;transform:rotate(1.8deg);background:var(--walnut) var(--w-walnut-h) 0 0/auto 200%}
+.band::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(255,240,210,.18),transparent 40%,rgba(0,0,0,.18));pointer-events:none}
+.band-track{display:flex;gap:40px;white-space:nowrap;will-change:transform;padding-left:40px}
+.band-track span{font-family:var(--f-display);font-size:clamp(26px,3vw,46px);font-style:italic;display:flex;align-items:center;gap:40px}
+.band-track span::after{content:"№";font-family:var(--f-mono);font-style:normal;font-size:.4em;opacity:.7}
+.oak .band-track span{color:rgba(52,32,18,.82);text-shadow:0 1px 0 rgba(255,236,205,.45)}
+.walnut .band-track span{color:var(--gold);text-shadow:0 -1px 0 rgba(0,0,0,.45)}
+
+/* ---------- Article spreads ---------- */
+.article{padding:clamp(90px,11vw,160px) 0}
+.spread{display:grid;grid-template-columns:7fr 5fr;gap:clamp(28px,5vw,80px);align-items:start}
+.spread.flip{grid-template-columns:5fr 7fr}
+.spread.flip .fig{order:2}
+.fig{margin:0;position:sticky;top:90px}
+.fig .media{position:relative;overflow:hidden;aspect-ratio:4/5;background:var(--moss)}
+.fig .media img{position:absolute;inset:-8% 0;width:100%;height:116%;object-fit:cover}
+.shutter{position:absolute;inset:0;z-index:3;background:var(--oak) var(--w-oak) center/340px;box-shadow:inset 0 -2px 0 var(--gold)}
+.shutter.dark{background:var(--walnut) var(--w-walnut) center/340px}
+.fig .num{position:absolute;right:16px;top:12px;z-index:2;font-family:var(--f-display);font-style:italic;font-size:64px;line-height:1;color:var(--cream);text-shadow:0 2px 20px rgba(0,0,0,.4)}
+.text{padding-top:clamp(0px,4vw,60px)}
+.text h2{font-size:clamp(52px,7vw,124px);margin:18px 0 22px}
+.standfirst{font-family:var(--f-display);font-style:italic;font-size:clamp(21px,1.8vw,27px);line-height:1.4;max-width:30ch}
+.body{margin-top:32px;font-size:16.5px;line-height:1.75;color:var(--dim);max-width:52ch}
+.body p+p{margin-top:1em}
+.specs{margin:40px 0 0;border-top:2px solid var(--fg);display:grid;grid-template-columns:1fr 1fr}
+.specs div{padding:14px 0;border-bottom:1px solid var(--line)}
+.specs div:nth-child(odd){padding-right:16px}
+.specs dt{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.specs dd{margin:4px 0 0;font-family:var(--f-display);font-size:26px}
+.read-more{display:inline-flex;align-items:center;gap:12px;margin-top:36px;font-weight:500;border-bottom:1px solid currentColor;padding-bottom:4px}
+.read-more:hover{color:var(--accent)}
+.side-quote{margin-top:44px;padding-left:22px;border-left:3px solid var(--gold);font-family:var(--f-display);font-style:italic;font-size:clamp(24px,2.2vw,34px);line-height:1.25}
+
+/* ---------- Materials: catalog plate ---------- */
+.materials{padding:clamp(90px,11vw,160px) 0}
+.plate-head{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:end;margin-bottom:clamp(40px,5vw,72px)}
+.plate-head h2{font-size:clamp(48px,6vw,104px)}
+.plate-head p{color:var(--dim);max-width:44ch;justify-self:end}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(14px,1.6vw,24px);perspective:1200px}
+.tile{display:grid;gap:12px}
+.tile .wood{position:relative;aspect-ratio:3/4;overflow:hidden;background:var(--c) var(--w) center/360px;box-shadow:0 30px 50px -30px rgba(0,0,0,.6),0 0 0 1px rgba(49,45,50,.25);will-change:transform}
+.tile .wood::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at var(--mx,50%) var(--my,0%),rgba(255,236,200,.28),transparent 55%)}
+.tile .wood::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,240,215,.28) 50%,transparent 65%);transform:translateX(-120%);transition:transform 1.3s var(--ease)}
+.tile:hover .wood::after{transform:translateX(120%)}
+.tile .cap{display:flex;justify-content:space-between;align-items:baseline;gap:10px;border-top:1px solid var(--fg);padding-top:10px}
+.tile h3{font-size:clamp(22px,2vw,30px)}
+.tile p{font-size:14px;color:var(--dim)}
+
+/* ---------- Photo story (horizontal) ---------- */
+.story{background:var(--forest-deep)!important;color:var(--cream);overflow:hidden}
+.story-pin{height:100vh;height:100svh;display:flex;flex-direction:column;justify-content:center;gap:clamp(20px,3vh,40px);padding:90px 0 36px}
+.story-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding:0 var(--gutter)}
+.story-head h2{font-size:clamp(40px,5vw,84px)}
+.story-count{font-family:var(--f-mono);font-size:13px;color:rgba(255,248,236,.6)}
+.story-count b{color:var(--gold);font-weight:500}
+.track{display:flex;gap:clamp(16px,2vw,32px);padding:0 var(--gutter);width:max-content;will-change:transform}
+.slide{width:clamp(280px,32vw,520px);flex:none;margin:0}
+.slide.wide{width:clamp(320px,46vw,780px)}
+.slide .media{position:relative;overflow:hidden;height:clamp(300px,54vh,620px);background:var(--moss)}
+.slide .media img{width:100%;height:100%;object-fit:cover;transform:scale(1.12)}
+.slide figcaption{color:rgba(255,248,236,.72);font-size:14px}
+.slide figcaption b{font-family:var(--f-display);font-weight:400;font-size:22px;color:var(--cream)}
+
+/* ---------- Services & process ---------- */
+.services{padding:clamp(90px,11vw,160px) 0}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:32px;flex-wrap:wrap;padding-bottom:20px;border-bottom:2px solid var(--fg);margin-bottom:0}
+.sec-head h2{font-size:clamp(46px,6vw,104px)}
+.sec-head p{color:var(--dim);max-width:38ch}
+.svc-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+.svc{padding:28px 24px 36px 0;border-bottom:1px solid var(--line);position:relative}
+.svc+.svc{padding-left:24px;border-left:1px solid var(--line)}
+.svc .kicker{display:block;margin-bottom:56px}
+.svc h3{font-size:clamp(26px,2.4vw,36px);margin-bottom:12px;transition:color .3s}
+.svc p{color:var(--dim);font-size:15px}
+.svc:hover h3{color:var(--accent);font-style:italic}
+.process{padding:clamp(90px,11vw,160px) 0;background:var(--moss)}
+.timeline{position:relative;display:grid;grid-template-columns:repeat(5,1fr);gap:24px;margin-top:56px;padding-top:44px}
+.timeline::before{content:"";position:absolute;left:0;right:0;top:12px;height:2px;background:var(--line)}
+.timeline .bar{position:absolute;left:0;right:0;top:11px;height:4px;background:var(--oak) var(--w-oak-h) 0 0/auto 600%;transform:scaleX(0);transform-origin:left;border-radius:2px}
+.tstep{position:relative}
+.tstep::before{content:"";position:absolute;top:-38px;left:0;width:12px;height:12px;border-radius:50%;background:var(--moss);border:2px solid var(--gold)}
+.tstep.active::before{background:var(--gold)}
+.tstep .roman{font-family:var(--f-display);font-style:italic;font-size:44px;color:var(--gold);line-height:1}
+.tstep h3{font-size:26px;margin:12px 0 10px}
+.tstep p{color:var(--dim);font-size:15px}
+
+/* ---------- Contact: reply coupon ---------- */
+.contact{padding:clamp(90px,11vw,170px) 0;background:var(--walnut) var(--w-walnut) center/460px;position:relative}
+.contact::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(21,27,23,.55),rgba(21,27,23,.25) 50%,rgba(21,27,23,.6))}
+.contact .wrap{position:relative}
+.coupon{max-width:1100px;margin:0 auto;background:var(--paper);color:var(--ink);display:grid;grid-template-columns:5fr 7fr;position:relative;box-shadow:0 50px 90px -40px rgba(0,0,0,.8);outline:2px dashed rgba(49,45,50,.35);outline-offset:-14px}
+.coupon .left{padding:clamp(32px,4vw,60px);border-right:2px dashed rgba(49,45,50,.3);display:flex;flex-direction:column;justify-content:space-between;gap:32px}
+.coupon h2{font-size:clamp(44px,5vw,84px);margin-top:16px}
+.coupon .lead{color:rgba(49,45,50,.72);margin-top:20px}
+.coupon .stamp{width:120px;height:120px;border-radius:50%;border:2px solid var(--gold-ink);display:grid;place-items:center;text-align:center;transform:rotate(-12deg);font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-ink);line-height:1.5}
+.coupon .stamp img{width:30px;margin:0 auto 4px}
+.scissors{position:absolute;left:calc(41.66% - 12px);top:-14px;width:24px;height:24px;color:var(--paper);background:var(--walnut);border-radius:50%;display:grid;place-items:center}
+.form{padding:clamp(32px,4vw,60px);display:grid;gap:28px;align-content:start}
+.fld{position:relative}
+.fld label{display:block;font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(49,45,50,.7);margin-bottom:6px}
+.fld input,.fld textarea{width:100%;background:transparent;border:0;border-bottom:1px solid rgba(49,45,50,.35);padding:10px 0;font-size:19px;font-family:var(--f-display);outline:none;border-radius:0;resize:none;transition:border-color .3s}
+.fld input:focus,.fld textarea:focus{border-color:var(--ink)}
+.fld .err{display:none;font-size:12px;color:#a33a24;margin-top:6px}
+.fld.invalid input{border-color:#a33a24}
+.fld.invalid .err{display:block}
+.checks{display:flex;flex-wrap:wrap;gap:20px}
+.checks input{position:absolute;opacity:0;pointer-events:none}
+.checks label{display:inline-flex;align-items:center;gap:10px;cursor:pointer;min-height:44px;font-size:15px}
+.checks label::before{content:"";width:18px;height:18px;border:1.5px solid var(--ink);display:grid;place-items:center;transition:background-color .2s}
+.checks input:checked+label::before{background:var(--ink);box-shadow:inset 0 0 0 3px var(--paper)}
+.checks input:focus-visible+label{outline:2px solid var(--gold);outline-offset:3px}
+.submit{justify-self:start;display:inline-flex;align-items:center;gap:14px;background:var(--forest);color:var(--cream);border:0;padding:16px 26px;cursor:pointer;font-weight:500;font-size:15px;min-height:52px;transition:background-color .3s}
+.submit:hover{background:var(--ink)}
+.submit svg{width:18px;height:18px;transition:transform .4s var(--ease)}
+.submit:hover svg{transform:translateX(4px)}
+.form-note{font-size:12px;color:rgba(49,45,50,.6)}
+.sent-msg{display:none}
+.form.sent>*:not(.sent-msg){display:none}
+.form.sent .sent-msg{display:grid;gap:12px}
+.sent-msg h3{font-size:clamp(34px,3.6vw,52px)}
+
+/* ---------- Colophon ---------- */
+.footer{background:var(--forest-deep);color:var(--cream);padding:clamp(70px,8vw,110px) 0 32px;position:relative}
+.footer::before{content:"";position:absolute;inset:0 0 auto;height:8px;background:var(--oak) var(--w-oak-h) 0 0/auto 1600%}
+.colophon{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px;padding-bottom:48px;border-bottom:1px solid rgba(255,248,236,.14)}
+.colophon h4{margin:0 0 14px;font-family:var(--f-mono);font-weight:500;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+.colophon ul{list-style:none;margin:0;padding:0;display:grid;gap:6px;color:rgba(255,248,236,.68);font-size:14px}
+.colophon a:hover{color:var(--cream)}
+.footer-big{display:flex;justify-content:center;padding:clamp(56px,8vw,110px) 0}
+.footer-big img{width:min(100%,860px);opacity:.92}
+.footer-bottom{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;color:rgba(255,248,236,.45)}
+
+.static .track{overflow-x:auto;width:auto;scroll-snap-type:x mandatory}
+.static .slide{scroll-snap-align:start}
+.static .shutter{display:none}
+.rv{opacity:0;transform:translateY(36px)}
+.float-img{position:fixed;top:0;left:0;width:260px;height:330px;pointer-events:none;z-index:40;overflow:hidden;opacity:0;transform:translate(-50%,-50%) scale(.85) rotate(-3deg);transition:opacity .4s var(--ease),transform .6s var(--ease);border:8px solid var(--paper);box-shadow:0 30px 60px -20px rgba(0,0,0,.5)}
+.float-img.on{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-3deg)}
+.float-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s}
+.float-img img.on{opacity:1}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1100px){
+  .letter-grid{grid-template-columns:1fr 1fr}
+  .letter-grid>:first-child{grid-column:1/-1}
+  .letter-body{columns:1}
+  .svc-grid{grid-template-columns:1fr 1fr}
+  .svc:nth-child(3){padding-left:0;border-left:0}
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .float-img{display:none}
+}
+@media (max-width:860px){
+  .header nav a{display:none}
+  .header-in{grid-template-columns:auto 1fr auto}
+  .header-in>.mono{display:none}
+  .logo{justify-self:start}
+  .cover-meta{grid-template-columns:1fr 1fr}
+  .cover-meta>:nth-child(2){display:none}
+  .cover-grid,.spread,.spread.flip,.plate-head,.coupon{grid-template-columns:1fr}
+  .cover-figure{order:-1}
+  .frame{aspect-ratio:4/5}
+  .spread.flip .fig{order:0}
+  .fig{position:relative;top:0}
+  .plate-head p{justify-self:start}
+  .letter-grid{grid-template-columns:1fr}
+  .timeline{grid-template-columns:1fr;gap:36px;padding-top:0;padding-left:36px}
+  .timeline::before{left:5px;right:auto;top:0;bottom:0;width:2px;height:auto}
+  .timeline .bar{left:4px;right:auto;top:0;bottom:0;width:4px;height:auto;transform:scaleY(0);transform-origin:top}
+  .tstep::before{top:6px;left:-36px}
+  .coupon .left{border-right:0;border-bottom:2px dashed rgba(49,45,50,.3)}
+  .scissors{display:none}
+  .story-pin{height:auto;padding:90px 0}
+  .track{overflow-x:auto;width:auto;scroll-snap-type:x mandatory;padding-bottom:12px;scrollbar-width:none}
+  .track::-webkit-scrollbar{display:none}
+  .slide,.slide.wide{width:82vw;scroll-snap-align:start}
+  .slide .media{height:56vh;max-height:460px}
+  .story-count{display:none}
+  .colophon{grid-template-columns:1fr 1fr}
+  .colophon>:first-child{grid-column:1/-1}
+}
+@media (max-width:560px){
+  .svc-grid{grid-template-columns:1fr}
+  .svc+.svc{padding-left:0;border-left:0}
+  .svc .kicker{margin-bottom:20px}
+  .specs{grid-template-columns:1fr}
+  .tile p{font-size:13px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition-duration:.01ms!important}
+  .rv,.fade-in{opacity:1!important;transform:none!important}
+  .wordmark .ch{transform:none!important}
+  .shutter{display:none}
+  .pull .w{opacity:1!important}
+}
+</style>
+</head>
+<body class="loading">
+<div class="grain" aria-hidden="true"></div>
+
+<div class="loader" id="loader" aria-hidden="true">
+  <div class="loader-inner">
+    <span class="mono">Акниет · журнал о доме</span>
+    <div class="issue">№<span id="loader-count">00</span></div>
+    <div class="loader-bar"><i id="loader-bar"></i></div>
+    <span class="mono">Выпуск 01 · Лесной лодж</span>
+  </div>
+</div>
+
+<div class="cursor" id="cursor" aria-hidden="true"><div class="ring"><span>Читать</span></div><div class="dot"></div></div>
+
+<header class="header" id="header">
+  <div class="header-in">
+    <span class="mono">Выпуск №01 · <span id="season">Осень</span></span>
+    <a href="#top" class="logo" aria-label="Акниет — на главную"><img src="assets/mark-dark.png" alt="" width="26" height="24"><span>АКНИЕТ</span></a>
+    <nav>
+      <a href="#articles">Статьи</a>
+      <a href="#materials">Материалы</a>
+      <a href="#contact">Заявка</a>
+      <button class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="overlay"><span class="menu-label">Содержание</span></button>
+    </nav>
+  </div>
+</header>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-label="Содержание">
+  <div class="wrap">
+    <span class="mono">Содержание выпуска</span>
+    <hr class="rule thin" style="margin:18px 0 0;border-top-color:rgba(255,248,236,.3)">
+    <a class="toc" href="#letter"><span class="mono">с. 02</span><b>Слово редакции</b><span class="mono">Манифест</span></a>
+    <a class="toc" href="#barn"><span class="mono">с. 04</span><b>Барнхаус</b><span class="mono">Архитектура</span></a>
+    <a class="toc" href="#aframe"><span class="mono">с. 08</span><b>A-frame</b><span class="mono">Архитектура</span></a>
+    <a class="toc" href="#materials"><span class="mono">с. 12</span><b>Каталог дерева</b><span class="mono">Материалы</span></a>
+    <a class="toc" href="#story"><span class="mono">с. 14</span><b>Фотоистория</b><span class="mono">Проекты</span></a>
+    <a class="toc" href="#contact"><span class="mono">с. 20</span><b>Заявка на дом</b><span class="mono">Контакты</span></a>
+  </div>
+</div>
+
+<main id="top">
+<!-- ============ COVER ============ -->
+<section class="cover">
+  <div class="wrap">
+    <div class="wordmark-clip"><h1 class="wordmark" aria-label="Акниет"><span class="ch">А</span><span class="ch">К</span><span class="ch">Н</span><span class="ch">И</span><span class="ch">Е</span><span class="ch">Т</span></h1></div>
+    <div class="cover-meta">
+      <span class="mono">Выпуск №01 · 2026</span>
+      <span class="mono">Журнал о доме, дереве и тишине</span>
+      <span class="mono">Барнхаус · A-frame · Под ключ</span>
+    </div>
+    <div class="cover-grid">
+      <div class="cover-lines">
+        <div class="fade-in">
+          <p class="kicker">Тема номера</p>
+          <h2 class="cover-title" style="margin-top:16px">Дерево, свет<br>и <em>тишина</em> леса</h2>
+          <p class="cover-lead">Как мы проектируем и строим барнхаусы и A-frame дома под ключ — с мебелью, авторским надзором и вниманием к каждой доске.</p>
+        </div>
+        <ul class="in-issue fade-in">
+          <li><a href="#barn"><span class="mono">04</span><b>Барнхаус: строгий силуэт</b><span class="mono">→</span></a></li>
+          <li><a href="#aframe"><span class="mono">08</span><b>A-frame: дом-шалаш</b><span class="mono">→</span></a></li>
+          <li><a href="#materials"><span class="mono">12</span><b>Каталог дерева</b><span class="mono">→</span></a></li>
+          <li><a href="#process"><span class="mono">18</span><b>Пять шагов до ключей</b><span class="mono">→</span></a></li>
+        </ul>
+      </div>
+      <figure class="cover-figure fade-in">
+        <div class="frame" id="frame">
+          <div class="fallback" aria-hidden="true"></div>
+          <canvas id="gl" aria-hidden="true"></canvas>
+          <span class="tag">На обложке</span>
+          <span class="mono hint">Двигайте мышью ↔</span>
+        </div>
+        <figcaption><span class="mono">A-frame «Карагай», 43 м² — интерактивная модель</span><span class="mono">с. 01</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EDITOR'S LETTER ============ -->
+<section class="letter" id="letter">
+  <div class="wrap">
+    <hr class="rule">
+    <div class="letter-grid" style="margin-top:28px">
+      <div><p class="kicker">с. 02 — Слово редакции</p><h2 class="rv" style="margin-top:18px">Почему <em>дерево</em></h2></div>
+      <div>
+        <div class="letter-body rv">
+          <p>Мы любим дерево за то, что оно живое: тёплое на ощупь, пахнет лесом и с годами становится только красивее. Поэтому каждый наш дом начинается не с квадратных метров, а с вопроса — как вы хотите в нём жить.</p>
+          <p>Барнхаус — это строгая геометрия и панорамный торец. A-frame — высокий конёк и второй свет, тот самый треугольник, что живёт в нашем логотипе. Оба стиля мы строим по лёгкой каркасной технологии: быстро, тепло и без компромиссов в архитектуре.</p>
+          <p>В этом выпуске — наши любимые решения, образцы отделки и то, как проходит путь от эскиза до ключей. Устраивайтесь поудобнее.</p>
+        </div>
+        <div class="sign rv"><img src="assets/mark-dark.png" alt=""><b>Команда Акниет</b></div>
+      </div>
+      <aside class="facts">
+        <div class="rv"><span class="mono">В цифрах</span></div>
+        <div class="rv"><b>02</b><span>архитектурных стиля</span></div>
+        <div class="rv"><b>43<em> м²</em></b><span>самый компактный дом</span></div>
+        <div class="rv"><b>12K<em>+</em></b><span>читателей в Instagram</span></div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BANDS ============ -->
+<div class="bands" aria-hidden="true">
+  <div class="band oak"><div class="band-track" id="band-a"><span>Барнхаус</span><span>A-frame</span><span>Под ключ</span><span>С мебелью</span><span>Авторский надзор</span><span>Барнхаус</span><span>A-frame</span><span>Под ключ</span><span>С мебелью</span></div></div>
+  <div class="band walnut"><div class="band-track" id="band-b"><span>Выпуск 01</span><span>Дерево</span><span>Свет</span><span>Тишина</span><span>Лес и горы</span><span>Выпуск 01</span><span>Дерево</span><span>Свет</span><span>Тишина</span></div></div>
+</div>
+
+<!-- ============ ARTICLE 01: BARNHOUSE ============ -->
+<article class="article dark" id="articles">
+  <div class="wrap spread" id="barn">
+    <figure class="fig" data-cursor="view">
+      <div class="media"><img data-parallax src="https://images.pexels.com/photos/4626268/pexels-photo-4626268.jpeg?auto=compress&cs=tinysrgb&w=1400" alt="Современный дом в стиле барнхаус с панорамным остеклением в сумерках" loading="lazy"><span class="num">01</span><div class="shutter"></div></div>
+      <figcaption><span class="mono">Барнхаус в сумерках. Фото: Pexels (демо)</span><span class="mono">с. 04</span></figcaption>
+    </figure>
+    <div class="text">
+      <p class="kicker">Архитектура · Стиль 01</p>
+      <h2 class="rv">Барн<em>хаус</em></h2>
+      <p class="standfirst rv">Строгий силуэт амбара, панорамный торец и ничего лишнего — дом, который выглядит дорого в любом пейзаже.</p>
+      <div class="body rv">
+        <p>Барнхаус вырос из простой формы сельского амбара: прямоугольник, двускатная кровля без свесов, честные материалы. Мы добавляем к этому большое остекление торца, чтобы свет заливал гостиную весь день.</p>
+        <p>Планировка — от компактной на одну спальню до двухэтажной с антресолью. Отделку подбираем вместе с вами: от светлой сосны до графичного обожжённого фасада.</p>
+      </div>
+      <dl class="specs rv">
+        <div><dt>Площадь</dt><dd>от 55 м²</dd></div>
+        <div><dt>Этажность</dt><dd>1–2 этажа</dd></div>
+        <div><dt>Технология</dt><dd>Каркас</dd></div>
+        <div><dt>Комплектация</dt><dd>С мебелью</dd></div>
+      </dl>
+      <a href="#contact" class="read-more">Обсудить барнхаус <span aria-hidden="true">→</span></a>
+    </div>
+  </div>
+</article>
+
+<!-- ============ PULL QUOTE ============ -->
+<section class="pull">
+  <div class="wrap">
+    <p id="pull">«Мы строим не квадратные метры, а ощущение — дом, в который хочется возвращаться»</p>
+    <span class="mono">— Из философии Акниет</span>
+  </div>
+</section>
+
+<!-- ============ ARTICLE 02: A-FRAME ============ -->
+<article class="article" style="padding-top:0">
+  <div class="wrap spread flip" id="aframe">
+    <figure class="fig" data-cursor="view">
+      <div class="media"><img data-parallax src="https://images.pexels.com/photos/9209878/pexels-photo-9209878.jpeg?auto=compress&cs=tinysrgb&w=1400" alt="Дом A-frame в сосновом лесу" loading="lazy"><span class="num">02</span><div class="shutter dark"></div></div>
+      <figcaption><span class="mono">A-frame среди сосен. Фото: Pexels (демо)</span><span class="mono">с. 08</span></figcaption>
+    </figure>
+    <div class="text">
+      <p class="kicker">Архитектура · Стиль 02</p>
+      <h2 class="rv">A-<em>frame</em></h2>
+      <p class="standfirst rv">Высокий конёк, как на нашем знаке, и второй свет под самой крышей — дом-шалаш, в который влюбляются с первого взгляда.</p>
+      <div class="body rv">
+        <p>Треугольный силуэт — не только красота. Крутые скаты сами сбрасывают снег, а высокий объём позволяет устроить спальню-антресоль прямо под коньком, с видом на лес или горы.</p>
+        <p>Это самый компактный формат в нашей линейке: идеален для загородного отдыха, гостевого дома или сдачи в аренду.</p>
+      </div>
+      <p class="side-quote rv">Спальня под коньком и окно во всю стену — главный аргумент A-frame.</p>
+      <dl class="specs rv">
+        <div><dt>Площадь</dt><dd>от 43 м²</dd></div>
+        <div><dt>Особенность</dt><dd>Второй свет</dd></div>
+      </dl>
+      <a href="#contact" class="read-more">Обсудить A-frame <span aria-hidden="true">→</span></a>
+    </div>
+  </div>
+</article>
+
+<!-- ============ MATERIALS ============ -->
+<section class="materials" id="materials" style="border-top:1px solid var(--line)">
+  <div class="wrap">
+    <div class="plate-head">
+      <div><p class="kicker">с. 12 — Материалы</p><h2 class="rv" style="margin-top:16px">Каталог <em>дерева</em></h2></div>
+      <p class="rv">Подбираем породу и обработку под характер дома. Проведите курсором по образцу — дерево отзывается на свет.</p>
+    </div>
+    <div class="tiles">
+      <figure class="tile rv" style="margin:0"><div class="wood" style="--c:#d6b88c;--w:var(--w-pine)"></div><div class="cap"><h3>Сосна</h3><span class="mono">Рис. 01</span></div><p>Светлая и тёплая — для интерьеров.</p></figure>
+      <figure class="tile rv" style="margin:0"><div class="wood" style="--c:#b98a5e;--w:var(--w-oak)"></div><div class="cap"><h3>Дуб</h3><span class="mono">Рис. 02</span></div><p>Плотный рисунок — для полов и лестниц.</p></figure>
+      <figure class="tile rv" style="margin:0"><div class="wood" style="--c:#5b3e2b;--w:var(--w-walnut)"></div><div class="cap"><h3>Орех</h3><span class="mono">Рис. 03</span></div><p>Глубокий тон для акцентных стен и мебели.</p></figure>
+      <figure class="tile rv" style="margin:0"><div class="wood" style="--c:#2a2421;--w:var(--w-char)"></div><div class="cap"><h3>Обожжённое</h3><span class="mono">Рис. 04</span></div><p>Шу-суги-бан — графичный, стойкий фасад.</p></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PHOTO STORY ============ -->
+<section class="story dark" id="story">
+  <div class="story-pin" id="story-pin">
+    <div class="story-head">
+      <div><p class="kicker">с. 14 — Проекты</p><h2 style="margin-top:14px">Фото<em>история</em></h2></div>
+      <span class="story-count"><b id="story-n">01</b> / 05</span>
+    </div>
+    <div class="track" id="track">
+      <figure class="slide wide" data-cursor="view"><div class="media"><img src="https://images.pexels.com/photos/9209878/pexels-photo-9209878.jpeg?auto=compress&cs=tinysrgb&w=1400" alt="A-frame с чёрной кровлей в сосновом лесу" loading="lazy"></div><figcaption><b>A-frame «Карагай»</b><span class="mono">01 · 43 м²</span></figcaption></figure>
+      <figure class="slide" data-cursor="view"><div class="media"><img src="https://images.pexels.com/photos/19737838/pexels-photo-19737838.jpeg?auto=compress&cs=tinysrgb&w=1000" alt="Интерьер A-frame с панорамным окном" loading="lazy"></div><figcaption><b>Окно под коньком</b><span class="mono">02 · интерьер</span></figcaption></figure>
+      <figure class="slide wide" data-cursor="view"><div class="media"><img src="https://images.pexels.com/photos/4626268/pexels-photo-4626268.jpeg?auto=compress&cs=tinysrgb&w=1400" alt="Барнхаус в сумерках с подсветкой" loading="lazy"></div><figcaption><b>Барнхаус «Жайлау»</b><span class="mono">03 · 55 м²</span></figcaption></figure>
+      <figure class="slide" data-cursor="view"><div class="media"><img src="https://images.pexels.com/photos/8112922/pexels-photo-8112922.jpeg?auto=compress&cs=tinysrgb&w=1000" alt="Тёмный интерьер с печью и большими окнами" loading="lazy"></div><figcaption><b>Вечер у печи</b><span class="mono">04 · интерьер</span></figcaption></figure>
+      <figure class="slide" data-cursor="view"><div class="media"><img src="https://images.pexels.com/photos/19737839/pexels-photo-19737839.jpeg?auto=compress&cs=tinysrgb&w=1000" alt="Спальня в доме A-frame с видом на горы" loading="lazy"></div><figcaption><b>Спальня с видом</b><span class="mono">05 · второй свет</span></figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SERVICES ============ -->
+<section class="services" id="services">
+  <div class="wrap">
+    <div class="sec-head"><div><p class="kicker">с. 16 — Услуги</p><h2 class="rv" style="margin-top:14px">От эскиза до <em>ключей</em></h2></div><p class="rv">Один подрядчик, один договор, одна ответственность за результат.</p></div>
+    <div class="svc-grid">
+      <div class="svc rv" data-img="0"><span class="kicker">№ 01</span><h3>Проектирование</h3><p>Архитектурный проект под ваш участок: планировки, фасады, визуализации.</p></div>
+      <div class="svc rv" data-img="1"><span class="kicker">№ 02</span><h3>Строительство</h3><p>Лёгкая каркасная конструкция — дом под ключ в короткие сроки.</p></div>
+      <div class="svc rv" data-img="2"><span class="kicker">№ 03</span><h3>Интерьер и мебель</h3><p>Чистовая отделка или полностью меблированный дом — заезжайте и живите.</p></div>
+      <div class="svc rv" data-img="3"><span class="kicker">№ 04</span><h3>Авторский надзор</h3><p>Архитектор на каждом этапе, чтобы дом совпал с проектом.</p></div>
+    </div>
+  </div>
+  <div class="float-img" id="float-img" aria-hidden="true">
+    <img src="https://images.pexels.com/photos/19737838/pexels-photo-19737838.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" loading="lazy">
+    <img src="https://images.pexels.com/photos/9209878/pexels-photo-9209878.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" loading="lazy">
+    <img src="https://images.pexels.com/photos/8112922/pexels-photo-8112922.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" loading="lazy">
+    <img src="https://images.pexels.com/photos/4626268/pexels-photo-4626268.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" loading="lazy">
+  </div>
+</section>
+
+<!-- ============ PROCESS ============ -->
+<section class="process dark" id="process">
+  <div class="wrap">
+    <div class="sec-head" style="border-color:var(--cream)"><div><p class="kicker">с. 18 — Процесс</p><h2 class="rv" style="margin-top:14px">Пять шагов до <em>новоселья</em></h2></div><p class="rv">Прозрачно на каждом этапе: вы всегда знаете, что происходит на объекте.</p></div>
+    <div class="timeline" id="timeline">
+      <div class="bar" id="tl-bar"></div>
+      <div class="tstep"><span class="roman">I</span><h3>Знакомство</h3><p>Обсуждаем участок, бюджет и то, как вы хотите жить.</p></div>
+      <div class="tstep"><span class="roman">II</span><h3>Проект</h3><p>Архитектура, планировки, смета, подбор отделки и пород дерева.</p></div>
+      <div class="tstep"><span class="roman">III</span><h3>Договор</h3><p>Фиксируем сроки, стоимость и комплектацию.</p></div>
+      <div class="tstep"><span class="roman">IV</span><h3>Стройка</h3><p>Каркасная технология под авторским надзором и фотоотчёты.</p></div>
+      <div class="tstep"><span class="roman">V</span><h3>Ключи</h3><p>Передаём дом. Остаётся зажечь свет в окнах.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT: COUPON ============ -->
+<section class="contact" id="contact">
+  <div class="wrap">
+    <div class="coupon rv">
+      <span class="scissors" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14"><path fill="none" stroke="currentColor" stroke-width="1.6" d="M6 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm0 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/></svg></span>
+      <div class="left">
+        <div>
+          <p class="kicker">с. 20 — Заявка на дом</p>
+          <h2>Начнём с <em>разговора</em></h2>
+          <p class="lead">Заполните купон — архитектор свяжется с вами, ответит на вопросы и рассчитает стоимость.</p>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+          <div class="stamp"><div><img src="assets/mark-gold.png" alt="">Акниет<br>выпуск 01</div></div>
+          <a href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener" class="read-more" style="margin:0">@akniet.home ↗</a>
+        </div>
+      </div>
+      <form class="form" id="form" novalidate>
+        <div class="fld" id="f-name"><label for="name">Ваше имя</label><input id="name" name="name" autocomplete="name"><span class="err">Укажите имя</span></div>
+        <div class="fld" id="f-phone"><label for="phone">Телефон</label><input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel"><span class="err">Введите корректный номер</span></div>
+        <div>
+          <span class="mono" style="display:block;margin-bottom:6px;color:rgba(49,45,50,.7)">Интересует</span>
+          <div class="checks" role="radiogroup" aria-label="Тип дома">
+            <input type="radio" name="type" id="c1" value="Барнхаус" checked><label for="c1">Барнхаус</label>
+            <input type="radio" name="type" id="c2" value="A-frame"><label for="c2">A-frame</label>
+            <input type="radio" name="type" id="c3" value="Нужен совет"><label for="c3">Нужен совет</label>
+          </div>
+        </div>
+        <div class="fld"><label for="msg">Пара слов о проекте</label><textarea id="msg" name="msg" rows="2"></textarea></div>
+        <button class="submit" type="submit">Отправить купон <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <p class="form-note">Нажимая кнопку, вы соглашаетесь на обработку персональных данных.</p>
+        <div class="sent-msg" role="status" aria-live="polite"><p class="kicker">Купон получен</p><h3>Спасибо. <em>Скоро</em> позвоним.</h3><p style="color:rgba(49,45,50,.7)">Архитектор свяжется с вами в ближайшее время.</p></div>
+      </form>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="colophon">
+      <div><h4>Выходные данные</h4><p style="font-family:var(--f-display);font-size:clamp(24px,2.4vw,34px);line-height:1.2;max-width:22ch">Барнхаусы и A-frame дома <em>под ключ</em></p></div>
+      <div><h4>Рубрики</h4><ul><li><a href="#barn">Барнхаус</a></li><li><a href="#aframe">A-frame</a></li><li><a href="#materials">Материалы</a></li><li><a href="#process">Процесс</a></li></ul></div>
+      <div><h4>Соцсети</h4><ul><li><a href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener">Instagram</a></li><li><a href="https://www.tiktok.com/@akniet_home" target="_blank" rel="noopener">TikTok</a></li><li><a href="https://www.threads.net/@akniet.home" target="_blank" rel="noopener">Threads</a></li></ul></div>
+      <div><h4>Над выпуском</h4><ul><li>Фото: Pexels (демо)</li><li>Фактуры: генерация в браузере</li><li>Шрифты: Playfair Display, Golos Text, JetBrains Mono</li></ul></div>
+    </div>
+    <div class="footer-big rv"><img src="assets/logo-light.png" alt="Акниет" loading="lazy"></div>
+    <div class="footer-bottom mono" style="color:rgba(255,248,236,.45)"><span>© <span id="year">2026</span> Акниет · Выпуск №01</span><a href="#top">Наверх ↑</a></div>
+  </div>
+</footer>
+
+<!-- ============ Procedural wood textures (shared by CSS and WebGL) ============ -->
+<script>
+window.aknietWood = (() => {
+  const cache = {};
+  const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+  const hash = (i, j, s) => {
+    let h = Math.imul(i, 374761393) ^ Math.imul(j, 668265263) ^ Math.imul(s, 2246822519);
+    h = Math.imul(h ^ (h >>> 13), 1274126177);
+    return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+  };
+  // value noise on a periodic lattice, so textures tile seamlessly
+  const vn = (x, y, px, py, s) => {
+    const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
+    const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+    const x0 = ((xi % px) + px) % px, x1 = (x0 + 1) % px, y0 = ((yi % py) + py) % py, y1 = (y0 + 1) % py;
+    const a = hash(x0, y0, s), b = hash(x1, y0, s), c = hash(x0, y1, s), d = hash(x1, y1, s);
+    return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+  };
+  const SPECS = {
+    walnut:  { w: 512, h: 512, planks: 4, base: '#5b3e2b', dark: '#24160d', light: '#8a6243', seed: 3 },
+    oak:     { w: 512, h: 512, planks: 4, base: '#b98a5e', dark: '#74492a', light: '#dfb98c', seed: 5 },
+    pine:    { w: 512, h: 512, planks: 4, base: '#d6b88c', dark: '#a27a4c', light: '#f0dcb6', seed: 9 },
+    char:    { w: 512, h: 512, planks: 4, base: '#352d29', dark: '#0d0b0a', light: '#5a4a40', seed: 13 },
+    'oak-h':    { w: 1024, h: 256, planks: 2, dir: 'h', base: '#b98a5e', dark: '#74492a', light: '#dfb98c', seed: 21 },
+    'walnut-h': { w: 1024, h: 256, planks: 2, dir: 'h', base: '#5b3e2b', dark: '#24160d', light: '#8a6243', seed: 27 },
+  };
+  function make({ w, h, planks, dir = 'v', base, dark, light, seed }) {
+    const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+    const ctx = cv.getContext('2d'), img = ctx.createImageData(w, h), D = img.data;
+    const B = hex(base), K = hex(dark), L = hex(light);
+    const A = dir === 'v' ? w : h, G = dir === 'v' ? h : w; // across / along the grain
+    const pw = A / planks, P = [];
+    for (let i = 0; i < planks; i++) P.push({ tone: (hash(i, 3, seed) - 0.5) * 0.24, phase: hash(i, 7, seed) * 10, joint: hash(i, 11, seed) * G, freq: 0.7 + hash(i, 5, seed) * 0.8 });
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const a = dir === 'v' ? x : y, g = dir === 'v' ? y : x;
+      const pi = Math.min(planks - 1, (a / pw) | 0), pl = P[pi], u = a - pi * pw;
+      const ga = a / A, gg = g / G;
+      const warp = vn(ga * planks * 2, gg * 2, planks * 2, 2, seed) * 0.7 + vn(ga * planks * 6, gg * 4, planks * 6, 4, seed + 1) * 0.3;
+      const t = (u / pw) * 7 * pl.freq + warp * 2.6 + pl.phase, f = t - Math.floor(t);
+      const ring = Math.pow(Math.max(0, 1 - Math.abs(f - 0.85) / 0.1), 1.6);        // latewood line
+      const soft = 0.5 + 0.5 * Math.sin(t * Math.PI * 2);
+      const pore = vn(ga * planks * 48, gg * 10, planks * 48, 10, seed + 2);
+      const fiber = vn(ga * planks * 140, gg * 3, planks * 140, 3, seed + 4);
+      const streak = Math.pow(Math.max(0, pore - 0.5) / 0.5, 2) * 0.7 + Math.pow(fiber, 3) * 0.45;
+      const m = Math.min(1, ring * 0.55 + soft * 0.16 + streak * 0.4);
+      const hl = Math.max(0, 0.5 - soft) * 0.3 * (1 - pore);
+      const edge = Math.min(u, pw - u);
+      const jd = Math.abs(((g - pl.joint) % G + G) % G), joint = Math.min(jd, G - jd) < 1.1 ? 0.75 : 0;
+      const seam = Math.max(edge < 1.2 ? 0.85 : edge < 2.6 ? 0.3 : 0, joint);
+      const tone = 1 + pl.tone, o = (y * w + x) * 4;
+      for (let k = 0; k < 3; k++) {
+        let c = B[k] * tone;
+        c += (L[k] - c) * hl;
+        c += (K[k] - c) * m;
+        c += (K[k] * 0.55 - c) * seam;
+        D[o + k] = c;
+      }
+      D[o + 3] = 255;
+    }
+    ctx.putImageData(img, 0, 0);
+    return cv;
+  }
+  const canvas = name => cache[name] || (cache[name] = make(SPECS[name]));
+  let applied = false;
+  const applyCSS = () => {
+    if (applied) return; applied = true;
+    const root = document.documentElement.style;
+    Object.keys(SPECS).forEach(n => root.setProperty('--w-' + n, `url(${canvas(n).toDataURL('image/jpeg', 0.86)})`));
+  };
+  return { canvas, applyCSS };
+})();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fine = matchMedia('(hover:hover) and (pointer:fine)').matches;
+  const hasGsap = !!window.gsap;
+  const now = new Date();
+  document.getElementById('year').textContent = now.getFullYear();
+  document.getElementById('season').textContent = ['Зима', 'Зима', 'Весна', 'Весна', 'Весна', 'Лето', 'Лето', 'Лето', 'Осень', 'Осень', 'Осень', 'Зима'][now.getMonth()];
+  requestAnimationFrame(() => setTimeout(() => window.aknietWood.applyCSS(), 30));
+
+  /* ---- smooth scroll ---- */
+  let lenis = null;
+  if (hasGsap) gsap.registerPlugin(ScrollTrigger);
+  if (!reduce && window.Lenis) {
+    lenis = new Lenis({ lerp: 0.09, smoothWheel: true });
+    if (hasGsap) { lenis.on('scroll', ScrollTrigger.update); gsap.ticker.add(t => lenis.raf(t * 1000)); gsap.ticker.lagSmoothing(0); }
+    else { const raf = t => { lenis.raf(t); requestAnimationFrame(raf); }; requestAnimationFrame(raf); }
+    lenis.stop();
+  }
+  const scrollTo = target => lenis ? lenis.scrollTo(target, { duration: 1.6, offset: -60 }) : document.querySelector(target)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
+  document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', e => {
+    const id = a.getAttribute('href'); if (id.length < 2) return;
+    e.preventDefault(); closeMenu(); scrollTo(id);
+  }));
+
+  /* ---- preloader ---- */
+  const loader = document.getElementById('loader'), count = document.getElementById('loader-count'), bar = document.getElementById('loader-bar');
+  const start = performance.now();
+  const tick = () => {
+    const t = Math.min((performance.now() - start) / 1500, 1), p = 1 - Math.pow(1 - t, 3);
+    count.textContent = p < 0.5 ? '00' : '01';
+    bar.style.transform = `scaleX(${p})`;
+    if (t < 1) requestAnimationFrame(tick); else finish();
+  };
+  const finish = () => {
+    count.textContent = '01';
+    window.aknietWood.applyCSS();
+    loader.classList.add('done'); document.body.classList.remove('loading'); lenis?.start();
+    window.dispatchEvent(new Event('akniet:intro'));
+    if (hasGsap && !reduce) {
+      gsap.to('.wordmark .ch', { y: 0, duration: 1.4, ease: 'expo.out', stagger: 0.06, delay: 0.3 });
+      gsap.to('.fade-in', { opacity: 1, duration: 1.2, ease: 'power2.out', delay: 0.8, stagger: 0.12 });
+    } else {
+      document.querySelectorAll('.wordmark .ch').forEach(s => s.style.transform = 'none');
+      document.querySelectorAll('.fade-in').forEach(s => s.style.opacity = 1);
+    }
+  };
+  reduce ? finish() : requestAnimationFrame(tick);
+
+  /* ---- header hide on scroll ---- */
+  const header = document.getElementById('header'); let lastY = 0;
+  const onScroll = y => { header.classList.toggle('hidden', y > lastY && y > 500 && !document.body.classList.contains('menu-open')); lastY = y; };
+  lenis ? lenis.on('scroll', e => onScroll(e.scroll)) : addEventListener('scroll', () => onScroll(scrollY), { passive: true });
+
+  /* ---- menu ---- */
+  const menuBtn = document.getElementById('menu-btn'), label = menuBtn.querySelector('.menu-label');
+  function closeMenu() { document.body.classList.remove('menu-open'); menuBtn.setAttribute('aria-expanded', 'false'); label.textContent = 'Содержание'; lenis?.start(); }
+  menuBtn.addEventListener('click', () => {
+    if (document.body.classList.contains('menu-open')) return closeMenu();
+    document.body.classList.add('menu-open'); menuBtn.setAttribute('aria-expanded', 'true'); label.textContent = 'Закрыть'; lenis?.stop();
+  });
+  addEventListener('keydown', e => e.key === 'Escape' && closeMenu());
+
+  /* ---- cursor ---- */
+  if (fine && !reduce) {
+    document.body.classList.add('has-cursor');
+    const c = document.getElementById('cursor'), ring = c.querySelector('.ring'), dot = c.querySelector('.dot');
+    let mx = innerWidth / 2, my = innerHeight / 2, rx = mx, ry = my;
+    addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; dot.style.transform = `translate(${mx}px,${my}px)`; }, { passive: true });
+    const loop = () => { rx += (mx - rx) * 0.16; ry += (my - ry) * 0.16; ring.style.transform = `translate(${rx}px,${ry}px)`; requestAnimationFrame(loop); };
+    loop();
+    document.addEventListener('mouseover', e => {
+      const v = e.target.closest('[data-cursor="view"]'), h = e.target.closest('a,button,label,input,textarea,.tile,.svc');
+      c.classList.toggle('view', !!v); c.classList.toggle('hover', !v && !!h);
+    });
+
+    // services: floating photo "clipping"
+    const fl = document.getElementById('float-img'), imgs = fl.querySelectorAll('img'); let fx = 0, fy = 0, cx = 0, cy = 0, on = false;
+    document.querySelectorAll('.svc').forEach(s => {
+      s.addEventListener('mouseenter', () => { imgs.forEach((im, i) => im.classList.toggle('on', i == s.dataset.img)); fl.classList.add('on'); on = true; });
+      s.addEventListener('mouseleave', () => { fl.classList.remove('on'); on = false; });
+    });
+    addEventListener('mousemove', e => { fx = e.clientX + 160; fy = e.clientY - 40; }, { passive: true });
+    const floop = () => { cx += (fx - cx) * 0.1; cy += (fy - cy) * 0.1; if (on) fl.style.left = cx + 'px', fl.style.top = cy + 'px'; requestAnimationFrame(floop); };
+    floop();
+
+    // wood tiles: tilt + light follows pointer
+    document.querySelectorAll('.tile .wood').forEach(w => {
+      w.addEventListener('pointermove', e => {
+        const r = w.getBoundingClientRect(), px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+        w.style.transition = 'transform .15s ease-out';
+        w.style.transform = `rotateY(${(px - 0.5) * 14}deg) rotateX(${(0.5 - py) * 12}deg)`;
+        w.style.setProperty('--mx', px * 100 + '%'); w.style.setProperty('--my', py * 100 + '%');
+      });
+      w.addEventListener('pointerleave', () => { w.style.transition = 'transform .9s cubic-bezier(.19,1,.22,1)'; w.style.transform = ''; });
+    });
+  }
+
+  /* ---- pull quote words ---- */
+  const pull = document.getElementById('pull');
+  pull.innerHTML = pull.textContent.trim().split(/\s+/).map(w => `<span class="w">${w}</span>`).join(' ');
+
+  /* ---- form ---- */
+  const form = document.getElementById('form'), phone = document.getElementById('phone');
+  phone.addEventListener('input', () => phone.value = phone.value.replace(/[^\d+()\-\s]/g, ''));
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const okN = document.getElementById('name').value.trim().length > 1, okP = phone.value.replace(/\D/g, '').length >= 10;
+    document.getElementById('f-name').classList.toggle('invalid', !okN);
+    document.getElementById('f-phone').classList.toggle('invalid', !okP);
+    if (!okN || !okP) return form.querySelector('.invalid input').focus();
+    // TODO: подключить отправку (WhatsApp / Telegram-бот / CRM)
+    form.classList.add('sent');
+  });
+
+  if (!hasGsap || reduce) {
+    document.documentElement.classList.add('static');
+    document.querySelectorAll('.rv').forEach(el => { el.style.opacity = 1; el.style.transform = 'none'; });
+    pull.querySelectorAll('.w').forEach(w => w.style.opacity = 1);
+    document.querySelectorAll('.tstep').forEach(s => s.classList.add('active'));
+    return;
+  }
+
+  /* ---- GSAP scroll choreography ---- */
+  gsap.utils.toArray('.rv').forEach(el => gsap.to(el, { opacity: 1, y: 0, duration: 1.3, ease: 'expo.out', scrollTrigger: { trigger: el, start: 'top 88%' } }));
+  gsap.utils.toArray('.shutter').forEach(s => {
+    const img = s.parentElement.querySelector('img');
+    gsap.timeline({ scrollTrigger: { trigger: s.parentElement, start: 'top 75%' } })
+      .to(s, { yPercent: -101, duration: 1.6, ease: 'expo.inOut' })
+      .from(img, { scale: 1.25, duration: 2, ease: 'expo.out' }, '<0.35');
+  });
+  gsap.utils.toArray('[data-parallax]').forEach(img => gsap.fromTo(img, { yPercent: -6 }, { yPercent: 6, ease: 'none', scrollTrigger: { trigger: img.parentElement, scrub: true } }));
+  gsap.fromTo('#band-a', { xPercent: 0 }, { xPercent: -30, ease: 'none', scrollTrigger: { trigger: '.bands', start: 'top bottom', end: 'bottom top', scrub: true } });
+  gsap.fromTo('#band-b', { xPercent: -30 }, { xPercent: 0, ease: 'none', scrollTrigger: { trigger: '.bands', start: 'top bottom', end: 'bottom top', scrub: true } });
+  gsap.to('#pull .w', { opacity: 1, ease: 'none', stagger: 0.1, scrollTrigger: { trigger: '#pull', start: 'top 80%', end: 'bottom 50%', scrub: true } });
+
+  // process timeline
+  const steps = gsap.utils.toArray('.tstep');
+  const mmq = gsap.matchMedia();
+  mmq.add({ desk: '(min-width: 861px)', mob: '(max-width: 860px)' }, ctx => {
+    const prop = ctx.conditions.desk ? 'scaleX' : 'scaleY';
+    gsap.fromTo('#tl-bar', { [prop]: 0 }, { [prop]: 1, ease: 'none', scrollTrigger: { trigger: '#timeline', start: 'top 75%', end: ctx.conditions.desk ? 'top 25%' : 'bottom 60%', scrub: true,
+      onUpdate: self => steps.forEach((s, i) => s.classList.toggle('active', self.progress >= i / (steps.length - 1) - 0.02)) } });
+  });
+
+  // horizontal photo story (desktop)
+  mmq.add('(min-width: 861px)', () => {
+    const track = document.getElementById('track'), n = document.getElementById('story-n'), total = track.children.length;
+    const dist = () => track.scrollWidth - innerWidth;
+    const tween = gsap.to(track, { x: () => -dist(), ease: 'none', scrollTrigger: { trigger: '#story-pin', pin: true, scrub: 1, start: 'top top', end: () => '+=' + dist(), invalidateOnRefresh: true,
+      onUpdate: self => n.textContent = String(Math.min(total, 1 + Math.floor(self.progress * total))).padStart(2, '0') } });
+    track.querySelectorAll('.media img').forEach(img => gsap.to(img, { scale: 1, ease: 'none', scrollTrigger: { trigger: img.closest('.slide'), containerAnimation: tween, start: 'left right', end: 'right left', scrub: true } }));
+  });
+
+  addEventListener('load', () => ScrollTrigger.refresh());
+})();
+</script>
+
+<!-- ============ WebGL cover: wooden A-frame in a pine forest (Three.js) ============ -->
+<script type="module">
+let THREE;
+try { THREE = await import('https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js'); }
+catch (e) { document.documentElement.classList.add('no-webgl'); }
+
+if (THREE) {
+  const canvas = document.getElementById('gl');
+  const hero = document.getElementById('frame'); // 3D lives inside the cover frame
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mobile = matchMedia('(max-width: 860px)').matches;
+
+  let renderer;
+  try { renderer = new THREE.WebGLRenderer({ canvas, antialias: !mobile, alpha: true, powerPreference: 'high-performance' }); }
+  catch (e) { document.documentElement.classList.add('no-webgl'); }
+
+  if (renderer) {
+    // Performance budget: capped DPR, no real-time shadows, instancing, one canvas.
+    renderer.setPixelRatio(Math.min(devicePixelRatio, mobile ? 1.5 : 1.75));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+
+    const C = { forest: 0x151b17, gold: 0xd5a039, cream: 0xfff8ec, warm: 0xffb062 };
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x18201a, 0.045);
+    const camera = new THREE.PerspectiveCamera(mobile ? 50 : 36, 1, 0.1, 120);
+
+    // shared procedural wood (same generator as the CSS panels)
+    const maxAniso = Math.min(4, renderer.capabilities.getMaxAnisotropy());
+    const tex = (name, rx, ry) => {
+      const t = new THREE.CanvasTexture(window.aknietWood.canvas(name));
+      t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rx, ry); t.anisotropy = maxAniso;
+      return t;
+    };
+
+    // lights
+    scene.add(new THREE.HemisphereLight(0x9fb3a0, 0x0e130f, 0.6));
+    const moon = new THREE.DirectionalLight(0xdfe8ff, 0.7); moon.position.set(-6, 10, -4); scene.add(moon);
+    const warm = new THREE.PointLight(C.warm, 0, 16, 1.6); warm.position.set(0, 1.6, 2.6); scene.add(warm);
+    const inner = new THREE.PointLight(C.warm, 0, 9, 1.4); inner.position.set(0, 1.3, 0.2); scene.add(inner);
+
+    const oak = new THREE.MeshStandardMaterial({ map: tex('oak', 1, 1), roughness: 0.75 });
+    const mat = {
+      char: new THREE.MeshStandardMaterial({ map: tex('char', 2, 1.4), roughness: 0.85 }),
+      oak,
+      inside: new THREE.MeshStandardMaterial({ map: tex('pine', 0.6, 0.6), roughness: 0.8, side: THREE.DoubleSide }),
+      glass: new THREE.MeshBasicMaterial({ color: 0xffc679, transparent: true, opacity: 0, depthWrite: false }),
+      frame: new THREE.MeshStandardMaterial({ color: 0x17120f, roughness: 0.6 }),
+      deck: new THREE.MeshStandardMaterial({ map: tex('oak', 2, 3), roughness: 0.85 }),
+      edge: new THREE.LineBasicMaterial({ color: C.gold, transparent: true, opacity: 0.55 }),
+      ground: new THREE.MeshStandardMaterial({ color: 0x18221b, roughness: 1 }),
+      pineA: new THREE.MeshStandardMaterial({ color: 0x1a2a1f, roughness: 1, flatShading: true }),
+      pineB: new THREE.MeshStandardMaterial({ color: 0x22382a, roughness: 1, flatShading: true }),
+      trunk: new THREE.MeshStandardMaterial({ color: 0x3a2a1f, roughness: 1 }),
+      mount: new THREE.MeshStandardMaterial({ color: 0x25302a, roughness: 1, flatShading: true }),
+    };
+
+    // ---- A-frame house: charred-wood roof, oak trim & soffits, pine interior ----
+    const house = new THREE.Group(); scene.add(house);
+    const H = 3.4, W = 3.2, D = 4.2, T = 0.14;
+    const slope = Math.hypot(W / 2, H), ang = Math.atan2(H, W / 2);
+    const roofMats = [mat.oak, mat.oak, mat.char, mat.inside, mat.oak, mat.oak]; // +x -x +y(outside) -y(inside) +z -z
+    [-1, 1].forEach(s => {
+      const roof = new THREE.Mesh(new THREE.BoxGeometry(slope + 0.2, T, D + 0.3), roofMats);
+      roof.position.set(s * W / 4, H / 2, 0); roof.rotation.z = -s * ang; house.add(roof);
+      const e = new THREE.LineSegments(new THREE.EdgesGeometry(roof.geometry), mat.edge); e.position.copy(roof.position); e.rotation.copy(roof.rotation); house.add(e);
+    });
+    const tri = new THREE.Shape(); tri.moveTo(-W / 2 + 0.12, 0); tri.lineTo(W / 2 - 0.12, 0); tri.lineTo(0, H - 0.22); tri.closePath();
+    const front = new THREE.Mesh(new THREE.ShapeGeometry(tri), mat.glass); front.position.z = D / 2 - 0.05; front.renderOrder = 2; house.add(front);
+    const back = new THREE.Mesh(new THREE.ShapeGeometry(tri), mat.inside); back.position.z = -D / 2 + 0.05; house.add(back);
+    // interior: floor, mezzanine, warm "lamp"
+    const floor = new THREE.Mesh(new THREE.BoxGeometry(W - 0.3, 0.04, D - 0.2), mat.deck); floor.position.set(0, 0.02, 0); house.add(floor);
+    const mezz = new THREE.Mesh(new THREE.BoxGeometry(W * 0.62, 0.08, D * 0.45), mat.oak); mezz.position.set(0, H * 0.36, -D * 0.26); house.add(mezz);
+    const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 12), new THREE.MeshBasicMaterial({ color: 0xffd9a0 })); lamp.position.set(0, H * 0.62, 0.4); house.add(lamp);
+    // mullions
+    const mull = (w, h, x, y) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.06), mat.frame); m.position.set(x, y, D / 2 - 0.02); house.add(m); };
+    const span = y => (W - 0.24) * (1 - y / (H - 0.22)); // glass width at height y
+    mull(0.06, H - 0.25, 0, (H - 0.25) / 2); mull(span(H * 0.36), 0.06, 0, H * 0.36); mull(span(H * 0.62), 0.06, 0, H * 0.62);
+    // ornament ring on gable (nod to the logo)
+    const orn = new THREE.Mesh(new THREE.TorusGeometry(0.22, 0.025, 8, 40), new THREE.MeshBasicMaterial({ color: C.gold })); orn.position.set(0, H * 0.78, D / 2 + 0.02); orn.scale.setScalar(0.7); house.add(orn);
+    // deck + steps
+    const deck = new THREE.Mesh(new THREE.BoxGeometry(W + 1.6, 0.14, D + 2.2), mat.deck); deck.position.set(0, -0.07, 0.8); house.add(deck);
+    const step = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.07, 0.5), mat.deck); step.position.set(0, -0.11, D / 2 + 2.15); house.add(step);
+
+    // ---- ground + light pool ----
+    const ground = new THREE.Mesh(new THREE.CircleGeometry(60, 48), mat.ground); ground.rotation.x = -Math.PI / 2; ground.position.y = -0.14; scene.add(ground);
+    const pool = new THREE.Mesh(new THREE.CircleGeometry(4, 48), new THREE.MeshBasicMaterial({ color: C.warm, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
+    pool.rotation.x = -Math.PI / 2; pool.position.set(0, -0.12, 3.4); pool.scale.set(1, 0.6, 1); scene.add(pool);
+    const ring = new THREE.Mesh(new THREE.RingGeometry(5.6, 5.62, 128), new THREE.MeshBasicMaterial({ color: C.gold, transparent: true, opacity: 0.3 }));
+    ring.rotation.x = -Math.PI / 2; ring.position.y = -0.1; scene.add(ring);
+
+    // ---- pines: two tiers + trunk, instanced (3 draw calls for the whole forest) ----
+    const gA = new THREE.ConeGeometry(0.85, 1.8, 7); gA.translate(0, 1.4, 0);
+    const gB = new THREE.ConeGeometry(0.6, 1.6, 7); gB.translate(0, 2.5, 0);
+    const gT = new THREE.CylinderGeometry(0.08, 0.11, 0.7, 5); gT.translate(0, 0.35, 0);
+    const N = mobile ? 40 : 90;
+    const tiers = [new THREE.InstancedMesh(gA, mat.pineA, N), new THREE.InstancedMesh(gB, mat.pineB, N), new THREE.InstancedMesh(gT, mat.trunk, N)];
+    const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), v = new THREE.Vector3(), sc = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0);
+    let rnd = 7; const rand = () => (rnd = (rnd * 16807) % 2147483647) / 2147483647;
+    for (let i = 0; i < N; i++) {
+      const a = rand() * Math.PI * 2, r = 7 + rand() * 18, s = 0.7 + rand() * 1.4;
+      v.set(Math.cos(a) * r, -0.12, Math.sin(a) * r - 4);
+      // keep the clearing around the cabin and the view from the camera empty
+      if (Math.abs(v.x) < 13 && v.z > -8) v.z = -9 - rand() * 14;
+      else if (v.z > 0) v.z = -v.z - 6;
+      sc.set(s, s * (0.9 + rand() * 0.6), s); q.setFromAxisAngle(up, rand() * Math.PI);
+      m4.compose(v, q, sc); tiers.forEach(t => t.setMatrixAt(i, m4));
+    }
+    tiers.forEach(t => scene.add(t));
+
+    // ---- mountains ----
+    const mGeo = new THREE.ConeGeometry(1, 1, 4);
+    const capMat = new THREE.MeshStandardMaterial({ color: 0xcfc6b5, roughness: 1, flatShading: true });
+    [[-22, -38, 14, 11], [-6, -46, 18, 15], [14, -40, 15, 12], [30, -34, 12, 9], [-36, -30, 10, 7]].forEach(([x, z, w, h]) => {
+      const m = new THREE.Mesh(mGeo, mat.mount); m.scale.set(w, h, w * 0.7); m.position.set(x, h / 2 - 0.2, z); m.rotation.y = rand() * Math.PI; scene.add(m);
+      const cap = new THREE.Mesh(mGeo, capMat); cap.scale.set(w * 0.28, h * 0.28, w * 0.7 * 0.28); cap.position.set(x, h - h * 0.14 - 0.2, z); cap.rotation.copy(m.rotation); scene.add(cap);
+    });
+
+    // ---- particles: drifting dust + blinking fireflies, all in the vertex shader ----
+    const P = mobile ? 450 : 1000; const pos = new Float32Array(P * 3), seed = new Float32Array(P);
+    for (let i = 0; i < P; i++) { pos[i * 3] = (rand() - 0.5) * 30; pos[i * 3 + 1] = rand() * 12; pos[i * 3 + 2] = (rand() - 0.5) * 30; seed[i] = rand(); }
+    const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); pGeo.setAttribute('seed', new THREE.BufferAttribute(seed, 1));
+    const pMat = new THREE.ShaderMaterial({
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      uniforms: { uTime: { value: 0 }, uPR: { value: renderer.getPixelRatio() }, uColor: { value: new THREE.Color(C.cream) }, uGold: { value: new THREE.Color(C.gold) } },
+      vertexShader: `uniform float uTime;uniform float uPR;attribute float seed;varying float vS;varying float vA;
+        void main(){vec3 p=position;float fly=step(0.7,seed);
+        p.y=mix(mod(p.y-uTime*(0.2+seed*0.3),12.0),0.4+mod(p.y,3.0)+sin(uTime*0.7+seed*30.0)*0.4,fly);
+        p.x+=sin(uTime*(0.3+fly*0.4)+seed*20.0)*(0.6+fly*0.8);p.z+=cos(uTime*0.25+seed*13.0)*(0.4+fly*0.6);
+        vec4 mv=modelViewMatrix*vec4(p,1.0);gl_Position=projectionMatrix*mv;
+        gl_PointSize=(1.1+seed*2.4+fly*1.6)*uPR*(10.0/-mv.z);vS=seed;
+        float blink=mix(1.0,0.35+0.65*pow(0.5+0.5*sin(uTime*2.2+seed*60.0),3.0),fly);
+        vA=smoothstep(0.0,1.2,p.y)*smoothstep(12.0,9.0,p.y)*blink;}`,
+      fragmentShader: `uniform vec3 uColor;uniform vec3 uGold;varying float vS;varying float vA;
+        void main(){float d=length(gl_PointCoord-0.5);float a=smoothstep(0.5,0.0,d)*vA*mix(0.4,0.9,step(0.7,vS));gl_FragColor=vec4(mix(uColor,uGold,step(0.7,vS)),a);}`
+    });
+    scene.add(new THREE.Points(pGeo, pMat));
+
+    // ---- sizing ----
+    let lookShift = 0;
+    const resize = () => {
+      const w = hero.clientWidth, h = hero.clientHeight; if (!w || !h) return;
+      renderer.setSize(w, h, false); camera.aspect = w / h;
+      camera.fov = w / h < 1 ? 44 : 34; camera.updateProjectionMatrix();
+      lookShift = 0; // house centred in the cover frame
+    };
+    resize(); new ResizeObserver(resize).observe(hero);
+
+    // ---- interaction ----
+    let mx = 0, my = 0, tx = 0, ty = 0, scrollP = 0;
+    addEventListener('pointermove', e => { mx = e.clientX / innerWidth - 0.5; my = e.clientY / innerHeight - 0.5; }, { passive: true });
+    addEventListener('scroll', () => { const r = hero.getBoundingClientRect(); scrollP = Math.max(0, Math.min(1, (innerHeight * 0.5 - r.top) / innerHeight)); }, { passive: true });
+
+    // ---- intro: the cabin "lights up" ----
+    let intro = reduce ? 1 : 0, introStart = null;
+    addEventListener('akniet:intro', () => { introStart = performance.now(); });
+
+    // ---- render loop: paused when hero is off-screen or tab hidden ----
+    let visible = true, raf = null; const clock = new THREE.Clock();
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible && !raf) loop(); }, { threshold: 0 }).observe(hero);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden && visible && !raf) loop(); });
+
+    function frame() {
+      const t = clock.getElapsedTime();
+      if (introStart !== null && intro < 1) intro = Math.min((performance.now() - introStart) / 2600, 1);
+      const e = 1 - Math.pow(1 - intro, 3);
+      const flicker = 0.94 + Math.sin(t * 2.1) * 0.03 + Math.sin(t * 5.3) * 0.02;
+      mat.glass.opacity = 0.32 * e; pool.material.opacity = 0.2 * e;
+      warm.intensity = 14 * e * flicker; inner.intensity = 22 * e * flicker;
+      lamp.material.color.setRGB(e, 0.85 * e, 0.63 * e);
+      house.scale.setScalar(0.92 + 0.08 * e);
+      tx += (mx - tx) * 0.04; ty += (my - ty) * 0.04;
+      const orbit = 0.32 + (reduce ? 0 : Math.sin(t * 0.12) * 0.22) + tx * 0.35;
+      const r = 18 - scrollP * 2.5 - e * 1.5;
+      camera.position.set(Math.sin(orbit) * r, 2.4 + ty * 1.0 + scrollP * 1.5, Math.cos(orbit) * r);
+      camera.lookAt(lookShift * Math.cos(orbit), 1.7 - scrollP * 0.5, lookShift * -Math.sin(orbit));
+      orn.rotation.z = t * 0.4;
+      ring.rotation.z = t * 0.02;
+      pMat.uniforms.uTime.value = reduce ? 0 : t;
+      renderer.render(scene, camera);
+    }
+    function loop() {
+      if (!visible || document.hidden) { raf = null; return; }
+      frame(); raf = requestAnimationFrame(loop);
+    }
+    house.scale.setScalar(reduce ? 1 : 0.92);
+    reduce ? (intro = 1, frame()) : loop();
+  }
+}
+</script>
+</body>
+</html>

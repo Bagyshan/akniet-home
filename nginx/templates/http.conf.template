@@ -1,0 +1,22 @@
+# Before the certificate is issued: HTTP only.
+include /etc/nginx/snippets/http-context.conf;
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name ${DOMAIN};
+
+    location /.well-known/acme-challenge/ { root /var/www/certbot; }
+
+    include /etc/nginx/snippets/site.conf;
+}
+
+# www → the main domain
+server {
+    listen 80;
+    listen [::]:80;
+    server_name www.${DOMAIN};
+
+    location /.well-known/acme-challenge/ { root /var/www/certbot; }
+    location / { return 301 http://${DOMAIN}$request_uri; }
+}

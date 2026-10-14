@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Акниет — админка</title>
+<link rel="icon" type="image/png" href="/assets/mark-gold.png">
+<link rel="stylesheet" href="/assets/fonts/fonts.css">
+<link rel="stylesheet" href="/assets/map/kg-map.css">
+<style>
+:root{--ink:#312d32;--ink-soft:#3a353b;--page:#211e22;--cream:#fff8ec;--gold:#d5a039;--dim:rgba(255,248,236,.62);--line:rgba(255,248,236,.09);--ok:#7fbf7f;--err:#e0785e;--r:20px;
+  --f-head:"Unbounded",system-ui,sans-serif;--f-text:"Onest",system-ui,sans-serif}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--cream);font:15px/1.5 var(--f-text);-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+[hidden]{display:none!important}
+.wrap{max-width:1240px;margin:0 auto;padding:16px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 12px 12px 18px;border-radius:999px;background:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--f-head);font-size:14px;letter-spacing:.16em}
+.logo img{width:24px}
+.logo small{font-family:var(--f-text);letter-spacing:0;font-size:13px;color:var(--dim)}
+.who{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--dim)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-size:12.5px;font-weight:500;background:rgba(255,248,236,.08);box-shadow:inset 0 0 0 1px var(--line);text-decoration:none}
+.chip i{width:7px;height:7px;border-radius:50%;background:var(--dim)}
+.chip.on i{background:var(--ok)}
+.chip.off i{background:var(--gold)}
+.chip.gold{background:var(--gold);color:var(--ink);box-shadow:none}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;padding:5px;margin:22px 0 16px;border-radius:28px;background:var(--ink);box-shadow:inset 0 0 0 1px var(--line);width:max-content;max-width:100%}
+.tabs button,.seg button{min-height:42px;padding:0 18px;border:0;border-radius:999px;background:none;cursor:pointer;font-weight:500;color:rgba(255,248,236,.75)}
+.tabs button[aria-selected="true"],.seg button[aria-pressed="true"]{background:var(--cream);color:var(--ink)}
+.card{background:var(--ink);border-radius:var(--r);box-shadow:inset 0 0 0 1px var(--line);padding:20px}
+h1{font:400 clamp(22px,3vw,32px)/1.1 var(--f-head);margin:0 0 6px;letter-spacing:-.02em}
+h2{font:400 18px/1.2 var(--f-head);margin:0}
+.muted{color:var(--dim);font-size:13.5px;margin:0}
+.bar{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.seg{display:inline-flex;flex-wrap:wrap;gap:4px;padding:4px;border-radius:24px;background:rgba(24,22,25,.5)}
+.seg button{min-height:38px;padding:0 14px;font-size:13.5px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 22px;border-radius:999px;border:0;font-weight:600;cursor:pointer;background:rgba(255,248,236,.1);box-shadow:inset 0 0 0 1px rgba(255,248,236,.2);text-decoration:none}
+.btn:hover{background:rgba(255,248,236,.16)}
+.btn.gold{background:var(--gold);color:var(--ink);box-shadow:none}
+.btn.gold:hover{background:#e6b752}
+.btn.danger{color:#f3a28c}
+.btn.sm{min-height:38px;padding:0 14px;font-size:13.5px}
+.btn[disabled]{opacity:.55;cursor:progress}
+
+/* leads */
+.leads{display:grid;gap:8px}
+.lead{display:grid;grid-template-columns:130px 1.1fr 1fr 1.6fr 150px;gap:14px;align-items:start;padding:14px 16px;border-radius:16px;background:rgba(24,22,25,.45);box-shadow:inset 0 0 0 1px var(--line)}
+.lead .d{font-size:12.5px;color:var(--dim)}
+.lead b{display:block;font-weight:600}
+.lead a{color:var(--gold);text-decoration:none;font-weight:600}
+.lead .m{font-size:13.5px;color:rgba(255,248,236,.8);white-space:pre-wrap;overflow-wrap:anywhere}
+.lead select{width:100%;min-height:40px;border-radius:12px;border:0;padding:0 10px;background:var(--ink-soft);box-shadow:inset 0 0 0 1px var(--line);cursor:pointer}
+.lead[data-status="new"]{box-shadow:inset 3px 0 0 var(--gold),inset 0 0 0 1px var(--line)}
+.lead[data-status="spam"],.lead[data-status="done"]{opacity:.6}
+.tg{font-size:12px;color:var(--dim)}
+.empty{padding:40px;text-align:center;color:var(--dim)}
+
+/* fields */
+.fields{display:grid;grid-template-columns:repeat(2,1fr);gap:14px 16px;margin:20px 0}
+.fld{display:grid;gap:6px;align-content:start}
+.fld label{font-size:13px;color:var(--dim)}
+.fld input{width:100%;min-height:48px;padding:0 14px;border-radius:14px;border:1.5px solid transparent;background:rgba(24,22,25,.55);outline:none}
+.fld input:focus{border-color:var(--gold)}
+.fld small{font-size:12px;color:rgba(255,248,236,.45)}
+
+/* slots */
+.slots{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.slots.gallery{grid-template-columns:repeat(3,1fr)}
+.slot{display:grid;gap:10px;padding:10px;border-radius:18px;background:rgba(24,22,25,.45);box-shadow:inset 0 0 0 1px var(--line)}
+.slot.custom{box-shadow:inset 0 0 0 1.5px var(--gold)}
+.slot-head{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px}
+.slot-head b{font-family:var(--f-head);font-weight:500}
+.prev{position:relative;aspect-ratio:4/5;border-radius:14px;overflow:hidden;background:#555 center/cover}
+.slots.gallery .prev{aspect-ratio:4/3}
+.prev .kind{position:absolute;top:8px;left:8px;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:5px 9px;border-radius:999px;background:rgba(33,30,34,.65)}
+.prev .lab{position:absolute;left:8px;right:8px;bottom:8px;display:grid;padding:9px 11px;border-radius:12px;background:rgba(255,248,236,.93);color:var(--ink)}
+.prev .lab b{font-family:var(--f-head);font-weight:500;font-size:13px;line-height:1.2;overflow-wrap:anywhere}
+.prev .lab span{font-size:11.5px;color:rgba(49,45,50,.7)}
+.prev .cap{position:absolute;left:8px;bottom:8px;max-width:calc(100% - 16px)}
+.prev .cap.chip{background:rgba(33,30,34,.65)}
+
+/* editor dialog */
+dialog{width:min(860px,calc(100% - 24px));max-height:calc(100dvh - 24px);padding:0;border:0;border-radius:var(--r);background:var(--ink);color:var(--cream);box-shadow:0 30px 80px -20px rgba(0,0,0,.8),inset 0 0 0 1px var(--line)}
+dialog::backdrop{background:rgba(20,18,21,.72)}
+.ed{display:grid;grid-template-columns:220px 1fr;gap:20px;padding:22px}
+.ed .prev{align-self:start}
+.ed form{display:grid;gap:12px}
+.ed .fld input{min-height:46px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pair span{display:block;font-size:11px;font-weight:600;letter-spacing:.08em;color:rgba(255,248,236,.45);margin:0 0 4px 4px}
+.pv-lang{display:flex;gap:4px;margin-top:8px}
+.pv-lang button{flex:1;min-height:34px;border:0;border-radius:999px;background:rgba(255,248,236,.08);font-size:12px;font-weight:600;cursor:pointer}
+.pv-lang button[aria-pressed="true"]{background:var(--cream);color:var(--ink)}
+.chip.warn{background:rgba(224,120,94,.18);box-shadow:inset 0 0 0 1px rgba(224,120,94,.5);color:#f3b3a2}
+.lang-tag{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(213,160,57,.2);color:var(--gold)}
+.photo-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.photo-row input[type=file]{position:absolute;opacity:0;width:1px;height:1px}
+.up-state{font-size:12.5px;color:var(--dim)}
+.ed-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;margin-top:6px}
+.ed-actions div{display:flex;gap:8px;flex-wrap:wrap}
+
+/* map points */
+.pm{display:grid;grid-template-columns:1.7fr 1fr;gap:16px;align-items:start}
+.pm-map{border-radius:16px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--line)}
+.pm-map .kg-box{width:100%;aspect-ratio:1.9}
+.pm-side{display:grid;gap:12px}
+.pm-form{display:grid;gap:10px;padding:16px;border-radius:16px;background:rgba(24,22,25,.45);box-shadow:inset 0 0 0 1.5px var(--gold)}
+.pm-form .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pm-form .fld input{min-height:44px}
+.pm-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between}
+.pm-actions div{display:flex;gap:8px}
+.pm-list{display:grid;gap:6px;max-height:520px;overflow:auto}
+.pm-item{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;padding:12px 14px;border:0;border-radius:14px;background:rgba(24,22,25,.45);box-shadow:inset 0 0 0 1px var(--line);text-align:left;cursor:pointer}
+.pm-item:hover{background:rgba(255,248,236,.06)}
+.pm-item.sel{box-shadow:inset 0 0 0 1.5px var(--gold)}
+.pm-item b{font-weight:600}
+.pm-item span{font-size:12.5px;color:var(--dim);white-space:nowrap}
+@media (max-width:1000px){.pm{grid-template-columns:1fr}}
+.toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,calc(100% + 40px));visibility:hidden;padding:12px 20px;border-radius:999px;background:var(--cream);color:var(--ink);font-weight:600;transition:transform .4s cubic-bezier(.19,1,.22,1);z-index:10;max-width:calc(100% - 24px);text-align:center}
+.toast.show{transform:translate(-50%,0);visibility:visible}
+.toast.err{background:var(--err);color:#fff}
+.note{margin-top:24px;font-size:12.5px;color:rgba(255,248,236,.4)}
+@media (max-width:1000px){.slots{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:900px){
+  .lead{grid-template-columns:1fr 1fr}
+  .lead .m,.lead .st{grid-column:1/-1}
+  .fields{grid-template-columns:1fr}
+  header{border-radius:var(--r)}
+  .slots,.slots.gallery{grid-template-columns:repeat(2,1fr)}
+  .ed{grid-template-columns:1fr}
+  .ed .prev{max-width:240px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo"><img src="/assets/mark-gold.png" alt="">АКНИЕТ <small>админка</small></div>
+    <div class="who"><span class="chip" id="tg"><i></i><span>Telegram…</span></span><span id="user"></span><a href="/" target="_blank" class="chip">Открыть сайт ↗</a></div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" aria-controls="p-leads">Заявки</button>
+    <button role="tab" aria-selected="false" aria-controls="p-main">Основное</button>
+    <button role="tab" aria-selected="false" aria-controls="p-contacts">Контакты</button>
+    <button role="tab" aria-selected="false" aria-controls="p-materials">Материалы</button>
+    <button role="tab" aria-selected="false" aria-controls="p-gallery">Галерея</button>
+    <button role="tab" aria-selected="false" aria-controls="p-map">Карта</button>
+  </div>
+
+  <section id="p-leads" role="tabpanel" class="card">
+    <div class="bar">
+      <div><h1>Заявки</h1><p class="muted" id="leads-count">Загрузка…</p></div>
+      <div class="seg" id="filter" role="group" aria-label="Статус">
+        <button data-s="" aria-pressed="true">Все</button><button data-s="new" aria-pressed="false">Новые</button><button data-s="in_work" aria-pressed="false">В работе</button><button data-s="done" aria-pressed="false">Готово</button><button data-s="spam" aria-pressed="false">Спам</button>
+      </div>
+    </div>
+    <div class="leads" id="leads"></div>
+    <button class="btn" id="more" style="margin-top:12px" hidden>Показать ещё</button>
+  </section>
+
+  <section id="p-main" role="tabpanel" class="card" hidden>
+    <h1>Основное</h1>
+    <p class="muted">Цена, гарантия, сроки и цифры на сайте. Пустое поле — вернуть значение по умолчанию. Слова «год / года / лет» и «месяц / месяцев» сайт подбирает сам.</p>
+    <form class="content-form" data-group="main"><div class="fields"></div><button class="btn gold" type="submit">Сохранить</button></form>
+  </section>
+
+  <section id="p-contacts" role="tabpanel" class="card" hidden>
+    <h1>Контакты</h1>
+    <p class="muted">Меняются везде: шапка, меню, кнопки связи, контакты и подвал, а также карточка компании для поисковиков.</p>
+    <form class="content-form" data-group="contacts"><div class="fields"></div><button class="btn gold" type="submit">Сохранить</button></form>
+  </section>
+
+  <section id="p-materials" role="tabpanel" class="card" hidden>
+    <div class="bar"><div><h1>Материалы</h1><p class="muted">Раздел «Дерево и камень, которые хочется трогать» — 10 карточек. Нажмите на карточку, чтобы заменить её. Изменённые обведены золотым. У каждого текста два поля: для русской версии сайта и для кыргызской (/ky/).</p></div></div>
+    <div class="slots" id="s-materials"></div>
+  </section>
+
+  <section id="p-gallery" role="tabpanel" class="card" hidden>
+    <div class="bar"><div><h1>Галерея</h1><p class="muted">Раздел «Тёплые кадры» — 6 фото с подписями на русском и кыргызском. Вид и анимация раздела не меняются, меняется только содержимое ячейки.</p></div></div>
+    <div class="slots gallery" id="s-gallery"></div>
+  </section>
+
+  <section id="p-map" role="tabpanel" class="card" hidden>
+    <div class="bar"><div><h1>Карта</h1><p class="muted">Блок «Строим по всему Кыргызстану». Нажмите на карту, чтобы поставить точку населённого пункта. Нажмите на точку, чтобы изменить её; пока точка выбрана, нажатие на карту переносит её. Приближение — «+» / «−», колесо с Ctrl или два пальца.</p></div></div>
+    <div class="pm">
+      <div class="pm-map"><div class="kg-box" id="pm-map"></div></div>
+      <div class="pm-side">
+        <form class="pm-form" id="pm-form" hidden>
+          <h2 id="pm-title">Новая точка</h2>
+          <div class="row2">
+            <div class="fld"><label for="pm-name">Населённый пункт (рус)</label><input id="pm-name" maxlength="80" required></div>
+            <div class="fld"><label for="pm-name-ky">Населённый пункт (кыр)</label><input id="pm-name-ky" maxlength="80" lang="ky" placeholder="пусто — как по-русски"></div>
+          </div>
+          <div class="row2">
+            <div class="fld"><label for="pm-houses">Домов построено</label><input id="pm-houses" type="text" inputmode="numeric" pattern="[0-9]*" required></div>
+            <div class="fld"><label for="pm-area">Общая площадь, м²</label><input id="pm-area" type="text" inputmode="decimal" required></div>
+          </div>
+          <div class="row2">
+            <div class="fld"><label for="pm-lat">Широта</label><input id="pm-lat" type="text" inputmode="decimal" required></div>
+            <div class="fld"><label for="pm-lon">Долгота</label><input id="pm-lon" type="text" inputmode="decimal" required></div>
+          </div>
+          <div class="pm-actions">
+            <button type="button" class="btn sm danger" id="pm-del">Удалить</button>
+            <div><button type="button" class="btn sm" id="pm-cancel">Отмена</button><button type="submit" class="btn sm gold">Сохранить</button></div>
+          </div>
+        </form>
+        <p class="muted" id="pm-empty">Нажмите на карту, чтобы добавить первую точку.</p>
+        <div class="pm-list" id="pm-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <p class="note">Новые поля добавляются в backend/src/content.ts и атрибутом data-cms на странице.</p>
+</div>
+
+<dialog id="ed" aria-labelledby="ed-heading">
+  <div class="ed">
+    <div><div class="prev" id="ed-prev"></div><div class="pv-lang" role="group" aria-label="Язык превью"><button type="button" data-pl="ru" aria-pressed="true">РУС</button><button type="button" data-pl="ky" aria-pressed="false">КЫР</button></div></div>
+    <form id="ed-form">
+      <h2 id="ed-heading"></h2>
+      <p class="muted" id="ed-hint"></p>
+      <div class="fld">
+        <label>Фото</label>
+        <div class="photo-row">
+          <label class="btn sm" for="ed-file">Загрузить фото</label><input type="file" id="ed-file" accept="image/jpeg,image/png,image/webp">
+          <button type="button" class="btn sm" id="ed-photo-reset">Стоковое фото</button>
+          <span class="up-state" id="ed-up" aria-live="polite"></span>
+        </div>
+      </div>
+      <div id="ed-fields"></div>
+      <div class="ed-actions">
+        <button type="button" class="btn sm danger" id="ed-reset">Вернуть стоковую карточку</button>
+        <div><button type="button" class="btn sm" id="ed-cancel">Отмена</button><button type="submit" class="btn sm gold">Сохранить</button></div>
+      </div>
+    </form>
+  </div>
+</dialog>
+<datalist id="kinds"><option value="Дерево"><option value="Камень"><option value="Металл"><option value="Утеплитель"><option value="Отделка"></datalist>
+<datalist id="kinds-ky"><option value="Жыгач"><option value="Таш"><option value="Металл"><option value="Жылуулагыч"><option value="Жасалга"></datalist>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  // Builds elements; user data only ever goes in via textContent / value
+  const el = (tag, props = {}, ...kids) => { const e = Object.assign(document.createElement(tag), props); e.append(...kids); return e; };
+  const api = async (url, opts = {}) => {
+    const r = await fetch(url, { ...opts, headers: { 'Content-Type': 'application/json', ...opts.headers } });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw Object.assign(new Error(r.status), { data });
+    return data;
+  };
+  let toastT;
+  const toast = (text, err) => { const t = $('#toast'); t.textContent = text; t.classList.toggle('err', !!err); t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 3000); };
+  const errText = (e, fallback) => (e.data?.errors || [fallback]).join('; ');
+
+  /* ---- tabs ---- */
+  const loaders = {};
+  document.querySelectorAll('[role="tab"]').forEach(tab => tab.addEventListener('click', () => {
+    document.querySelectorAll('[role="tab"]').forEach(t => { const on = t === tab; t.setAttribute('aria-selected', on); $('#' + t.getAttribute('aria-controls')).hidden = !on; });
+    loaders[tab.getAttribute('aria-controls')]?.();
+  }));
+
+  api('/api/admin/me').then(me => {
+    $('#user').textContent = me.user;
+    const tg = $('#tg'); tg.classList.add(me.telegram ? 'on' : 'off');
+    tg.querySelector('span').textContent = me.telegram ? 'Telegram подключён' : 'Telegram: заглушка';
+  }).catch(() => toast('Нет связи с сервером', true));
+
+  /* ---- leads ---- */
+  const STATUS = { new: 'Новая', in_work: 'В работе', done: 'Готово', spam: 'Спам' };
+  const fmtDate = s => new Date(s).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
+  let filter = '', offset = 0;
+  function leadRow(l) {
+    const sel = el('select', { 'aria-label': 'Статус заявки №' + l.id });
+    for (const [v, t] of Object.entries(STATUS)) sel.append(el('option', { value: v, textContent: t, selected: v === l.status }));
+    const row = el('article', { className: 'lead' },
+      el('div', { className: 'd' }, '№' + l.id, el('br'), fmtDate(l.created_at)),
+      el('div', {}, el('b', { textContent: l.name }, ...(l.lang === 'ky' ? [el('span', { className: 'lang-tag', textContent: 'КЫР', title: 'Заявка с кыргызской версии сайта' })] : [])), el('a', { href: 'tel:' + l.phone.replace(/[^\d+]/g, ''), textContent: l.phone })),
+      el('div', {}, el('b', { textContent: l.house_type || '—' }), el('span', { className: 'd', textContent: (l.contact_via || '') + (l.project ? ' · ' + l.project : '') + (l.area ? ', ' + l.area + ' м²' : '') })),
+      el('div', { className: 'm', textContent: l.message || '' }),
+      el('div', { className: 'st' }, sel, el('div', { className: 'tg', textContent: l.telegram_sent ? 'отправлено в Telegram' : 'в Telegram не отправлено' })));
+    row.dataset.status = l.status;
+    sel.addEventListener('change', async () => {
+      try { await api('/api/admin/leads/' + l.id, { method: 'PATCH', body: JSON.stringify({ status: sel.value }) }); row.dataset.status = sel.value; toast('Статус сохранён'); }
+      catch { sel.value = row.dataset.status; toast('Не удалось сохранить статус', true); }
+    });
+    return row;
+  }
+  async function loadLeads(reset) {
+    if (reset) { offset = 0; $('#leads').replaceChildren(); }
+    try {
+      const { total, items } = await api(`/api/admin/leads?limit=50&offset=${offset}` + (filter ? '&status=' + filter : ''));
+      offset += items.length;
+      $('#leads').append(...items.map(leadRow));
+      if (!total) $('#leads').append(el('div', { className: 'empty', textContent: 'Заявок пока нет' }));
+      $('#leads-count').textContent = 'Всего: ' + total;
+      $('#more').hidden = offset >= total;
+    } catch { $('#leads-count').textContent = 'Не удалось загрузить заявки'; }
+  }
+  $('#filter').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    filter = b.dataset.s;
+    document.querySelectorAll('#filter button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    loadLeads(true);
+  });
+  $('#more').addEventListener('click', () => loadLeads(false));
+  loadLeads(true);
+
+  /* ---- main + contacts fields ---- */
+  let fields = null;
+  const DEC = { type: 'text', inputMode: 'decimal', pattern: '[0-9]+([.,][0-9]+)?' };
+  const INPUT = { number: DEC, lat: DEC, lon: DEC, phone: { type: 'tel' }, telegram: { type: 'text' }, email: { type: 'email' }, url: { type: 'url' }, text: { type: 'text', maxLength: 200 }, time: { type: 'time' } };
+  const isNum = t => t === 'number' || t === 'lat' || t === 'lon';
+  function fieldInput(f) {
+    if (f.type === 'days') {
+      const sel = el('select', { id: 'c-' + f.key, name: f.key });
+      sel.style.cssText = 'width:100%;min-height:48px;padding:0 12px;border-radius:14px;border:1.5px solid transparent;background:rgba(24,22,25,.55)';
+      for (const [v, t] of Object.entries(f.options)) sel.append(el('option', { value: v, textContent: t, selected: v === (f.value ?? f.default) }));
+      return sel;
+    }
+    return el('input', { id: 'c-' + f.key, name: f.key, ...INPUT[f.type], value: f.value === null ? '' : isNum(f.type) ? String(f.value).replace('.', ',') : f.value, placeholder: f.default === null ? 'не задано — на сайте заглушка «00»' : 'по умолчанию: ' + f.default });
+  }
+  async function loadFields() {
+    if (fields) return;
+    try { fields = await api('/api/admin/content'); } catch { return toast('Не удалось загрузить поля', true); }
+    document.querySelectorAll('.content-form').forEach(form => {
+      form.querySelector('.fields').replaceChildren(...fields.filter(f => f.group === form.dataset.group).map(f => el('div', { className: 'fld' },
+        el('label', { htmlFor: 'c-' + f.key, textContent: f.label }),
+        fieldInput(f),
+        el('small', { textContent: f.hint || '' }))));
+    });
+  }
+  loaders['p-main'] = loaders['p-contacts'] = loadFields;
+  document.querySelectorAll('.content-form').forEach(form => form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = e.submitter; btn.disabled = true;
+    const body = {};
+    for (const f of fields.filter(f => f.group === form.dataset.group)) {
+      const raw = form.elements[f.key].value.trim(), v = isNum(f.type) ? raw.replace(',', '.') : raw;
+      body[f.key] = v === '' ? null : isNum(f.type) ? Number(v) : v;
+    }
+    try { await api('/api/admin/content', { method: 'PUT', body: JSON.stringify(body) }); toast('Сохранено — сайт обновится в течение минуты'); }
+    catch (err) { toast(errText(err, 'Ошибка сохранения'), true); }
+    finally { btn.disabled = false; }
+  }));
+
+  /* ---- numbered slots: stock cards are read from the live home page ---- */
+  const SECTIONS = {
+    materials: {
+      kind: 'material', title: 'Карточка материала',
+      fields: [['kind', 'Категория (бейдж сверху)', 24], ['title', 'Название материала', 60], ['subtitle', 'Где используется (подзаголовок)', 80]],
+      stock: doc => [...doc.querySelectorAll('.tile[data-slot]')].map(t => ({
+        image: /--w:\s*url\(["']?([^"')]+)/.exec(t.getAttribute('style'))?.[1],
+        kind: t.querySelector('.kind').textContent.trim(),
+        title: t.querySelector('.lab b').textContent.replace(/\u00ad/g, '').trim(),
+        subtitle: t.querySelector('.lab span').textContent.trim(),
+      })),
+    },
+    gallery: {
+      kind: 'gallery', title: 'Фото галереи',
+      fields: [['caption', 'Подпись на фото', 60]],
+      stock: doc => [...doc.querySelectorAll('.shot[data-slot]')].map(f => ({
+        image: f.querySelector('img').getAttribute('src'),
+        caption: f.querySelector('.chip').textContent.trim(),
+        hint: f.classList.contains('tall') ? 'Ячейка вертикальная (3:4) — лучше вертикальное фото' : 'Ячейка горизонтальная (4:3) — лучше горизонтальное фото',
+      })),
+    },
+  };
+  let docs = null; // { ru, ky } — the live pages, source of the stock cards
+  const state = { materials: null, gallery: null }; // { stock: [], stockKy: [], custom: [] }
+  const abs = src => src && new URL(src, location.origin + '/').href;
+  // What a page in `lang` shows: custom text of that language → custom Russian → stock of that language
+  function merged(sec, i, lang = 'ru', custom = state[sec].custom[i] || {}) {
+    const stock = lang === 'ky' ? { ...state[sec].stock[i], ...state[sec].stockKy[i], image: state[sec].stock[i].image } : state[sec].stock[i];
+    const d = { ...stock };
+    if (custom.image) d.image = custom.image;
+    for (const [k] of SECTIONS[sec].fields) d[k] = (lang === 'ky' && custom[k + '_ky']) || custom[k] || stock[k];
+    return d;
+  }
+  // Russian text changed, Kyrgyz not given — /ky/ shows Russian until translated
+  const untranslated = (sec, c) => !!c && SECTIONS[sec].fields.some(([k]) => c[k] && !c[k + '_ky']);
+
+  function preview(sec, d) {
+    const p = el('div', { className: 'prev' });
+    if (d.image) p.style.backgroundImage = `url("${abs(d.image)}")`;
+    if (sec === 'materials') p.append(el('span', { className: 'kind', textContent: d.kind || '' }), el('div', { className: 'lab' }, el('b', { textContent: d.title || '' }), el('span', { textContent: d.subtitle || '' })));
+    else p.append(el('span', { className: 'chip cap', textContent: d.caption || '' }));
+    return p;
+  }
+  function renderSlots(sec) {
+    const box = $('#s-' + sec);
+    box.replaceChildren(...state[sec].stock.map((_, i) => {
+      const custom = !!state[sec].custom[i], noKy = untranslated(sec, state[sec].custom[i]);
+      const card = el('button', { type: 'button', className: 'slot' + (custom ? ' custom' : ''), 'aria-label': `${SECTIONS[sec].title} №${i + 1}, изменить` },
+        el('div', { className: 'slot-head' }, el('b', { textContent: '№' + (i + 1) }), el('span', { className: 'chip' + (noKy ? ' warn' : custom ? ' gold' : ''), textContent: noKy ? 'нет перевода' : custom ? 'изменена' : 'стоковая' })),
+        preview(sec, merged(sec, i)));
+      card.style.cssText = 'border:0;cursor:pointer;text-align:left;color:inherit';
+      card.addEventListener('click', () => openEditor(sec, i));
+      return card;
+    }));
+  }
+  async function loadSlots(sec) {
+    try {
+      if (!docs) {
+        const parse = async url => new DOMParser().parseFromString(await (await fetch(url, { cache: 'no-store' })).text(), 'text/html');
+        docs = { ru: await parse('/'), ky: await parse('/ky/') };
+      }
+      state[sec] = { stock: SECTIONS[sec].stock(docs.ru), stockKy: SECTIONS[sec].stock(docs.ky), custom: await api('/api/admin/slots/' + sec) };
+      renderSlots(sec);
+    } catch { toast('Не удалось загрузить карточки', true); }
+  }
+  loaders['p-materials'] = () => loadSlots('materials');
+  loaders['p-gallery'] = () => loadSlots('gallery');
+
+  /* ---- slot editor ---- */
+  const ed = $('#ed'); let cur = null; // { sec, i, image, lang }
+  const formValues = () => {
+    const body = { image: cur.image || null };
+    for (const [k] of SECTIONS[cur.sec].fields) { body[k] = $('#ed-' + k).value.trim(); body[k + '_ky'] = $('#ed-' + k + '_ky').value.trim(); }
+    return body;
+  };
+  function edPreview() {
+    const p = preview(cur.sec, merged(cur.sec, cur.i, cur.lang, formValues())); p.id = 'ed-prev';
+    $('#ed-prev').replaceWith(p);
+    document.querySelectorAll('.pv-lang button').forEach(b => b.setAttribute('aria-pressed', b.dataset.pl === cur.lang));
+  }
+  document.querySelectorAll('.pv-lang button').forEach(b => b.addEventListener('click', () => { cur.lang = b.dataset.pl; edPreview(); }));
+  function openEditor(sec, i) {
+    const custom = state[sec].custom[i] || {}, stock = state[sec].stock[i], stockKy = state[sec].stockKy[i] || {};
+    cur = { sec, i, image: custom.image || '', lang: 'ru' };
+    $('#ed-heading').textContent = `${SECTIONS[sec].title} №${i + 1}`;
+    $('#ed-hint').textContent = (stock.hint ? stock.hint + '. ' : '') + 'Пустое поле — останется стоковый текст. Пустое кыргызское поле при заполненном русском — на /ky/ будет русский текст.';
+    $('#ed-up').textContent = cur.image ? 'загружено своё фото' : 'стоковое фото';
+    $('#ed-fields').replaceChildren(...SECTIONS[sec].fields.map(([k, label, max]) => el('div', { className: 'fld' },
+      el('label', { htmlFor: 'ed-' + k, textContent: label }),
+      el('div', { className: 'pair' },
+        el('div', {}, el('span', { textContent: 'РУС' }), el('input', { id: 'ed-' + k, maxLength: max, value: custom[k] || '', placeholder: stock[k] || '', autocomplete: 'off' })),
+        el('div', {}, el('span', { textContent: 'КЫР' }), el('input', { id: 'ed-' + k + '_ky', lang: 'ky', maxLength: max, value: custom[k + '_ky'] || '', placeholder: custom[k] ? 'нет перевода — будет: ' + custom[k] : stockKy[k] || '', autocomplete: 'off', 'aria-label': label + ' — кыргызча' }))))));
+    if (sec === 'materials') { $('#ed-kind').setAttribute('list', 'kinds'); $('#ed-kind_ky').setAttribute('list', 'kinds-ky'); }
+    $('#ed-fields').querySelectorAll('input').forEach(inp => inp.addEventListener('input', edPreview));
+    $('#ed-reset').hidden = !state[sec].custom[i];
+    edPreview();
+    ed.showModal();
+  }
+  $('#ed-file').addEventListener('change', async e => {
+    const file = e.target.files[0]; e.target.value = ''; if (!file) return;
+    if (file.size > 15 * 1024 * 1024) return toast('Файл больше 15 МБ', true);
+    $('#ed-up').textContent = 'Сжимаем фото…';
+    try {
+      const r = await api('/api/admin/upload?kind=' + SECTIONS[cur.sec].kind, { method: 'POST', body: file, headers: { 'Content-Type': file.type || 'image/jpeg' } });
+      cur.image = r.url;
+      $('#ed-up').textContent = `загружено: ${r.width}×${r.height}, ${Math.round(r.bytes / 1024)} КБ`;
+      edPreview();
+    } catch (err) { $('#ed-up').textContent = ''; toast(errText(err, 'Не удалось загрузить фото'), true); }
+  });
+  $('#ed-photo-reset').addEventListener('click', () => { cur.image = ''; $('#ed-up').textContent = 'стоковое фото'; edPreview(); });
+  $('#ed-cancel').addEventListener('click', () => ed.close());
+  ed.addEventListener('click', e => { if (e.target === ed) ed.close(); });
+  $('#ed-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const body = formValues();
+    try {
+      const r = await api(`/api/admin/slots/${cur.sec}/${cur.i + 1}`, { method: 'PUT', body: JSON.stringify(body) });
+      state[cur.sec].custom[cur.i] = Object.keys(r.data).length ? r.data : null;
+      renderSlots(cur.sec); ed.close(); toast(`Карточка №${cur.i + 1} сохранена`);
+    } catch (err) { toast(errText(err, 'Ошибка сохранения'), true); }
+  });
+  /* ---- map points ---- */
+  const loadScript = src => new Promise((ok, fail) => { const sc = document.createElement('script'); sc.src = src; sc.onload = ok; sc.onerror = fail; document.head.append(sc); });
+  const nf = n => Number(n).toLocaleString('ru-RU');
+  let kg = null, pts = [], editing = null; // editing: the point in the form (no id — a new one)
+  const PF = { name: '#pm-name', name_ky: '#pm-name-ky', houses: '#pm-houses', area: '#pm-area', lat: '#pm-lat', lon: '#pm-lon' };
+  function startEdit(p) {
+    editing = { ...p };
+    for (const [k, sel] of Object.entries(PF)) $(sel).value = p[k] ?? '';
+    $('#pm-title').textContent = p.id ? p.name : 'Новая точка';
+    $('#pm-del').hidden = !p.id;
+    renderPoints();
+    $('#pm-name').focus({ preventScroll: true });
+  }
+  function moveTo(lat, lon) { editing.lat = lat; editing.lon = lon; $('#pm-lat').value = lat; $('#pm-lon').value = lon; renderPoints(); }
+  function renderPoints() {
+    const shown = pts.map(p => editing && p.id === editing.id ? { ...p, lat: editing.lat, lon: editing.lon } : p);
+    if (editing && !editing.id) shown.push({ ...editing, draft: true });
+    kg?.setPoints(shown, editing?.id ?? null);
+    $('#pm-form').hidden = !editing;
+    $('#pm-empty').hidden = pts.length > 0 || !!editing;
+    $('#pm-list').replaceChildren(...pts.map(p => {
+      const b = el('button', { type: 'button', className: 'pm-item' + (editing?.id === p.id ? ' sel' : '') },
+        el('b', { textContent: p.name }), el('span', { textContent: `${nf(p.houses)} дом. · ${nf(p.area)} м²` }));
+      b.addEventListener('click', () => startEdit(p));
+      return b;
+    }));
+  }
+  loaders['p-map'] = async () => {
+    try {
+      if (!kg) {
+        await loadScript('/assets/map/kg-geo.js'); await loadScript('/assets/map/kg-map.js');
+        kg = window.AknietMap($('#pm-map'), { relief: '/assets/map/relief.webp', onPick: (lat, lon) => (editing ? moveTo(lat, lon) : startEdit({ lat, lon })), onPinClick: p => !p.draft && startEdit(pts.find(x => x.id === p.id)) });
+      }
+      pts = await api('/api/admin/points'); renderPoints();
+    } catch { toast('Не удалось загрузить карту', true); }
+  };
+  // typing coordinates moves the pin
+  ['#pm-lat', '#pm-lon'].forEach(sel => $(sel).addEventListener('change', () => {
+    const lat = +$('#pm-lat').value.replace(',', '.'), lon = +$('#pm-lon').value.replace(',', '.');
+    if (lat && lon) moveTo(lat, lon);
+  }));
+  $('#pm-cancel').addEventListener('click', () => { editing = null; renderPoints(); });
+  $('#pm-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const body = Object.fromEntries(Object.entries(PF).map(([k, sel]) => [k, $(sel).value.trim()]));
+    const btn = e.submitter; btn.disabled = true;
+    try {
+      await api('/api/admin/points' + (editing.id ? '/' + editing.id : ''), { method: editing.id ? 'PUT' : 'POST', body: JSON.stringify(body) });
+      editing = null; pts = await api('/api/admin/points'); renderPoints(); toast('Точка сохранена — на сайте появится в течение минуты');
+    } catch (err) { toast(errText(err, 'Ошибка сохранения'), true); }
+    finally { btn.disabled = false; }
+  });
+  $('#pm-del').addEventListener('click', async () => {
+    if (!confirm(`Удалить точку «${editing.name}»?`)) return;
+    try { await api('/api/admin/points/' + editing.id, { method: 'DELETE' }); editing = null; pts = await api('/api/admin/points'); renderPoints(); toast('Точка удалена'); }
+    catch { toast('Не удалось удалить', true); }
+  });
+
+  $('#ed-reset').addEventListener('click', async () => {
+    if (!confirm(`Вернуть стоковую карточку №${cur.i + 1}?`)) return;
+    try {
+      await api(`/api/admin/slots/${cur.sec}/${cur.i + 1}`, { method: 'DELETE' });
+      state[cur.sec].custom[cur.i] = null; renderSlots(cur.sec); ed.close(); toast(`Карточка №${cur.i + 1} — снова стоковая`);
+    } catch { toast('Не удалось сбросить', true); }
+  });
+})();
+</script>
+</body>
+</html>

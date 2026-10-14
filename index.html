@@ -1,0 +1,889 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Акниет — барнхаусы и A-frame под ключ</title>
+<meta name="description" content="Акниет — строительство барнхаусов и A-frame домов под ключ: проектирование, строительство в короткие сроки, авторский надзор.">
+<link rel="icon" type="image/png" href="assets/mark-dark.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#312d32;
+  --ink-2:#3d383e;
+  --ink-3:#4a444b;
+  --cream:#fff8ec;
+  --cream-2:#f6ecd9;
+  --cream-3:#ecdfc6;
+  --gold:#d5a039;
+  --gold-dark:#a87a22;   /* gold for text on cream (AA) */
+  --muted-on-cream:#6b636c;
+  --muted-on-ink:#bdb3a6;
+  --line-cream:rgba(49,45,50,.12);
+  --line-ink:rgba(255,248,236,.12);
+  --radius:20px;
+  --radius-sm:12px;
+  --shadow:0 1px 2px rgba(49,45,50,.06),0 12px 32px -12px rgba(49,45,50,.18);
+  --shadow-lg:0 2px 4px rgba(49,45,50,.06),0 30px 60px -20px rgba(49,45,50,.35);
+  --container:1240px;
+  --gutter:clamp(16px,4vw,40px);
+  --ease:cubic-bezier(.22,.8,.26,1);
+  --f-display:"Bitter",Georgia,serif;
+  --f-body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+img,svg{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
+h1,h2,h3{font-family:var(--f-display);line-height:1.08;margin:0;letter-spacing:-.01em}
+p{margin:0}
+.container{max-width:var(--container);margin:0 auto;padding:0 var(--gutter)}
+.skip{position:absolute;left:-999px;top:8px;background:var(--gold);color:var(--ink);padding:8px 14px;border-radius:8px;z-index:100}
+.skip:focus{left:8px}
+
+/* ---------- Buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 26px;border-radius:999px;border:1.5px solid transparent;font-weight:700;font-size:16px;cursor:pointer;transition:transform .2s var(--ease),background-color .2s,color .2s,border-color .2s,box-shadow .2s;white-space:nowrap}
+.btn svg{width:18px;height:18px;transition:transform .2s var(--ease)}
+.btn:hover svg{transform:translateX(3px)}
+.btn:active{transform:scale(.98)}
+.btn-gold{background:var(--gold);color:var(--ink);box-shadow:0 10px 24px -10px rgba(213,160,57,.7)}
+.btn-gold:hover{background:#e0ad48}
+.btn-ghost-light{border-color:rgba(255,248,236,.35);color:var(--cream)}
+.btn-ghost-light:hover{border-color:var(--cream);background:rgba(255,248,236,.06)}
+.btn-ink{background:var(--ink);color:var(--cream)}
+.btn-ink:hover{background:var(--ink-3)}
+
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-dark)}
+.eyebrow::before{content:"";width:28px;height:2px;background:currentColor;border-radius:2px}
+.on-ink .eyebrow{color:var(--gold)}
+.section{padding:clamp(72px,10vw,128px) 0}
+.section-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:clamp(36px,5vw,56px)}
+.section-head h2{font-size:clamp(34px,5vw,56px);margin-top:14px;max-width:16ch}
+.section-head p{max-width:42ch;color:var(--muted-on-cream)}
+.on-ink .section-head p{color:var(--muted-on-ink)}
+
+/* ---------- Header ---------- */
+.header{position:fixed;inset:0 0 auto 0;z-index:50;transition:background-color .3s,box-shadow .3s,backdrop-filter .3s}
+.header.scrolled{background:rgba(49,45,50,.86);backdrop-filter:saturate(140%) blur(14px);-webkit-backdrop-filter:saturate(140%) blur(14px);box-shadow:0 1px 0 var(--line-ink)}
+.header-inner{display:flex;align-items:center;justify-content:space-between;height:80px;gap:24px}
+.brand{display:flex;align-items:center;gap:12px;color:var(--cream)}
+.brand img{width:44px;height:auto}
+.brand span{font-family:var(--f-display);font-weight:800;font-size:22px;letter-spacing:.08em}
+.nav{display:flex;align-items:center;gap:6px}
+.nav a{color:rgba(255,248,236,.82);font-weight:600;font-size:15px;padding:10px 14px;border-radius:999px;transition:color .2s,background-color .2s}
+.nav a:hover{color:var(--cream);background:rgba(255,248,236,.08)}
+.header .btn{min-height:46px;padding:0 20px;font-size:15px}
+.burger{display:none;width:48px;height:48px;border-radius:50%;border:1.5px solid rgba(255,248,236,.3);background:transparent;cursor:pointer;align-items:center;justify-content:center}
+.burger span,.burger span::before,.burger span::after{display:block;width:18px;height:2px;background:var(--cream);border-radius:2px;position:relative;transition:transform .25s var(--ease),background-color .2s}
+.burger span::before,.burger span::after{content:"";position:absolute;left:0}
+.burger span::before{top:-6px}.burger span::after{top:6px}
+.menu-open .burger span{background:transparent}
+.menu-open .burger span::before{transform:translateY(6px) rotate(45deg)}
+.menu-open .burger span::after{transform:translateY(-6px) rotate(-45deg)}
+.mobile-menu{position:fixed;inset:80px 0 0 0;background:var(--ink);z-index:49;padding:24px var(--gutter) 40px;display:flex;flex-direction:column;gap:4px;transform:translateY(-8px);opacity:0;visibility:hidden;transition:opacity .25s,transform .25s var(--ease),visibility .25s}
+.menu-open .mobile-menu{opacity:1;transform:none;visibility:visible}
+.mobile-menu a:not(.btn){font-family:var(--f-display);font-size:28px;font-weight:700;color:var(--cream);padding:14px 0;border-bottom:1px solid var(--line-ink)}
+.mobile-menu .btn{margin-top:24px}
+
+/* ---------- Hero ---------- */
+.hero{position:relative;background:var(--ink);color:var(--cream);padding:clamp(130px,16vw,170px) 0 0;overflow:hidden;isolation:isolate}
+.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 50% at 78% 45%,rgba(213,160,57,.18),transparent 70%);z-index:-1}
+.hero-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:clamp(32px,5vw,72px);align-items:center}
+.hero h1{font-size:clamp(42px,6.6vw,88px);font-weight:800;margin:22px 0 24px}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero-lead{font-size:clamp(17px,1.6vw,20px);color:var(--muted-on-ink);max-width:44ch}
+.hero-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:36px}
+.hero-tags{display:flex;flex-wrap:wrap;gap:10px;margin-top:40px}
+.tag{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid var(--line-ink);border-radius:999px;font-size:14px;font-weight:600;color:rgba(255,248,236,.85)}
+.tag svg{width:16px;height:16px;color:var(--gold)}
+.hero-art{position:relative;aspect-ratio:1/1;max-width:600px;justify-self:end;width:100%}
+.hero-art svg{width:100%;height:100%}
+.hero-badge{position:absolute;left:-6%;bottom:12%;background:var(--cream);color:var(--ink);border-radius:var(--radius);padding:16px 20px;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:14px;animation:float 6s ease-in-out infinite}
+.hero-badge b{font-family:var(--f-display);font-size:30px;line-height:1}
+.hero-badge small{display:block;font-size:13px;color:var(--muted-on-cream);line-height:1.3}
+.hero-badge .ic{width:44px;height:44px;border-radius:12px;background:var(--gold);display:grid;place-items:center}
+.hero-badge .ic svg{width:22px;height:22px}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);margin-top:clamp(56px,8vw,96px);border-top:1px solid var(--line-ink)}
+.stat{padding:28px 24px 36px 0}
+.stat+.stat{padding-left:24px;border-left:1px solid var(--line-ink)}
+.stat b{display:block;font-family:var(--f-display);font-size:clamp(30px,3.6vw,44px);color:var(--cream);line-height:1.1}
+.stat span{font-size:14px;color:var(--muted-on-ink)}
+
+/* ---------- Marquee ---------- */
+.marquee{background:var(--gold);color:var(--ink);overflow:hidden;padding:18px 0;border-block:1px solid rgba(49,45,50,.15)}
+.marquee-track{display:flex;width:max-content;animation:marquee 32s linear infinite}
+.marquee-track span{display:inline-flex;align-items:center;gap:28px;padding-right:28px;font-family:var(--f-display);font-weight:800;font-size:clamp(18px,2.2vw,26px);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.marquee-track img{width:28px;height:auto}
+@keyframes marquee{to{transform:translateX(-50%)}}
+
+/* ---------- Styles (Barnhouse / A-frame) ---------- */
+.types{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.type-card{position:relative;border-radius:28px;overflow:hidden;background:var(--cream-2);border:1px solid var(--line-cream);display:flex;flex-direction:column;transition:transform .35s var(--ease),box-shadow .35s}
+.type-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.type-card .art{aspect-ratio:16/10;background:var(--ink)}
+.type-card .art svg{width:100%;height:100%}
+.type-body{padding:28px 32px 32px;display:flex;flex-direction:column;gap:14px;flex:1}
+.type-body h3{font-size:clamp(26px,2.8vw,34px)}
+.type-body p{color:var(--muted-on-cream)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:8px}
+.chip{font-size:13px;font-weight:700;padding:6px 12px;border-radius:999px;background:var(--cream);border:1px solid var(--line-cream)}
+
+/* ---------- Projects ---------- */
+.projects{background:var(--ink);color:var(--cream)}
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+.filter{min-height:44px;padding:0 20px;border-radius:999px;border:1px solid var(--line-ink);background:transparent;color:rgba(255,248,236,.8);font-weight:700;font-size:15px;cursor:pointer;transition:background-color .2s,color .2s,border-color .2s}
+.filter:hover{border-color:rgba(255,248,236,.4);color:var(--cream)}
+.filter[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+.grid-projects{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.project{background:var(--ink-2);border:1px solid var(--line-ink);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;transition:transform .35s var(--ease),border-color .3s,opacity .3s}
+.project:hover{transform:translateY(-4px);border-color:rgba(213,160,57,.5)}
+.project.hide{display:none}
+.project .art{aspect-ratio:4/3;position:relative}
+.project .art svg{width:100%;height:100%}
+.project .label{position:absolute;top:16px;left:16px;background:rgba(49,45,50,.8);backdrop-filter:blur(6px);color:var(--cream);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:6px 12px;border-radius:999px}
+.project-body{padding:22px 24px 26px;display:flex;flex-direction:column;gap:14px;flex:1}
+.project-body h3{font-size:24px}
+.specs{display:flex;flex-wrap:wrap;gap:18px;font-size:14px;color:var(--muted-on-ink)}
+.specs span{display:inline-flex;align-items:center;gap:6px}
+.specs svg{width:16px;height:16px;color:var(--gold)}
+.project-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:auto;padding-top:16px;border-top:1px solid var(--line-ink)}
+.project-foot small{color:var(--muted-on-ink);font-size:13px}
+.project-foot a{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--gold);min-height:44px}
+.project-foot a svg{width:16px;height:16px;transition:transform .2s}
+.project-foot a:hover svg{transform:translateX(3px)}
+
+/* ---------- Services ---------- */
+.services{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.service{background:#fffdf8;border:1px solid var(--line-cream);border-radius:var(--radius);padding:30px 26px;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow);transition:transform .3s var(--ease),box-shadow .3s}
+.service:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.service .ic{width:56px;height:56px;border-radius:16px;background:var(--ink);color:var(--gold);display:grid;place-items:center}
+.service .ic svg{width:26px;height:26px}
+.service h3{font-size:22px;margin-top:8px}
+.service p{color:var(--muted-on-cream);font-size:16px}
+
+/* ---------- Process ---------- */
+.process{background:var(--cream-2)}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:0;counter-reset:step;position:relative}
+.step{position:relative;padding:0 20px 0 0}
+.step .num{width:56px;height:56px;border-radius:50%;background:var(--cream);border:1.5px solid var(--ink);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:20px;position:relative;z-index:1;transition:background-color .3s,color .3s}
+.step:hover .num{background:var(--gold);border-color:var(--gold)}
+.step::before{content:"";position:absolute;top:28px;left:56px;right:0;height:1.5px;background:repeating-linear-gradient(90deg,var(--ink) 0 6px,transparent 6px 12px);opacity:.35}
+.step:last-child::before{display:none}
+.step h3{font-size:21px;margin:22px 0 10px}
+.step p{font-size:15px;color:var(--muted-on-cream)}
+
+/* ---------- Why / feature split ---------- */
+.why{background:var(--ink);color:var(--cream);overflow:hidden;position:relative}
+.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,6vw,88px);align-items:center}
+.why h2{font-size:clamp(34px,4.6vw,54px);margin:14px 0 22px}
+.why-lead{color:var(--muted-on-ink);max-width:46ch}
+.why-list{list-style:none;margin:36px 0 0;padding:0;display:grid;gap:4px}
+.why-list li{display:flex;gap:16px;padding:18px 0;border-top:1px solid var(--line-ink)}
+.why-list li:last-child{border-bottom:1px solid var(--line-ink)}
+.why-list svg{flex:none;width:24px;height:24px;color:var(--gold);margin-top:2px}
+.why-list b{display:block;font-size:17px}
+.why-list span{font-size:15px;color:var(--muted-on-ink)}
+.why-visual{position:relative;border-radius:28px;overflow:hidden;aspect-ratio:4/5;background:var(--ink-2);border:1px solid var(--line-ink)}
+.why-visual svg{width:100%;height:100%}
+.watermark{position:absolute;right:-120px;bottom:-140px;width:520px;opacity:.04;pointer-events:none}
+
+/* ---------- Reviews / Instagram ---------- */
+.insta{display:grid;grid-template-columns:1.1fr 1fr;gap:24px;align-items:stretch}
+.insta-card{border-radius:28px;padding:clamp(28px,4vw,48px);background:var(--gold);color:var(--ink);display:flex;flex-direction:column;gap:20px;position:relative;overflow:hidden}
+.insta-card h3{font-size:clamp(28px,3.4vw,42px)}
+.insta-card p{max-width:40ch;font-weight:500}
+.insta-card .btn{align-self:flex-start;margin-top:auto}
+.insta-card img.bg{position:absolute;right:-40px;bottom:-30px;width:260px;opacity:.14}
+.highlights{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;align-content:center;background:#fffdf8;border:1px solid var(--line-cream);border-radius:28px;padding:clamp(24px,3vw,36px)}
+.hl{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;font-size:13px;font-weight:700;padding:6px 0;border-radius:var(--radius-sm);transition:transform .2s}
+.hl:hover{transform:translateY(-3px)}
+.hl .ring{width:72px;height:72px;border-radius:50%;padding:3px;background:conic-gradient(var(--gold),var(--ink),var(--gold))}
+.hl .ring div{width:100%;height:100%;border-radius:50%;background:var(--cream);border:3px solid #fffdf8;display:grid;place-items:center;color:var(--ink)}
+.hl svg{width:26px;height:26px}
+.hl-title{grid-column:1/-1;font-family:var(--f-display);font-weight:700;font-size:20px;margin-bottom:6px}
+
+/* ---------- Contact ---------- */
+.contact{background:var(--ink);color:var(--cream);position:relative;overflow:hidden}
+.contact-grid{display:grid;grid-template-columns:1fr 1.05fr;gap:clamp(40px,6vw,88px);align-items:start}
+.contact h2{font-size:clamp(36px,5vw,60px);margin:14px 0 22px}
+.contact-lead{color:var(--muted-on-ink);max-width:42ch}
+.socials{display:flex;flex-wrap:wrap;gap:12px;margin-top:36px}
+.social{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 18px;border:1px solid var(--line-ink);border-radius:999px;font-weight:600;font-size:15px;transition:border-color .2s,background-color .2s}
+.social:hover{border-color:var(--gold);background:rgba(213,160,57,.08)}
+.social svg{width:20px;height:20px;color:var(--gold)}
+.form{background:var(--cream);color:var(--ink);border-radius:28px;padding:clamp(24px,4vw,44px);box-shadow:var(--shadow-lg);display:grid;gap:18px}
+.form h3{font-size:28px}
+.form .sub{color:var(--muted-on-cream);font-size:15px;margin-top:-8px}
+.field{display:grid;gap:8px}
+.field label{font-size:14px;font-weight:700}
+.field input,.field select,.field textarea{width:100%;min-height:52px;padding:12px 16px;border-radius:var(--radius-sm);border:1.5px solid var(--cream-3);background:#fffdf8;font-size:16px;transition:border-color .2s,box-shadow .2s}
+.field textarea{min-height:96px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 4px rgba(213,160,57,.18)}
+.field .err{font-size:13px;color:#b3261e;display:none}
+.field.invalid input{border-color:#b3261e}
+.field.invalid .err{display:block}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label{display:flex;align-items:center;justify-content:center;min-height:48px;border-radius:var(--radius-sm);border:1.5px solid var(--cream-3);background:#fffdf8;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;text-align:center;padding:4px 8px}
+.seg input:checked+label{background:var(--ink);border-color:var(--ink);color:var(--cream)}
+.seg input:focus-visible+label{outline:2px solid var(--gold);outline-offset:2px}
+.form .btn{width:100%}
+.form .note{font-size:12.5px;color:var(--muted-on-cream);text-align:center}
+.success{display:none;text-align:center;padding:30px 0;gap:14px;justify-items:center}
+.success .ic{width:72px;height:72px;border-radius:50%;background:var(--gold);display:grid;place-items:center}
+.success .ic svg{width:34px;height:34px}
+.form.sent>*:not(.success){display:none}
+.form.sent .success{display:grid}
+
+/* ---------- Footer ---------- */
+.footer{background:#29262a;color:var(--muted-on-ink);padding:64px 0 32px;font-size:15px}
+.footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px}
+.footer .logo{width:150px;margin-bottom:18px}
+.footer h4{font-family:var(--f-display);color:var(--cream);font-size:17px;margin:0 0 16px}
+.footer ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.footer a:hover{color:var(--gold)}
+.footer-bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;margin-top:56px;padding-top:24px;border-top:1px solid var(--line-ink);font-size:13px}
+
+/* ---------- Reveal ---------- */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+.reveal[data-d="1"]{transition-delay:.08s}.reveal[data-d="2"]{transition-delay:.16s}.reveal[data-d="3"]{transition-delay:.24s}.reveal[data-d="4"]{transition-delay:.32s}
+
+/* window glow in illustrations */
+.glow{animation:glow 4s ease-in-out infinite}
+@keyframes glow{0%,100%{opacity:1}50%{opacity:.82}}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1080px){
+  .nav,.header .btn-desktop{display:none}
+  .burger{display:inline-flex}
+  .services{grid-template-columns:repeat(2,1fr)}
+  .grid-projects{grid-template-columns:repeat(2,1fr)}
+  .steps{grid-template-columns:1fr;gap:28px}
+  .step{display:grid;grid-template-columns:56px 1fr;column-gap:20px;padding:0}
+  .step h3{margin:12px 0 6px}
+  .step .num{grid-row:span 2}
+  .step::before{top:56px;bottom:-28px;left:28px;right:auto;width:1.5px;height:auto;background:repeating-linear-gradient(180deg,var(--ink) 0 6px,transparent 6px 12px)}
+  .insta{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:860px){
+  .hero-grid,.why-grid,.contact-grid,.types{grid-template-columns:1fr}
+  .hero-art{justify-self:center;max-width:480px}
+  .hero-badge{left:0}
+  .stats{grid-template-columns:1fr 1fr}
+  .stat:nth-child(3){padding-left:0;border-left:0}
+  .stat:nth-child(n+3){border-top:1px solid var(--line-ink)}
+  .why-visual{aspect-ratio:4/3}
+}
+@media (max-width:600px){
+  body{font-size:16px}
+  .grid-projects,.services{grid-template-columns:1fr}
+  .highlights{grid-template-columns:repeat(2,1fr)}
+  .row2{grid-template-columns:1fr}
+  .seg{grid-template-columns:1fr}
+  .hero-actions .btn{width:100%}
+  .footer-grid{grid-template-columns:1fr}
+  .stat{padding:22px 12px 26px 0}
+  .stat+.stat{padding-left:12px}
+  .stat:nth-child(3){padding-left:0}
+  .type-body{padding:24px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Перейти к содержанию</a>
+
+<!-- ============ SVG sprite: icons + reusable illustration parts ============ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></g></symbol>
+    <symbol id="i-area" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9V3h6M21 9V3h-6M3 15v6h6M21 15v6h-6"/></g></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5"/></g></symbol>
+    <symbol id="i-bed" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18V6M21 18v-6a3 3 0 0 0-3-3H10v6M3 15h18"/><circle cx="6.5" cy="11" r="1.5"/></g></symbol>
+    <symbol id="i-ruler" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17 17 3l4 4L7 21l-4-4Z"/><path d="m7 13 2 2M10 10l2 2M13 7l2 2"/></g></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3 20h18L12 3Z"/><path d="M10 20v-5h4v5"/></g></symbol>
+    <symbol id="i-sofa" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11V8a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v3"/><path d="M3 13a2 2 0 0 1 4 0v2h10v-2a2 2 0 0 1 4 0v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4ZM6 19v2M18 19v2"/></g></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></g></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2Z"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-6-6Z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></g></symbol>
+    <symbol id="i-key" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="m10.7 12.3 9.3-9.3M17 6l3 3M14 9l2 2"/></g></symbol>
+    <symbol id="i-hammer" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 12-8.5 8.5a2.1 2.1 0 0 1-3-3L12 9"/><path d="M17.6 15 22 10.6l-3.5-3.5-.9.9-1.6-1.6.5-.5a3.5 3.5 0 0 0-5 0L9 8.4l1.6 1.6.9-.9 3.5 3.5"/></g></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9L12 3Z"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></g></symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8Z"/><circle cx="7.5" cy="7.5" r="1.5"/></g></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.4A8 8 0 1 1 21 12Z"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></g></symbol>
+    <symbol id="i-insta" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor"/></g></symbol>
+    <symbol id="i-tiktok" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5M14 3c.4 2.6 2.4 4.6 5 5"/></symbol>
+    <symbol id="i-threads" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M17.5 8.5C16.6 5.9 14.6 4 12 4 7.6 4 5 7.6 5 12s2.6 8 7 8c3.3 0 6-1.9 6-4.8 0-3.8-5-4.2-7-3.2-1.6.8-1.4 3.2.8 3.2 2.6 0 3.7-2 3.7-5.2"/></symbol>
+
+    <!-- Ornament (koshkar muiz) used in illustrations -->
+    <symbol id="ornament" viewBox="0 0 120 60"><path fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" d="M60 54c-10-2-18-6-24-14-6-8-4-20 6-22 8-2 12 6 7 10-3 3-8 0-5-3M60 54c10-2 18-6 24-14 6-8 4-20-6-22-8-2-12 6-7 10 3 3 8 0 5-3M8 56c10-12 24-10 30-4M112 56c-10-12-24-10-30-4"/></symbol>
+
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a262b"/><stop offset=".65" stop-color="#3b3439"/><stop offset="1" stop-color="#5a4535"/></linearGradient>
+    <linearGradient id="sky2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6ecd9"/><stop offset="1" stop-color="#ecd7ae"/></linearGradient>
+    <linearGradient id="win" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3c66a"/><stop offset="1" stop-color="#d5a039"/></linearGradient>
+    <radialGradient id="halo" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#d5a039" stop-opacity=".45"/><stop offset="1" stop-color="#d5a039" stop-opacity="0"/></radialGradient>
+    <pattern id="planks" width="14" height="10" patternUnits="userSpaceOnUse"><rect width="14" height="10" fill="#312d32"/><path d="M13.5 0v10" stroke="#3f3940" stroke-width="1"/></pattern>
+    <pattern id="planks-l" width="12" height="10" patternUnits="userSpaceOnUse"><rect width="12" height="10" fill="#e9dcc2"/><path d="M11.5 0v10" stroke="#d9c8a6" stroke-width="1"/></pattern>
+
+    <symbol id="pine" viewBox="0 0 40 100"><path fill="currentColor" d="M20 0 6 30h8L3 55h10L0 82h17v18h6V82h17L27 55h10L26 30h8Z"/></symbol>
+  </defs>
+</svg>
+
+<!-- ============ Header ============ -->
+<header class="header" id="header">
+  <div class="container header-inner">
+    <a href="#top" class="brand" aria-label="Акниет — на главную">
+      <img src="assets/mark-light.png" alt="" width="44" height="40">
+      <span>АКНИЕТ</span>
+    </a>
+    <nav class="nav" aria-label="Основная навигация">
+      <a href="#types">Дома</a>
+      <a href="#projects">Проекты</a>
+      <a href="#services">Услуги</a>
+      <a href="#process">Этапы</a>
+      <a href="#reviews">Отзывы</a>
+      <a href="#contact">Контакты</a>
+    </nav>
+    <a href="#contact" class="btn btn-gold btn-desktop">Узнать цену</a>
+    <button class="burger" id="burger" aria-label="Открыть меню" aria-expanded="false" aria-controls="mobile-menu"><span></span></button>
+  </div>
+</header>
+<nav class="mobile-menu" id="mobile-menu" aria-label="Мобильное меню">
+  <a href="#types">Дома</a>
+  <a href="#projects">Проекты</a>
+  <a href="#services">Услуги</a>
+  <a href="#process">Этапы</a>
+  <a href="#reviews">Отзывы</a>
+  <a href="#contact">Контакты</a>
+  <a href="#contact" class="btn btn-gold">Узнать цену <svg><use href="#i-arrow"/></svg></a>
+</nav>
+
+<main id="main">
+<!-- ============ Hero ============ -->
+<section class="hero on-ink" id="top">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <span class="eyebrow reveal">Барнхаус · A-frame · Лёгкая конструкция</span>
+        <h1 class="reveal" data-d="1">Построим ваш дом <em>за&nbsp;короткие сроки</em></h1>
+        <p class="hero-lead reveal" data-d="2">Проектируем и строим барнхаусы и A-frame дома под ключ — с мебелью или без. Сами ведём авторский надзор, чтобы дом получился точно таким, как на проекте.</p>
+        <div class="hero-actions reveal" data-d="3">
+          <a href="#contact" class="btn btn-gold">Рассчитать стоимость <svg><use href="#i-arrow"/></svg></a>
+          <a href="#projects" class="btn btn-ghost-light">Смотреть проекты</a>
+        </div>
+        <div class="hero-tags reveal" data-d="4">
+          <span class="tag"><svg><use href="#i-check"/></svg>Под ключ</span>
+          <span class="tag"><svg><use href="#i-check"/></svg>Собственное проектирование</span>
+          <span class="tag"><svg><use href="#i-check"/></svg>Авторский надзор</span>
+        </div>
+      </div>
+
+      <div class="hero-art reveal" data-d="2">
+        <!-- Barnhouse at dusk illustration -->
+        <svg viewBox="0 0 600 600" role="img" aria-label="Иллюстрация: барнхаус с панорамным остеклением в вечерних сумерках">
+          <defs><clipPath id="heroClip"><rect x="0" y="0" width="600" height="600" rx="300"/></clipPath></defs>
+          <g clip-path="url(#heroClip)">
+            <rect width="600" height="600" fill="url(#sky)"/>
+            <circle cx="455" cy="150" r="34" fill="#fff8ec" opacity=".9"/>
+            <circle cx="455" cy="150" r="80" fill="url(#halo)"/>
+            <g fill="#fff8ec" opacity=".6"><circle cx="120" cy="110" r="1.6"/><circle cx="200" cy="70" r="1.2"/><circle cx="300" cy="120" r="1.4"/><circle cx="360" cy="60" r="1"/><circle cx="540" cy="250" r="1.2"/><circle cx="80" cy="200" r="1"/></g>
+            <path d="M0 400 C120 340 220 360 320 330 C420 300 520 330 600 310 V600 H0Z" fill="#3a3439"/>
+            <path d="M0 440 C140 410 260 430 380 405 C470 388 540 400 600 395 V600 H0Z" fill="#2c282d"/>
+            <g color="#26222a"><use href="#pine" x="40" y="300" width="50" height="125"/><use href="#pine" x="90" y="330" width="38" height="95"/><use href="#pine" x="500" y="290" width="54" height="135"/><use href="#pine" x="465" y="335" width="36" height="90"/></g>
+            <!-- halo behind house -->
+            <ellipse cx="300" cy="420" rx="230" ry="70" fill="url(#halo)"/>
+            <!-- house: side wall -->
+            <path d="M300 230 L430 300 L430 450 L300 450Z" fill="url(#planks)"/>
+            <path d="M300 230 L300 450" stroke="#1f1c20" stroke-width="2"/>
+            <!-- roof -->
+            <path d="M300 228 L180 300 L180 306 L300 236Z" fill="#1f1c20"/>
+            <path d="M300 228 L440 306 L430 306 L300 236Z" fill="#1f1c20"/>
+            <!-- gable front (glass) -->
+            <path d="M300 236 L184 304 L184 450 L300 450Z" fill="#1f1c20"/>
+            <path d="M300 246 L192 309 L192 446 L296 446 Z" fill="url(#win)" class="glow"/>
+            <g stroke="#1f1c20" stroke-width="4"><path d="M244 278 V446"/><path d="M192 360 H296"/></g>
+            <!-- interior hints -->
+            <g fill="#a87a22" opacity=".55"><rect x="205" y="400" width="34" height="18" rx="4"/><rect x="255" y="386" width="30" height="40" rx="3"/><circle cx="270" cy="330" r="10"/></g>
+            <!-- side windows -->
+            <rect x="350" y="350" width="50" height="80" fill="url(#win)" class="glow"/>
+            <rect x="350" y="350" width="50" height="80" fill="none" stroke="#1f1c20" stroke-width="4"/>
+            <!-- deck -->
+            <path d="M160 450 H450 L460 462 H150Z" fill="#6b5435"/>
+            <path d="M150 462 H460 V468 H150Z" fill="#4a3a26"/>
+            <!-- light spill -->
+            <path d="M192 468 L296 468 L340 560 L130 560Z" fill="#d5a039" opacity=".12"/>
+            <g color="#1f1c20"><use href="#pine" x="420" y="380" width="40" height="100"/></g>
+          </g>
+          <circle cx="300" cy="300" r="298" fill="none" stroke="rgba(213,160,57,.35)" stroke-width="2"/>
+        </svg>
+        <div class="hero-badge">
+          <div class="ic"><svg><use href="#i-home"/></svg></div>
+          <div><b>12K+</b><small>подписчиков следят<br>за нашими стройками</small></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat reveal"><b>2 стиля</b><span>Барнхаус и A-frame</span></div>
+      <div class="stat reveal" data-d="1"><b>от 43 м²</b><span>Компактные и двухэтажные дома</span></div>
+      <div class="stat reveal" data-d="2"><b>Под ключ</b><span>С мебелью или без</span></div>
+      <div class="stat reveal" data-d="3"><b>1 команда</b><span>От проекта до сдачи дома</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Marquee ============ -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <span>Барнхаус <img src="assets/mark-dark.png" alt=""> A-frame <img src="assets/mark-dark.png" alt=""> Лёгкая конструкция <img src="assets/mark-dark.png" alt=""> Проектирование <img src="assets/mark-dark.png" alt=""> Под ключ <img src="assets/mark-dark.png" alt=""></span>
+    <span>Барнхаус <img src="assets/mark-dark.png" alt=""> A-frame <img src="assets/mark-dark.png" alt=""> Лёгкая конструкция <img src="assets/mark-dark.png" alt=""> Проектирование <img src="assets/mark-dark.png" alt=""> Под ключ <img src="assets/mark-dark.png" alt=""></span>
+  </div>
+</div>
+
+<!-- ============ Types ============ -->
+<section class="section" id="types">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Что мы строим</span>
+        <h2>Два стиля — один подход к качеству</h2>
+      </div>
+      <p>Оба типа домов строятся по лёгкой каркасной технологии: быстро, тепло и без лишних затрат на фундамент.</p>
+    </div>
+
+    <div class="types">
+      <article class="type-card reveal">
+        <div class="art">
+          <svg viewBox="0 0 640 400" role="img" aria-label="Иллюстрация барнхауса">
+            <rect width="640" height="400" fill="url(#sky2)"/>
+            <path d="M0 320 C160 290 300 305 640 280 V400 H0Z" fill="#e3cfa7"/>
+            <g color="#c9b48a"><use href="#pine" x="40" y="190" width="56" height="140"/><use href="#pine" x="540" y="180" width="60" height="150"/></g>
+            <!-- long barn: side -->
+            <path d="M260 120 L520 120 L560 190 L560 330 L300 330 L300 190Z" fill="url(#planks)"/>
+            <path d="M260 120 L520 120 L560 190 L300 190Z" fill="#1f1c20"/>
+            <!-- gable -->
+            <path d="M260 120 L200 190 L200 330 L300 330 L300 190Z" fill="#312d32"/>
+            <path d="M260 134 L212 192 L212 322 L292 322 L292 192Z" fill="url(#win)"/>
+            <g stroke="#312d32" stroke-width="4"><path d="M252 150 V322M212 252 H292"/></g>
+            <g fill="url(#win)"><rect x="340" y="220" width="40" height="80"/><rect x="410" y="220" width="40" height="80"/><rect x="480" y="220" width="40" height="80"/></g>
+            <path d="M180 330 H580 V340 H180Z" fill="#8a6a40"/>
+            <g color="#d5a039" opacity=".9"><use href="#ornament" x="225" y="80" width="70" height="35"/></g>
+          </svg>
+        </div>
+        <div class="type-body">
+          <h3>Барнхаус</h3>
+          <p>Строгий силуэт амбара: крутая двускатная кровля без свесов и панорамное остекление торца. Подходит для постоянного проживания всей семьёй.</p>
+          <div class="chips"><span class="chip">от 55 м²</span><span class="chip">1 или 2 этажа</span><span class="chip">Панорамные окна</span></div>
+        </div>
+      </article>
+
+      <article class="type-card reveal" data-d="1">
+        <div class="art">
+          <svg viewBox="0 0 640 400" role="img" aria-label="Иллюстрация дома A-frame">
+            <rect width="640" height="400" fill="#312d32"/>
+            <circle cx="500" cy="90" r="26" fill="#fff8ec" opacity=".9"/>
+            <circle cx="500" cy="90" r="70" fill="url(#halo)"/>
+            <path d="M0 320 C160 290 320 300 640 285 V400 H0Z" fill="#3d383e"/>
+            <g color="#29262a"><use href="#pine" x="60" y="170" width="64" height="160"/><use href="#pine" x="120" y="220" width="44" height="110"/><use href="#pine" x="520" y="190" width="56" height="140"/></g>
+            <ellipse cx="320" cy="300" rx="190" ry="60" fill="url(#halo)"/>
+            <!-- A-frame -->
+            <path d="M320 50 L470 330 L170 330Z" fill="#1f1c20"/>
+            <path d="M320 50 L470 330 L452 330 L320 80 L188 330 L170 330Z" fill="#fff8ec" opacity=".9"/>
+            <path d="M320 92 L440 322 L200 322Z" fill="url(#win)" class="glow"/>
+            <g stroke="#1f1c20" stroke-width="4"><path d="M320 92 V322M246 232 H394M275 180 H365"/></g>
+            <path d="M290 322 V270 a30 30 0 0 1 60 0 V322" fill="none" stroke="#1f1c20" stroke-width="4"/>
+            <path d="M150 330 H490 V340 H150Z" fill="#6b5435"/>
+          </svg>
+        </div>
+        <div class="type-body">
+          <h3>A-frame</h3>
+          <p>Дом-шалаш с треугольным силуэтом — как на нашем логотипе. Компактный, уютный и очень фотогеничный: идеален для загородного отдыха и гостевых домов.</p>
+          <div class="chips"><span class="chip">от 43 м²</span><span class="chip">Второй свет</span><span class="chip">Мансарда</span></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Projects ============ -->
+<section class="section projects on-ink" id="projects">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Проекты</span>
+        <h2>Готовые решения для старта</h2>
+      </div>
+      <div class="filters" role="group" aria-label="Фильтр проектов">
+        <button class="filter" aria-pressed="true" data-filter="all">Все</button>
+        <button class="filter" aria-pressed="false" data-filter="barn">Барнхаус</button>
+        <button class="filter" aria-pressed="false" data-filter="aframe">A-frame</button>
+      </div>
+    </div>
+
+    <div class="grid-projects">
+      <article class="project reveal" data-type="aframe">
+        <div class="art">
+          <svg viewBox="0 0 400 300" role="img" aria-label="A-frame 43 м²">
+            <rect width="400" height="300" fill="#f6ecd9"/>
+            <path d="M0 240 C120 220 260 230 400 215 V300 H0Z" fill="#e3cfa7"/>
+            <g color="#c9b48a"><use href="#pine" x="30" y="140" width="44" height="110"/><use href="#pine" x="330" y="130" width="48" height="120"/></g>
+            <path d="M200 40 L300 250 L100 250Z" fill="#312d32"/>
+            <path d="M200 76 L278 240 L122 240Z" fill="url(#win)"/>
+            <g stroke="#312d32" stroke-width="3"><path d="M200 76 V240M146 190 H254"/></g>
+            <path d="M80 250 H320 V258 H80Z" fill="#8a6a40"/>
+          </svg>
+          <span class="label">A-frame</span>
+        </div>
+        <div class="project-body">
+          <h3>«Шалаш 43»</h3>
+          <div class="specs">
+            <span><svg><use href="#i-area"/></svg>43 м²</span>
+            <span><svg><use href="#i-layers"/></svg>1 этаж + мансарда</span>
+          </div>
+          <div class="project-foot"><small>Цена — по запросу</small><a href="#contact" data-project="A-frame 43 м²">Узнать цену <svg><use href="#i-arrow"/></svg></a></div>
+        </div>
+      </article>
+
+      <article class="project reveal" data-type="barn" data-d="1">
+        <div class="art">
+          <svg viewBox="0 0 400 300" role="img" aria-label="Барнхаус 55 м²">
+            <rect width="400" height="300" fill="#3d383e"/>
+            <circle cx="320" cy="70" r="18" fill="#fff8ec" opacity=".85"/>
+            <path d="M0 240 C120 220 260 230 400 215 V300 H0Z" fill="#312d32"/>
+            <ellipse cx="200" cy="230" rx="150" ry="40" fill="url(#halo)"/>
+            <path d="M150 90 L320 90 L350 140 L350 245 L180 245 L180 140Z" fill="url(#planks)"/>
+            <path d="M150 90 L320 90 L350 140 L180 140Z" fill="#1f1c20"/>
+            <path d="M150 90 L110 140 L110 245 L180 245 L180 140Z" fill="#1f1c20"/>
+            <path d="M150 104 L118 143 L118 238 L174 238 L174 143Z" fill="url(#win)" class="glow"/>
+            <g stroke="#1f1c20" stroke-width="3"><path d="M146 112 V238M118 188 H174"/></g>
+            <g fill="url(#win)"><rect x="210" y="165" width="30" height="55"/><rect x="290" y="165" width="30" height="55"/></g>
+            <path d="M100 245 H360 V252 H100Z" fill="#6b5435"/>
+          </svg>
+          <span class="label">Барнхаус</span>
+        </div>
+        <div class="project-body">
+          <h3>«Барн 55»</h3>
+          <div class="specs">
+            <span><svg><use href="#i-area"/></svg>55 м²</span>
+            <span><svg><use href="#i-layers"/></svg>1 этаж</span>
+          </div>
+          <div class="project-foot"><small>Цена — по запросу</small><a href="#contact" data-project="Барнхаус 55 м²">Узнать цену <svg><use href="#i-arrow"/></svg></a></div>
+        </div>
+      </article>
+
+      <article class="project reveal" data-type="barn" data-d="2">
+        <div class="art">
+          <svg viewBox="0 0 400 300" role="img" aria-label="Двухэтажный барнхаус">
+            <rect width="400" height="300" fill="#ecdfc6"/>
+            <path d="M0 245 C120 225 260 235 400 220 V300 H0Z" fill="#dcc79e"/>
+            <g color="#c4ad80"><use href="#pine" x="20" y="130" width="50" height="125"/></g>
+            <path d="M170 40 L310 40 L345 105 L345 250 L205 250 L205 105Z" fill="url(#planks-l)"/>
+            <path d="M170 40 L310 40 L345 105 L205 105Z" fill="#312d32"/>
+            <path d="M170 40 L120 105 L120 250 L205 250 L205 105Z" fill="#312d32"/>
+            <path d="M170 56 L128 108 L128 242 L198 242 L198 108Z" fill="url(#win)"/>
+            <g stroke="#312d32" stroke-width="3"><path d="M128 172 H198M163 66 V242"/></g>
+            <g fill="#312d32"><rect x="230" y="125" width="34" height="40"/><rect x="290" y="125" width="34" height="40"/><rect x="230" y="190" width="34" height="50"/><rect x="290" y="190" width="34" height="50"/></g>
+            <g fill="url(#win)" opacity=".9"><rect x="234" y="129" width="26" height="32"/><rect x="294" y="194" width="26" height="42"/></g>
+            <path d="M105 250 H360 V258 H105Z" fill="#8a6a40"/>
+          </svg>
+          <span class="label">Барнхаус</span>
+        </div>
+        <div class="project-body">
+          <h3>«Барн Duo»</h3>
+          <div class="specs">
+            <span><svg><use href="#i-area"/></svg>Площадь — по проекту</span>
+            <span><svg><use href="#i-layers"/></svg>2 этажа</span>
+          </div>
+          <div class="project-foot"><small>Цена — по запросу</small><a href="#contact" data-project="Двухэтажный барнхаус">Узнать цену <svg><use href="#i-arrow"/></svg></a></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Services ============ -->
+<section class="section" id="services">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Услуги</span>
+        <h2>Берём на себя весь путь</h2>
+      </div>
+      <p>Вы приходите с идеей — уезжаете с ключами. Один подрядчик отвечает за проект, стройку и результат.</p>
+    </div>
+    <div class="services">
+      <article class="service reveal">
+        <div class="ic"><svg><use href="#i-ruler"/></svg></div>
+        <h3>Проектирование</h3>
+        <p>Разработаем проект под ваш участок, бюджет и образ жизни: планировки, фасады, визуализации.</p>
+      </article>
+      <article class="service reveal" data-d="1">
+        <div class="ic"><svg><use href="#i-hammer"/></svg></div>
+        <h3>Строительство под ключ</h3>
+        <p>Лёгкая каркасная конструкция позволяет построить дом в короткие сроки без потери качества.</p>
+      </article>
+      <article class="service reveal" data-d="2">
+        <div class="ic"><svg><use href="#i-sofa"/></svg></div>
+        <h3>С мебелью или без</h3>
+        <p>Сдадим дом с чистовой отделкой или полностью меблированным — заезжайте и живите.</p>
+      </article>
+      <article class="service reveal" data-d="3">
+        <div class="ic"><svg><use href="#i-eye"/></svg></div>
+        <h3>Авторский надзор</h3>
+        <p>Архитектор контролирует стройку на каждом этапе, чтобы дом совпал с проектом до миллиметра.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Process ============ -->
+<section class="section process" id="process">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Как мы работаем</span>
+        <h2>Пять шагов до новоселья</h2>
+      </div>
+      <p>Прозрачный процесс: на каждом этапе вы знаете, что происходит и что будет дальше.</p>
+    </div>
+    <ol class="steps" style="list-style:none;margin:0;padding:0">
+      <li class="step reveal"><div class="num">1</div><div><h3>Заявка</h3><p>Обсуждаем пожелания, участок и бюджет.</p></div></li>
+      <li class="step reveal" data-d="1"><div class="num">2</div><div><h3>Проект</h3><p>Готовим планировки, фасады и смету.</p></div></li>
+      <li class="step reveal" data-d="2"><div class="num">3</div><div><h3>Договор</h3><p>Фиксируем сроки, стоимость и комплектацию.</p></div></li>
+      <li class="step reveal" data-d="3"><div class="num">4</div><div><h3>Стройка</h3><p>Строим под авторским надзором, показываем ход работ.</p></div></li>
+      <li class="step reveal" data-d="4"><div class="num">5</div><div><h3>Ключи</h3><p>Сдаём готовый дом — с мебелью или без.</p></div></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ Why ============ -->
+<section class="section why on-ink">
+  <img class="watermark" src="assets/mark-light.png" alt="">
+  <div class="container why-grid">
+    <div>
+      <span class="eyebrow reveal">Почему Акниет</span>
+      <h2 class="reveal" data-d="1">Дом, в котором чувствуется характер</h2>
+      <p class="why-lead reveal" data-d="2">Акниет — это современная архитектура барнхауса и A-frame, дополненная тёплыми национальными мотивами. Как орнамент в нашем логотипе.</p>
+      <ul class="why-list">
+        <li class="reveal"><svg><use href="#i-clock"/></svg><div><b>Короткие сроки</b><span>Лёгкая конструкция ускоряет стройку в разы по сравнению с кирпичом и газоблоком.</span></div></li>
+        <li class="reveal" data-d="1"><svg><use href="#i-file"/></svg><div><b>Свой проект</b><span>Проектируем сами — без посредников и переплат за чужие чертежи.</span></div></li>
+        <li class="reveal" data-d="2"><svg><use href="#i-key"/></svg><div><b>Одна ответственность</b><span>От первого эскиза до передачи ключей — одна команда и один договор.</span></div></li>
+      </ul>
+    </div>
+    <div class="why-visual reveal" data-d="2">
+      <svg viewBox="0 0 400 500" role="img" aria-label="Иллюстрация: интерьер дома A-frame с видом на горы">
+        <rect width="400" height="500" fill="#2a262b"/>
+        <!-- window frame triangle -->
+        <path d="M200 40 L380 470 L20 470Z" fill="#f6ecd9"/>
+        <clipPath id="triClip"><path d="M200 70 L360 460 L40 460Z"/></clipPath>
+        <g clip-path="url(#triClip)">
+        <path d="M200 70 L360 460 L40 460Z" fill="url(#sky2)"/>
+        <path d="M40 380 L120 290 L170 340 L240 250 L360 400 L360 460 L40 460Z" fill="#c9b48a"/>
+        <path d="M200 250 L240 250 L215 280Z" fill="#fff8ec"/>
+        <path d="M40 420 C120 400 260 410 360 395 V460 H40Z" fill="#a89070"/>
+        <g color="#7d6a52"><use href="#pine" x="60" y="360" width="34" height="85"/><use href="#pine" x="300" y="350" width="40" height="100"/></g>
+        <circle cx="270" cy="170" r="20" fill="#d5a039"/>
+        </g>
+        <g stroke="#312d32" stroke-width="6"><path d="M200 70 V460M95 330 H305M145 210 H255"/></g>
+        <path d="M200 40 L380 470 L20 470Z" fill="none" stroke="#312d32" stroke-width="10" stroke-linejoin="round"/>
+        <!-- ornament on floor -->
+        <rect x="0" y="470" width="400" height="30" fill="#1f1c20"/>
+        <g color="#d5a039"><use href="#ornament" x="150" y="440" width="100" height="50"/></g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Reviews / Instagram ============ -->
+<section class="section" id="reviews">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Отзывы и стройки</span>
+        <h2>Живые объекты — в нашем Instagram</h2>
+      </div>
+      <p>Каждый день показываем, как строятся дома: от фундамента до новоселья. Там же — отзывы наших клиентов.</p>
+    </div>
+    <div class="insta">
+      <div class="insta-card reveal">
+        <img class="bg" src="assets/mark-dark.png" alt="">
+        <span style="display:flex;align-items:center;gap:10px;font-weight:800"><svg width="24" height="24"><use href="#i-insta"/></svg>@akniet.home</span>
+        <h3>Более 12 000 человек уже следят за нашими домами</h3>
+        <p>Смотрите видео со строек, готовые объекты, отзывы клиентов и актуальный прайс в закреплённых историях.</p>
+        <a class="btn btn-ink" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener">Открыть Instagram <svg><use href="#i-arrow"/></svg></a>
+      </div>
+      <div class="highlights reveal" data-d="1">
+        <div class="hl-title">Актуальное</div>
+        <a class="hl" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener"><span class="ring"><div><svg><use href="#i-tag"/></svg></div></span>Прайс</a>
+        <a class="hl" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener"><span class="ring"><div><svg><use href="#i-home"/></svg></div></span>Готовые</a>
+        <a class="hl" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener"><span class="ring"><div><svg><use href="#i-star"/></svg></div></span>Отзывы</a>
+        <a class="hl" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener"><span class="ring"><div><svg><use href="#i-calendar"/></svg></div></span>График</a>
+        <a class="hl" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener"><span class="ring"><div><svg><use href="#i-layers"/></svg></div></span>A-frame</a>
+        <a class="hl" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener"><span class="ring"><div><svg><use href="#i-bed"/></svg></div></span>Барнхаус</a>
+        <a class="hl" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener"><span class="ring"><div><svg><use href="#i-pin"/></svg></div></span>Адрес</a>
+        <a class="hl" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener"><span class="ring"><div><svg><use href="#i-chat"/></svg></div></span>Контакты</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Contact ============ -->
+<section class="section contact on-ink" id="contact">
+  <img class="watermark" src="assets/mark-light.png" alt="" style="left:-140px;right:auto;top:-120px;bottom:auto">
+  <div class="container contact-grid">
+    <div>
+      <span class="eyebrow reveal">Связаться с нами</span>
+      <h2 class="reveal" data-d="1">Давайте обсудим ваш будущий дом</h2>
+      <p class="contact-lead reveal" data-d="2">Оставьте заявку — мы перезвоним, ответим на вопросы и рассчитаем стоимость под ваш проект. Консультация бесплатная.</p>
+      <div class="socials reveal" data-d="3">
+        <a class="social" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener"><svg><use href="#i-insta"/></svg>akniet.home</a>
+        <a class="social" href="https://www.tiktok.com/@akniet_home" target="_blank" rel="noopener"><svg><use href="#i-tiktok"/></svg>akniet_home</a>
+        <a class="social" href="https://www.threads.net/@akniet.home" target="_blank" rel="noopener"><svg><use href="#i-threads"/></svg>akniet.home</a>
+      </div>
+    </div>
+
+    <form class="form reveal" id="lead-form" novalidate data-d="2">
+      <h3>Рассчитать стоимость</h3>
+      <p class="sub">Ответим в течение рабочего дня</p>
+      <div class="row2">
+        <div class="field" id="f-name">
+          <label for="name">Ваше имя</label>
+          <input id="name" name="name" autocomplete="name" placeholder="Например, Айбек">
+          <span class="err">Пожалуйста, укажите имя</span>
+        </div>
+        <div class="field" id="f-phone">
+          <label for="phone">Телефон</label>
+          <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+7 (___) ___-__-__">
+          <span class="err">Введите корректный номер телефона</span>
+        </div>
+      </div>
+      <div class="field">
+        <span style="font-size:14px;font-weight:700">Тип дома</span>
+        <div class="seg" role="radiogroup" aria-label="Тип дома">
+          <input type="radio" name="type" id="t1" value="Барнхаус" checked><label for="t1">Барнхаус</label>
+          <input type="radio" name="type" id="t2" value="A-frame"><label for="t2">A-frame</label>
+          <input type="radio" name="type" id="t3" value="Не решил"><label for="t3">Ещё не решил</label>
+        </div>
+      </div>
+      <div class="field">
+        <label for="msg">Комментарий <span style="font-weight:500;color:var(--muted-on-cream)">(необязательно)</span></label>
+        <textarea id="msg" name="msg" placeholder="Площадь, этажность, нужна ли мебель…"></textarea>
+      </div>
+      <button class="btn btn-gold" type="submit">Отправить заявку <svg><use href="#i-arrow"/></svg></button>
+      <p class="note">Нажимая кнопку, вы соглашаетесь на обработку персональных данных</p>
+      <div class="success" role="status" aria-live="polite">
+        <div class="ic"><svg><use href="#i-check"/></svg></div>
+        <h3>Спасибо! Заявка принята</h3>
+        <p style="color:var(--muted-on-cream)">Мы свяжемся с вами в ближайшее время.</p>
+      </div>
+    </form>
+  </div>
+</section>
+</main>
+
+<!-- ============ Footer ============ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <img class="logo" src="assets/logo-light.png" alt="Акниет" width="150" height="103">
+        <p style="max-width:32ch">Строим барнхаусы и A-frame дома под ключ: проектирование, строительство, авторский надзор.</p>
+      </div>
+      <div>
+        <h4>Дома</h4>
+        <ul><li><a href="#types">Барнхаус</a></li><li><a href="#types">A-frame</a></li><li><a href="#projects">Проекты</a></li></ul>
+      </div>
+      <div>
+        <h4>Компания</h4>
+        <ul><li><a href="#services">Услуги</a></li><li><a href="#process">Этапы работы</a></li><li><a href="#reviews">Отзывы</a></li></ul>
+      </div>
+      <div>
+        <h4>Соцсети</h4>
+        <ul><li><a href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener">Instagram</a></li><li><a href="https://www.tiktok.com/@akniet_home" target="_blank" rel="noopener">TikTok</a></li><li><a href="https://www.threads.net/@akniet.home" target="_blank" rel="noopener">Threads</a></li></ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year">2026</span> Акниет. Все права защищены.</span>
+      <a href="#top">Наверх ↑</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const header = document.getElementById('header');
+  const onScroll = () => header.classList.toggle('scrolled', window.scrollY > 20);
+  onScroll(); window.addEventListener('scroll', onScroll, {passive:true});
+
+  // mobile menu
+  const burger = document.getElementById('burger');
+  const setMenu = open => {
+    document.body.classList.toggle('menu-open', open);
+    burger.setAttribute('aria-expanded', open);
+    burger.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
+    header.classList.toggle('scrolled', open || window.scrollY > 20);
+  };
+  burger.addEventListener('click', () => setMenu(!document.body.classList.contains('menu-open')));
+  document.querySelectorAll('#mobile-menu a').forEach(a => a.addEventListener('click', () => setMenu(false)));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
+
+  // reveal on scroll
+  const io = 'IntersectionObserver' in window ? new IntersectionObserver(entries => {
+    entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+  }, {threshold:.12, rootMargin:'0px 0px -40px 0px'}) : null;
+  document.querySelectorAll('.reveal').forEach(el => io ? io.observe(el) : el.classList.add('in'));
+
+  // project filter
+  const filters = document.querySelectorAll('.filter');
+  filters.forEach(btn => btn.addEventListener('click', () => {
+    filters.forEach(b => b.setAttribute('aria-pressed', b === btn));
+    const f = btn.dataset.filter;
+    document.querySelectorAll('.project').forEach(p => p.classList.toggle('hide', f !== 'all' && p.dataset.type !== f));
+  }));
+
+  // prefill form from project card
+  document.querySelectorAll('[data-project]').forEach(a => a.addEventListener('click', () => {
+    const name = a.dataset.project;
+    document.getElementById(name.includes('A-frame') ? 't2' : 't1').checked = true;
+    document.getElementById('msg').value = 'Интересует проект: ' + name;
+  }));
+
+  // form validation (front-end only)
+  const form = document.getElementById('lead-form');
+  const phone = document.getElementById('phone');
+  phone.addEventListener('input', () => { phone.value = phone.value.replace(/[^\d+()\-\s]/g, ''); });
+  const check = () => {
+    const okName = document.getElementById('name').value.trim().length > 1;
+    const okPhone = phone.value.replace(/\D/g, '').length >= 10;
+    document.getElementById('f-name').classList.toggle('invalid', !okName);
+    document.getElementById('f-phone').classList.toggle('invalid', !okPhone);
+    return okName && okPhone;
+  };
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    if (!check()) { form.querySelector('.invalid input').focus(); return; }
+    // TODO: подключить отправку (WhatsApp / Telegram-бот / CRM)
+    form.classList.add('sent');
+  });
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+})();
+</script>
+</body>
+</html>

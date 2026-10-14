@@ -1,0 +1,917 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Акниет — тёплые дома из дерева</title>
+<meta name="description" content="Акниет — проектирование и строительство барнхаусов и A-frame домов под ключ. Тёплые оттенки, натуральное дерево, авторский надзор.">
+<link rel="icon" type="image/png" href="assets/mark-gold.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://images.pexels.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;500;600&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#312d32;--cream:#fff8ec;--gold:#d5a039;
+  --base:#2a2224;--base-deep:#1e1819;--terra:#a8553a;--terra-deep:#7d3a26;--linen:#e9dcc6;--page:#f2e8d9;
+  --walnut:#5b3e2b;--oak:#c9a27a;--gold-ink:#7a5410;
+  --w-walnut:none;--w-oak:none;--w-pine:none;--w-char:none;--w-oak-h:none;--w-walnut-h:none;
+  --r:28px;--gap:14px;
+  --gutter:clamp(12px,2vw,28px);
+  --ease:cubic-bezier(.19,1,.22,1);
+  --f-head:"Unbounded",system-ui,sans-serif;
+  --f-text:"Onest",system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+body{margin:0;background:var(--page);color:var(--ink);font-family:var(--f-text);font-size:16px;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body.loading{overflow:hidden}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button,input,textarea{font:inherit;color:inherit}
+::selection{background:var(--terra);color:var(--cream)}
+:focus-visible{outline:2px solid var(--terra);outline-offset:3px}
+h1,h2,h3{font-family:var(--f-head);font-weight:400;line-height:1.05;margin:0;letter-spacing:-.03em}
+p{margin:0}
+.wrap{padding:0 var(--gutter);max-width:1520px;margin:0 auto}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:500;background:rgba(255,248,236,.14);border:1px solid rgba(255,248,236,.22);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.chip.ink{background:rgba(49,45,50,.06);border-color:rgba(49,45,50,.14)}
+.chip i{width:7px;height:7px;border-radius:50%;background:var(--gold)}
+.eyebrow{font-size:13px;font-weight:500;letter-spacing:.02em;opacity:.7}
+
+/* ---------- Preloader: bento tiles assemble ---------- */
+.loader{position:fixed;inset:0;z-index:200;background:var(--terra);display:grid;place-items:center;transition:transform 1s var(--ease)}
+.loader.done{transform:translateY(-100%)}
+.loader-grid{display:grid;grid-template-columns:repeat(3,44px);gap:8px}
+.loader-grid i{height:44px;border-radius:12px;background:var(--cream);transform:scale(0);animation:pop .7s var(--ease) forwards;animation-delay:calc(var(--i)*.08s)}
+.loader-grid i:nth-child(2){background:var(--gold)}.loader-grid i:nth-child(4){background:var(--base)}.loader-grid i:nth-child(6){background:var(--oak)}
+.loader-grid i.logo{display:grid;place-items:center;background:var(--base)}
+.loader-grid i.logo img{width:26px}
+.loader p{margin-top:22px;font-family:var(--f-head);font-size:14px;color:var(--cream);letter-spacing:.2em;text-align:center}
+@keyframes pop{to{transform:scale(1)}}
+
+/* ---------- Cursor ---------- */
+.cursor{position:fixed;top:0;left:0;z-index:150;pointer-events:none;display:none}
+.cursor .ring{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--terra);display:grid;place-items:center;transition:width .4s var(--ease),height .4s var(--ease),margin .4s var(--ease),background-color .3s}
+.cursor .ring span{font-size:12px;font-weight:600;color:var(--cream);opacity:0;transition:opacity .3s}
+.cursor.hover .ring{width:40px;height:40px;margin:-20px 0 0 -20px;background:rgba(168,85,58,.25)}
+.cursor.view .ring{width:88px;height:88px;margin:-44px 0 0 -44px;background:var(--terra)}
+.cursor.view .ring span{opacity:1}
+@media (hover:hover) and (pointer:fine){.cursor{display:block}}
+
+/* ---------- Floating pill header ---------- */
+.header{position:fixed;top:14px;left:50%;z-index:100;transform:translateX(-50%);width:min(calc(100% - 24px),1100px);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 8px 8px 18px;border-radius:999px;background:rgba(255,248,236,.78);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);box-shadow:0 10px 40px -16px rgba(42,34,36,.35),inset 0 0 0 1px rgba(49,45,50,.08);transition:transform .6s var(--ease)}
+.header.hidden{transform:translate(-50%,-140%)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo img{width:26px}
+.logo span{font-family:var(--f-head);font-weight:500;font-size:15px;letter-spacing:.18em}
+.header nav{display:flex;gap:4px}
+.header nav a{padding:10px 16px;border-radius:999px;font-size:14px;font-weight:500;transition:background-color .3s}
+.header nav a:hover{background:rgba(49,45,50,.07)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:46px;padding:0 22px;border-radius:999px;border:0;font-weight:600;font-size:15px;cursor:pointer;transition:transform .4s var(--ease),background-color .3s,box-shadow .4s}
+.btn svg{width:18px;height:18px;transition:transform .4s var(--ease)}
+.btn:hover svg{transform:translateX(3px) rotate(-45deg)}
+.btn.terra{background:var(--terra);color:var(--cream);box-shadow:0 10px 24px -12px rgba(168,85,58,.9)}
+.btn.terra:hover{background:var(--terra-deep)}
+.btn.cream{background:var(--cream);color:var(--ink)}
+.btn.ghost{background:rgba(255,248,236,.12);color:var(--cream);border:1px solid rgba(255,248,236,.3)}
+.menu-btn{display:none;width:46px;height:46px;border-radius:50%;border:0;background:var(--base);color:var(--cream);cursor:pointer}
+.menu-btn span{display:block;width:16px;height:1.5px;background:currentColor;margin:4px auto;transition:transform .4s var(--ease)}
+.menu-open .menu-btn span:first-child{transform:translateY(2.75px) rotate(45deg)}
+.menu-open .menu-btn span:last-child{transform:translateY(-2.75px) rotate(-45deg)}
+.sheet{position:fixed;top:78px;left:12px;right:12px;z-index:99;background:var(--cream);border-radius:var(--r);padding:12px;box-shadow:0 30px 60px -20px rgba(42,34,36,.45);display:grid;gap:4px;opacity:0;transform:translateY(-12px) scale(.98);pointer-events:none;transition:opacity .4s var(--ease),transform .5s var(--ease)}
+.menu-open .sheet{opacity:1;transform:none;pointer-events:auto}
+.sheet a{padding:16px 18px;border-radius:18px;font-family:var(--f-head);font-size:20px;display:flex;justify-content:space-between}
+.sheet a:hover{background:var(--linen)}
+
+/* ---------- Bento base ---------- */
+section{padding:var(--gap) 0}
+.bento{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gap)}
+.card{position:relative;border-radius:var(--r);overflow:hidden;padding:clamp(20px,2.2vw,32px);background:var(--cream);isolation:isolate;transition:transform .6s var(--ease),box-shadow .6s var(--ease)}
+a.card:hover,.card.lift:hover{transform:translateY(-4px);box-shadow:0 24px 50px -24px rgba(42,34,36,.45)}
+.card.dark{background:var(--base);color:var(--cream)}
+.card.terra{background:linear-gradient(150deg,var(--terra),var(--terra-deep));color:var(--cream)}
+.card.linen{background:var(--linen)}
+.card.oak{background:var(--oak) var(--w-oak) center/320px;color:#2a1a10}
+.card.walnut{background:var(--walnut) var(--w-walnut) center/360px;color:var(--cream)}
+.card.photo{padding:0;color:var(--cream);min-height:240px;background:var(--base)}
+.card.photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.2s var(--ease)}
+.card.photo:hover img{transform:scale(1.06)}
+.card.photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(30,24,25,.75));z-index:0}
+.card.photo .over{position:absolute;inset:auto 0 0 0;z-index:1;padding:clamp(18px,2vw,28px);display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.card.photo .top{position:absolute;top:16px;left:16px;z-index:1;display:flex;gap:6px;flex-wrap:wrap}
+.arrow{width:46px;height:46px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--cream);color:var(--ink);transition:transform .5s var(--ease)}
+.arrow svg{width:18px;height:18px}
+.card:hover .arrow{transform:rotate(-45deg)}
+.big-num{font-family:var(--f-head);font-weight:300;font-size:clamp(56px,6vw,104px);line-height:.9;letter-spacing:-.05em}
+.big-num small{font-size:.36em;letter-spacing:0;margin-left:4px}
+.sec-title{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;padding:clamp(56px,7vw,110px) 6px clamp(22px,2.4vw,34px)}
+.sec-title h2{font-size:clamp(34px,4.6vw,76px)}
+.sec-title h2 span{color:var(--terra)}
+.sec-title p{max-width:38ch;color:rgba(49,45,50,.72)}
+
+/* ---------- Hero ---------- */
+.hero{padding-top:84px}
+.c-3d{grid-column:1/9;grid-row:1/3;min-height:clamp(520px,74vh,720px);padding:0;background:radial-gradient(75% 60% at 66% 62%,#8a4430 0%,#4a2a24 40%,var(--base-deep) 80%);color:var(--cream)}
+.c-3d canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.c-3d .fallback{position:absolute;inset:0;background:center/cover url("https://images.pexels.com/photos/19737830/pexels-photo-19737830.jpeg?auto=compress&cs=tinysrgb&w=1600");opacity:0}
+.no-webgl .c-3d .fallback{opacity:.6}
+.c-3d .hero-ui{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(20px,2.6vw,40px);pointer-events:none}
+.c-3d .hero-ui a{pointer-events:auto}
+.c-3d h1{font-size:clamp(40px,5vw,84px);max-width:11ch}
+.c-3d h1 .line{display:block;overflow:hidden}
+.c-3d h1 .line>span{display:inline-block;transform:translateY(110%)}
+.c-3d h1 .line>span em{font-style:normal;color:var(--gold)}
+.hero-bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-top:22px}
+.hero-bottom p{max-width:36ch;color:rgba(255,248,236,.78);font-size:15px}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap}
+.c-stat{grid-column:9/13;grid-row:1;display:flex;flex-direction:column;justify-content:space-between;gap:20px}
+.c-photo{grid-column:9/11;grid-row:2}
+.c-insta{grid-column:11/13;grid-row:2;display:flex;flex-direction:column;justify-content:space-between;gap:12px}
+.c-insta b{font-family:var(--f-head);font-weight:400;font-size:clamp(36px,3.4vw,56px);letter-spacing:-.04em;line-height:1}
+.c-manifest{grid-column:1/7;font-family:var(--f-head);font-weight:300;font-size:clamp(20px,1.8vw,28px);line-height:1.35;letter-spacing:-.02em;display:flex;flex-direction:column;justify-content:space-between;gap:28px}
+.c-manifest span{color:var(--terra)}
+.c-key{grid-column:7/10;display:flex;flex-direction:column;justify-content:space-between;gap:28px;min-height:220px}
+.c-key h3{font-size:clamp(22px,1.8vw,30px)}
+.c-styles{grid-column:10/13;display:flex;flex-direction:column;justify-content:space-between;gap:20px}
+.icon{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:rgba(255,248,236,.16)}
+.icon svg{width:26px;height:26px}
+.card:not(.dark):not(.terra):not(.walnut):not(.photo) .icon{background:rgba(168,85,58,.12);color:var(--terra)}
+
+/* ---------- Two styles ---------- */
+.c-barn{grid-column:1/8;min-height:clamp(420px,46vw,620px)}
+.c-af{grid-column:8/13;min-height:clamp(420px,46vw,620px)}
+.style-name{font-family:var(--f-head);font-size:clamp(32px,3.6vw,60px);line-height:1}
+.style-meta{margin-top:10px;color:rgba(255,248,236,.85);font-size:15px;max-width:34ch}
+.includes{grid-column:1/13;display:flex;align-items:center;gap:clamp(16px,3vw,48px);flex-wrap:wrap;justify-content:space-between}
+.includes h3{font-size:clamp(20px,1.8vw,28px)}
+.includes ul{list-style:none;margin:0;padding:0;display:flex;gap:8px;flex-wrap:wrap}
+.includes li{padding:10px 16px;border-radius:999px;background:rgba(255,248,236,.16);border:1px solid rgba(255,248,236,.25);font-size:14px;font-weight:500}
+
+/* ---------- Materials ---------- */
+.c-mat-text{grid-column:1/5;grid-row:span 2;display:flex;flex-direction:column;justify-content:space-between;gap:24px}
+.c-mat-text h3{font-size:clamp(26px,2.4vw,40px)}
+.c-mat-text p{color:rgba(255,248,236,.72)}
+.swatch-dots{display:flex;gap:8px}
+.swatch-dots i{width:34px;height:34px;border-radius:50%;background:var(--c) var(--w) center/120px;box-shadow:0 0 0 2px rgba(255,248,236,.25)}
+.tile{grid-column:span 4;padding:0;min-height:clamp(220px,20vw,300px);background:var(--c) var(--w) center/360px;perspective:900px;will-change:transform}
+.tile.wide{grid-column:span 4}
+.tile::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at var(--mx,50%) var(--my,0%),rgba(255,236,200,.3),transparent 55%);z-index:0}
+.tile::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,240,215,.3) 50%,transparent 65%);transform:translateX(-120%);transition:transform 1.3s var(--ease)}
+.tile:hover::after{transform:translateX(120%)}
+.tile .lab{position:absolute;left:14px;bottom:14px;right:14px;z-index:1;display:flex;justify-content:space-between;align-items:center;gap:10px;background:rgba(255,248,236,.9);color:var(--ink);border-radius:18px;padding:12px 14px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.tile .lab b{font-family:var(--f-head);font-weight:500;font-size:16px}
+.tile .lab span{font-size:12px;color:rgba(49,45,50,.7)}
+
+/* ---------- Services ---------- */
+.c-svc-photo{grid-column:1/6;grid-row:span 2;min-height:520px}
+.svc-grid{grid-column:6/13;grid-row:span 2;display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+.svc-card{display:flex;flex-direction:column;justify-content:space-between;gap:36px;min-height:250px}
+.svc-card h3{font-size:clamp(20px,1.7vw,26px);margin-bottom:10px}
+.svc-card p{font-size:15px;opacity:.75}
+.svc-card .row{display:flex;justify-content:space-between;align-items:flex-start}
+.svc-card .no{font-family:var(--f-head);font-size:14px;opacity:.5}
+
+/* ---------- Process ---------- */
+.c-process{grid-column:1/13;padding:clamp(28px,3.4vw,52px)}
+.c-process .head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.c-process h2{font-size:clamp(30px,3.6vw,60px)}
+.steps{position:relative;display:grid;grid-template-columns:repeat(5,1fr);gap:var(--gap);margin-top:clamp(36px,4vw,64px)}
+.track-line{position:absolute;left:24px;right:24px;top:24px;height:3px;border-radius:3px;background:rgba(255,248,236,.2)}
+.track-line i{position:absolute;inset:0;border-radius:3px;background:var(--cream);transform:scaleX(0);transform-origin:left}
+.step{position:relative;background:rgba(30,24,25,.18);border-radius:22px;padding:72px 18px 20px}
+.step .dot{position:absolute;top:4px;left:4px;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-head);font-size:15px;background:var(--terra-deep);border:2px solid rgba(255,248,236,.4);transition:background-color .4s,color .4s,border-color .4s}
+.step.active .dot{background:var(--cream);color:var(--terra);border-color:var(--cream)}
+.step h3{font-size:19px;margin-bottom:8px}
+.step p{font-size:14px;color:rgba(255,248,236,.8)}
+
+/* ---------- Gallery marquee ---------- */
+.gallery{overflow:hidden;padding-bottom:var(--gap)}
+.rail{display:flex;gap:var(--gap);width:max-content;will-change:transform;margin-bottom:var(--gap)}
+.shot{position:relative;width:clamp(240px,26vw,420px);aspect-ratio:4/3;border-radius:var(--r);overflow:hidden;flex:none;background:var(--base)}
+.shot.tall{width:clamp(200px,18vw,300px);aspect-ratio:3/4}
+.shot img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s var(--ease)}
+.shot:hover img{transform:scale(1.06)}
+.shot span{position:absolute;left:12px;bottom:12px;z-index:1}
+.shot.wood{background:var(--c) var(--w) center/300px;display:grid;place-items:center;text-align:center;padding:20px}
+.shot.wood b{font-family:var(--f-head);font-weight:400;font-size:clamp(20px,1.8vw,28px);line-height:1.15}
+
+/* ---------- Contact ---------- */
+.c-form{grid-column:1/8;grid-row:span 2;padding:clamp(24px,3.4vw,52px)}
+.c-form h2{font-size:clamp(32px,3.8vw,62px)}
+.c-form h2 span{color:var(--terra)}
+.c-form .lead{color:rgba(49,45,50,.72);margin:16px 0 32px;max-width:44ch}
+.form{display:grid;gap:14px;grid-template-columns:1fr 1fr}
+.fld{position:relative}
+.fld.full{grid-column:1/-1}
+.fld input,.fld textarea{width:100%;background:var(--page);border:1.5px solid transparent;border-radius:18px;padding:26px 18px 10px;font-size:16px;outline:none;resize:none;transition:border-color .3s,background-color .3s}
+.fld textarea{min-height:110px}
+.fld label{position:absolute;left:19px;top:18px;font-size:16px;color:rgba(49,45,50,.55);pointer-events:none;transition:top .35s var(--ease),font-size .35s var(--ease),color .3s}
+.fld input:focus,.fld textarea:focus{border-color:var(--terra);background:#fff}
+.fld input:focus+label,.fld input:not(:placeholder-shown)+label,.fld textarea:focus+label,.fld textarea:not(:placeholder-shown)+label{top:8px;font-size:12px;color:var(--terra)}
+.fld .err{display:none;font-size:12px;color:#a33a24;margin:6px 0 0 6px}
+.fld.invalid input{border-color:#a33a24}
+.fld.invalid .err{display:block}
+.seg{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--page);border-radius:18px;padding:6px}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label{min-height:46px;border-radius:13px;display:grid;place-items:center;font-weight:500;font-size:14px;cursor:pointer;text-align:center;transition:background-color .3s,color .3s}
+.seg input:checked+label{background:var(--base);color:var(--cream)}
+.seg input:focus-visible+label{outline:2px solid var(--terra);outline-offset:2px}
+.form .btn{grid-column:1/-1;min-height:58px;font-size:16px}
+.form-note{grid-column:1/-1;font-size:12px;color:rgba(49,45,50,.55);text-align:center}
+.sent-msg{display:none}
+.form.sent>*:not(.sent-msg){display:none}
+.form.sent .sent-msg{display:grid;gap:12px;grid-column:1/-1;padding:24px 0}
+.sent-msg h3{font-size:clamp(26px,2.6vw,40px)}
+.c-quote{grid-column:8/13;min-height:320px}
+.c-quote .over{flex-direction:column;align-items:flex-start}
+.c-quote q{font-family:var(--f-head);font-weight:300;font-size:clamp(20px,1.8vw,28px);line-height:1.3;quotes:none}
+.c-social{grid-column:8/13;display:grid;gap:8px;align-content:start}
+.c-social a{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-radius:18px;background:rgba(255,248,236,.08);font-family:var(--f-head);font-size:18px;transition:background-color .3s,padding .4s var(--ease)}
+.c-social a:hover{background:var(--terra);padding-left:24px}
+.c-social a span{font-family:var(--f-text);font-size:13px;opacity:.7}
+
+/* ---------- Footer ---------- */
+.footer{padding:var(--gap) 0 calc(var(--gap) + 6px)}
+.footer .card{padding:clamp(28px,4vw,64px)}
+.foot-top{display:grid;grid-template-columns:2fr 1fr 1fr;gap:32px}
+.foot-top h4{margin:0 0 14px;font-size:13px;font-weight:500;color:var(--gold)}
+.foot-top ul{list-style:none;margin:0;padding:0;display:grid;gap:6px;color:rgba(255,248,236,.72)}
+.foot-top a:hover{color:var(--cream)}
+.foot-logo{display:flex;justify-content:center;padding:clamp(48px,7vw,100px) 0}
+.foot-logo img{width:min(100%,520px)}
+.foot-bottom{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:13px;color:rgba(255,248,236,.5)}
+
+.rv{opacity:0;transform:translateY(40px) scale(.97)}
+.static .rv{opacity:1;transform:none}
+.fade-in{opacity:0}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1100px){
+  .header nav{display:none}
+  .menu-btn{display:block}
+  .c-3d{grid-column:1/-1;grid-row:auto}
+  .c-stat{grid-column:1/7;grid-row:auto}
+  .c-photo{grid-column:7/10;grid-row:auto}
+  .c-insta{grid-column:10/13;grid-row:auto}
+  .c-manifest{grid-column:1/-1}
+  .c-key{grid-column:1/7}
+  .c-styles{grid-column:7/13}
+  .c-mat-text{grid-column:1/-1;grid-row:auto}
+  .tile,.tile.wide{grid-column:span 6}
+  .c-svc-photo{grid-column:1/-1;grid-row:auto;min-height:320px}
+  .svc-grid{grid-column:1/-1;grid-row:auto}
+  .steps{grid-template-columns:1fr 1fr 1fr}
+  .track-line{display:none}
+  .c-form{grid-column:1/-1;grid-row:auto}
+  .c-quote,.c-social{grid-column:span 6}
+}
+@media (max-width:700px){
+  :root{--r:22px;--gap:10px}
+  .header .btn.terra{display:none}
+  .c-3d{min-height:640px}
+  .c-3d h1{font-size:clamp(32px,9.6vw,40px);max-width:none}
+  .c-stat,.c-photo,.c-insta,.c-key,.c-styles,.c-barn,.c-af,.c-quote,.c-social{grid-column:1/-1}
+  .c-photo{min-height:260px}
+  .tile,.tile.wide{grid-column:span 6;min-height:200px}
+  .tile .lab{flex-direction:column;align-items:flex-start;gap:0}
+  .svc-grid{grid-template-columns:1fr}
+  .svc-card{min-height:0}
+  .steps{grid-template-columns:1fr}
+  .form{grid-template-columns:1fr}
+  .foot-top{grid-template-columns:1fr 1fr}
+  .foot-top>:first-child{grid-column:1/-1}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition-duration:.01ms!important}
+  .loader-grid i{transform:none}
+  .rv,.fade-in{opacity:1!important;transform:none!important}
+  .c-3d h1 .line>span{transform:none!important}
+}
+</style>
+</head>
+<body class="loading">
+
+<div class="loader" id="loader" aria-hidden="true">
+  <div>
+    <div class="loader-grid"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i class="logo" style="--i:3"><img src="assets/mark-gold.png" alt=""></i><i style="--i:4"></i><i style="--i:5"></i></div>
+    <p>АКНИЕТ</p>
+  </div>
+</div>
+
+<div class="cursor" id="cursor" aria-hidden="true"><div class="ring"><span>Смотреть</span></div></div>
+
+<header class="header" id="header">
+  <a href="#top" class="logo" aria-label="Акниет — на главную"><img src="assets/mark-dark.png" alt="" width="26" height="24"><span>АКНИЕТ</span></a>
+  <nav>
+    <a href="#homes">Дома</a>
+    <a href="#materials">Материалы</a>
+    <a href="#services">Услуги</a>
+    <a href="#process">Процесс</a>
+  </nav>
+  <div style="display:flex;gap:8px;align-items:center">
+    <a href="#contact" class="btn terra">Рассчитать дом</a>
+    <button class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="sheet" aria-label="Меню"><span></span><span></span></button>
+  </div>
+</header>
+<nav class="sheet" id="sheet" aria-label="Меню">
+  <a href="#homes">Дома <span>→</span></a>
+  <a href="#materials">Материалы <span>→</span></a>
+  <a href="#services">Услуги <span>→</span></a>
+  <a href="#process">Процесс <span>→</span></a>
+  <a href="#contact">Рассчитать дом <span>→</span></a>
+</nav>
+
+<main id="top">
+<!-- ============ HERO BENTO ============ -->
+<section class="hero">
+  <div class="wrap bento">
+    <div class="card c-3d" id="frame">
+      <div class="fallback" aria-hidden="true"></div>
+      <canvas id="gl" aria-hidden="true"></canvas>
+      <div class="hero-ui">
+        <div class="fade-in"><span class="chip"><i></i>Барнхаус · A-frame · под ключ</span></div>
+        <div>
+          <h1><span class="line"><span>Глина, дерево</span></span><span class="line"><span>и <em>тёплый</em> свет</span></span></h1>
+          <div class="hero-bottom">
+            <p class="fade-in">Проектируем и строим барнхаусы и A-frame дома под ключ — с мебелью и авторским надзором.</p>
+            <div class="hero-actions fade-in">
+              <a href="#contact" class="btn cream">Получить расчёт <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+              <a href="#homes" class="btn ghost">Смотреть дома</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <a href="#homes" class="card terra c-stat rv">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><span class="eyebrow">Самый компактный дом</span><span class="arrow"><svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
+      <div><div class="big-num">от <span class="count" data-to="43">43</span><small>м²</small></div><p style="margin-top:10px;opacity:.85">A-frame с антресолью и вторым светом</p></div>
+    </a>
+    <div class="card photo c-photo rv" data-cursor="view">
+      <img src="https://images.pexels.com/photos/19737838/pexels-photo-19737838.jpeg?auto=compress&cs=tinysrgb&w=700" alt="Интерьер A-frame с панорамным окном" loading="lazy">
+      <div class="over"><span class="chip">Интерьер</span></div>
+    </div>
+    <a href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener" class="card oak c-insta rv">
+      <span class="eyebrow" style="opacity:.85">Instagram</span>
+      <div><b><span class="count" data-to="12">12</span>K+</b><p style="font-size:14px;margin-top:6px;font-weight:500">следят за стройками</p></div>
+    </a>
+    <div class="card c-manifest rv">
+      <p>Мы строим не квадратные метры, а <span>ощущение</span>: тёплое дерево, честная геометрия и свет, ради которого хочется возвращаться домой.</p>
+      <span class="chip ink" style="align-self:flex-start;font-family:var(--f-text)">Философия Акниет</span>
+    </div>
+    <div class="card walnut c-key rv">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg></div>
+      <div><h3>Под ключ<br>с мебелью</h3><p style="margin-top:8px;opacity:.8;font-size:15px">Заезжайте и живите</p></div>
+    </div>
+    <div class="card dark c-styles rv">
+      <span class="eyebrow">Стилей в линейке</span>
+      <div class="big-num"><span class="count" data-to="2">02</span></div>
+      <p style="font-size:15px;opacity:.75">Барнхаус и A-frame — оба на лёгком каркасе</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TWO STYLES ============ -->
+<section id="homes">
+  <div class="wrap">
+    <div class="sec-title"><h2 class="rv">Два стиля — <span>одна</span><br>философия</h2><p class="rv">Оба строятся по лёгкой каркасной технологии: быстро, тепло и без компромиссов в архитектуре.</p></div>
+    <div class="bento">
+      <a href="#contact" class="card photo c-barn rv" data-cursor="view">
+        <img src="https://images.pexels.com/photos/4626268/pexels-photo-4626268.jpeg?auto=compress&cs=tinysrgb&w=1400" alt="Барнхаус с панорамным остеклением в сумерках" loading="lazy">
+        <div class="top"><span class="chip">от 55 м²</span><span class="chip">1–2 этажа</span></div>
+        <div class="over"><div><div class="style-name">Барнхаус</div><p class="style-meta">Строгий силуэт и панорамный торец</p></div><span class="arrow"><svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
+      </a>
+      <a href="#contact" class="card photo c-af rv" data-cursor="view">
+        <img src="https://images.pexels.com/photos/9209878/pexels-photo-9209878.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="Дом A-frame в сосновом лесу" loading="lazy">
+        <div class="top"><span class="chip">от 43 м²</span><span class="chip">Второй свет</span></div>
+        <div class="over"><div><div class="style-name">A-frame</div><p class="style-meta">Высокий конёк, как на нашем знаке</p></div><span class="arrow"><svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
+      </a>
+      <div class="card terra includes rv">
+        <h3>Что входит в дом под ключ</h3>
+        <ul><li>Архитектурный проект</li><li>Каркас и кровля</li><li>Окна и утепление</li><li>Чистовая отделка</li><li>Мебель — по желанию</li><li>Авторский надзор</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MATERIALS ============ -->
+<section id="materials">
+  <div class="wrap">
+    <div class="sec-title"><h2 class="rv">Фактура, которую<br>хочется <span>трогать</span></h2><p class="rv">Подбираем породу и обработку дерева под характер дома. Наведите на образец — дерево отзывается на свет.</p></div>
+    <div class="bento">
+      <div class="card dark c-mat-text rv">
+        <div class="swatch-dots"><i style="--c:#d6b88c;--w:var(--w-pine)"></i><i style="--c:#c9a27a;--w:var(--w-oak)"></i><i style="--c:#5b3e2b;--w:var(--w-walnut)"></i><i style="--c:#2a2421;--w:var(--w-char)"></i></div>
+        <div><h3>Четыре характера дерева</h3><p style="margin-top:14px">От светлой сосны в интерьере до графичного обожжённого фасада — собираем палитру отделки вместе с вами.</p></div>
+        <a href="#contact" class="btn terra" style="align-self:flex-start">Подобрать отделку</a>
+      </div>
+      <div class="card tile rv" style="--c:#d6b88c;--w:var(--w-pine)"><div class="lab"><b>Сосна</b><span>Интерьер</span></div></div>
+      <div class="card tile rv" style="--c:#c9a27a;--w:var(--w-oak)"><div class="lab"><b>Дуб</b><span>Полы и лестницы</span></div></div>
+      <div class="card tile rv" style="--c:#5b3e2b;--w:var(--w-walnut)"><div class="lab"><b>Орех</b><span>Акценты</span></div></div>
+      <div class="card tile rv" style="--c:#2a2421;--w:var(--w-char)"><div class="lab"><b>Обожжённое</b><span>Фасад</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SERVICES ============ -->
+<section id="services">
+  <div class="wrap">
+    <div class="sec-title"><h2 class="rv">От эскиза<br>до <span>ключей</span></h2><p class="rv">Один подрядчик, один договор, одна ответственность за результат.</p></div>
+    <div class="bento">
+      <div class="card photo c-svc-photo rv" data-cursor="view">
+        <img src="https://images.pexels.com/photos/8112922/pexels-photo-8112922.jpeg?auto=compress&cs=tinysrgb&w=1000" alt="Интерьер с печью и большими окнами" loading="lazy">
+        <div class="over"><div><div class="style-name" style="font-size:clamp(24px,2.4vw,38px)">Дом, который<br>живёт с вами</div></div></div>
+      </div>
+      <div class="svc-grid">
+        <div class="card svc-card lift rv"><div class="row"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 20h16M6 20V9l6-5 6 5v11"/><path d="M9 13h6"/></svg></div><span class="no">01</span></div><div><h3>Проектирование</h3><p>Планировки, фасады и визуализации под ваш участок.</p></div></div>
+        <div class="card terra svc-card lift rv"><div class="row"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V10l7-6 7 6v11"/><path d="M9 21v-6h6v6"/></svg></div><span class="no">02</span></div><div><h3>Строительство</h3><p>Лёгкий каркас — дом под ключ в короткие сроки.</p></div></div>
+        <div class="card dark svc-card lift rv"><div class="row"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 18v-6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v6"/><path d="M2 18h20M6 10V7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3"/></svg></div><span class="no">03</span></div><div><h3>Интерьер и мебель</h3><p>Чистовая отделка или полностью меблированный дом.</p></div></div>
+        <div class="card linen svc-card lift rv"><div class="row"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/></svg></div><span class="no">04</span></div><div><h3>Авторский надзор</h3><p>Архитектор на каждом этапе стройки.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROCESS ============ -->
+<section id="process">
+  <div class="wrap bento" style="margin-top:clamp(40px,5vw,80px)">
+    <div class="card terra c-process rv">
+      <div class="head"><h2>Пять шагов<br>до новоселья</h2><p style="max-width:36ch;opacity:.85">Прозрачно на каждом этапе: вы всегда знаете, что происходит на объекте.</p></div>
+      <div class="steps" id="steps">
+        <div class="track-line"><i id="track-line"></i></div>
+        <div class="step"><span class="dot">1</span><h3>Знакомство</h3><p>Участок, бюджет и то, как вы хотите жить.</p></div>
+        <div class="step"><span class="dot">2</span><h3>Проект</h3><p>Архитектура, планировки, смета и отделка.</p></div>
+        <div class="step"><span class="dot">3</span><h3>Договор</h3><p>Сроки, стоимость и комплектация.</p></div>
+        <div class="step"><span class="dot">4</span><h3>Стройка</h3><p>Каркас под авторским надзором и фотоотчёты.</p></div>
+        <div class="step"><span class="dot">5</span><h3>Ключи</h3><p>Остаётся зажечь свет в окнах.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ GALLERY ============ -->
+<section class="gallery" aria-label="Галерея">
+  <div class="wrap"><div class="sec-title"><h2 class="rv">Тёплые <span>кадры</span></h2><p class="rv">Демо-фото для референса — заменим на ваши объекты.</p></div></div>
+  <div class="rail" id="rail-a">
+    <figure class="shot" style="margin:0" data-cursor="view"><img src="https://images.pexels.com/photos/9209878/pexels-photo-9209878.jpeg?auto=compress&cs=tinysrgb&w=800" alt="A-frame в сосновом лесу" loading="lazy"><span class="chip">A-frame «Карагай»</span></figure>
+    <figure class="shot tall" style="margin:0" data-cursor="view"><img src="https://images.pexels.com/photos/19737838/pexels-photo-19737838.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Интерьер A-frame" loading="lazy"><span class="chip">Окно под коньком</span></figure>
+    <div class="shot wood" style="--c:#a8553a;--w:none;background:linear-gradient(150deg,var(--terra),var(--terra-deep));color:var(--cream)"><b>Каждый дом —<br>в Instagram</b></div>
+    <figure class="shot" style="margin:0" data-cursor="view"><img src="https://images.pexels.com/photos/4626268/pexels-photo-4626268.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Барнхаус в сумерках" loading="lazy"><span class="chip">Барнхаус «Жайлау»</span></figure>
+    <figure class="shot tall" style="margin:0" data-cursor="view"><img src="https://images.pexels.com/photos/19737839/pexels-photo-19737839.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Спальня в A-frame" loading="lazy"><span class="chip">Спальня с видом</span></figure>
+    <div class="shot wood" style="--c:#c9a27a;--w:var(--w-oak);color:#2a1a10"><b>Натуральное<br>дерево</b></div>
+    <figure class="shot" style="margin:0" data-cursor="view"><img src="https://images.pexels.com/photos/8112922/pexels-photo-8112922.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Интерьер с печью" loading="lazy"><span class="chip">Вечер у печи</span></figure>
+    <figure class="shot" style="margin:0" data-cursor="view"><img src="https://images.pexels.com/photos/19737830/pexels-photo-19737830.jpeg?auto=compress&cs=tinysrgb&w=800" alt="A-frame на фоне гор" loading="lazy"><span class="chip">A-frame «Тау»</span></figure>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section id="contact">
+  <div class="wrap bento" style="margin-top:clamp(40px,5vw,80px)">
+    <div class="card c-form rv">
+      <h2>Рассчитаем<br>ваш <span>дом</span></h2>
+      <p class="lead">Оставьте контакты — архитектор свяжется с вами, ответит на вопросы и рассчитает стоимость.</p>
+      <form class="form" id="form" novalidate>
+        <div class="fld" id="f-name"><input id="name" name="name" placeholder=" " autocomplete="name"><label for="name">Ваше имя</label><span class="err">Укажите имя</span></div>
+        <div class="fld" id="f-phone"><input id="phone" name="phone" type="tel" inputmode="tel" placeholder=" " autocomplete="tel"><label for="phone">Телефон</label><span class="err">Введите корректный номер</span></div>
+        <div class="seg" role="radiogroup" aria-label="Тип дома">
+          <input type="radio" name="type" id="c1" value="Барнхаус" checked><label for="c1">Барнхаус</label>
+          <input type="radio" name="type" id="c2" value="A-frame"><label for="c2">A-frame</label>
+          <input type="radio" name="type" id="c3" value="Нужен совет"><label for="c3">Нужен совет</label>
+        </div>
+        <div class="fld full"><textarea id="msg" name="msg" placeholder=" "></textarea><label for="msg">Пара слов о проекте</label></div>
+        <button class="btn terra" type="submit">Отправить заявку <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <p class="form-note">Нажимая кнопку, вы соглашаетесь на обработку персональных данных.</p>
+        <div class="sent-msg" role="status" aria-live="polite"><span class="chip ink" style="justify-self:start">Заявка принята</span><h3>Спасибо! Скоро позвоним.</h3><p style="color:rgba(49,45,50,.7)">Архитектор свяжется с вами в ближайшее время.</p></div>
+      </form>
+    </div>
+    <div class="card photo c-quote rv">
+      <img src="https://images.pexels.com/photos/28677184/pexels-photo-28677184.jpeg?auto=compress&cs=tinysrgb&w=1000" alt="Горы на закате" loading="lazy" style="filter:sepia(.35) saturate(1.1) brightness(.8)">
+      <div class="over"><img src="assets/mark-gold.png" alt="" style="position:static;width:36px;height:auto;margin-bottom:14px"><q>Закат над горами, запах дерева и тёплый свет. Остальное — построим мы.</q></div>
+    </div>
+    <div class="card dark c-social rv">
+      <span class="eyebrow" style="margin:4px 4px 8px">Мы в соцсетях</span>
+      <a href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener">Instagram <span>@akniet.home ↗</span></a>
+      <a href="https://www.tiktok.com/@akniet_home" target="_blank" rel="noopener">TikTok <span>@akniet_home ↗</span></a>
+      <a href="https://www.threads.net/@akniet.home" target="_blank" rel="noopener">Threads <span>@akniet.home ↗</span></a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="card dark">
+      <div class="foot-top">
+        <p style="font-family:var(--f-head);font-weight:300;font-size:clamp(22px,2.2vw,32px);line-height:1.25;max-width:20ch">Барнхаусы и A-frame дома <span style="color:var(--gold)">под ключ</span></p>
+        <div><h4>Навигация</h4><ul><li><a href="#homes">Дома</a></li><li><a href="#materials">Материалы</a></li><li><a href="#services">Услуги</a></li><li><a href="#process">Процесс</a></li></ul></div>
+        <div><h4>Соцсети</h4><ul><li><a href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener">Instagram</a></li><li><a href="https://www.tiktok.com/@akniet_home" target="_blank" rel="noopener">TikTok</a></li><li><a href="https://www.threads.net/@akniet.home" target="_blank" rel="noopener">Threads</a></li></ul></div>
+      </div>
+      <div class="foot-logo rv"><img src="assets/logo-light.png" alt="Акниет" loading="lazy"></div>
+      <div class="foot-bottom"><span>© <span id="year">2026</span> Акниет</span><span>Фото: Pexels (демо) · Фактуры дерева генерируются в браузере</span><a href="#top">Наверх ↑</a></div>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ Procedural wood textures (shared by CSS and WebGL) ============ -->
+<script>
+window.aknietWood = (() => {
+  const cache = {};
+  const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+  const hash = (i, j, s) => {
+    let h = Math.imul(i, 374761393) ^ Math.imul(j, 668265263) ^ Math.imul(s, 2246822519);
+    h = Math.imul(h ^ (h >>> 13), 1274126177);
+    return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+  };
+  // value noise on a periodic lattice, so textures tile seamlessly
+  const vn = (x, y, px, py, s) => {
+    const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
+    const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+    const x0 = ((xi % px) + px) % px, x1 = (x0 + 1) % px, y0 = ((yi % py) + py) % py, y1 = (y0 + 1) % py;
+    const a = hash(x0, y0, s), b = hash(x1, y0, s), c = hash(x0, y1, s), d = hash(x1, y1, s);
+    return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+  };
+  const SPECS = {
+    walnut:  { w: 512, h: 512, planks: 4, base: '#5b3e2b', dark: '#24160d', light: '#8a6243', seed: 3 },
+    oak:     { w: 512, h: 512, planks: 4, base: '#c9a27a', dark: '#86603c', light: '#e8c9a0', seed: 5 },
+    pine:    { w: 512, h: 512, planks: 4, base: '#d6b88c', dark: '#a27a4c', light: '#f0dcb6', seed: 9 },
+    char:    { w: 512, h: 512, planks: 4, base: '#352d29', dark: '#0d0b0a', light: '#5a4a40', seed: 13 },
+    'oak-h':    { w: 1024, h: 256, planks: 2, dir: 'h', base: '#c9a27a', dark: '#86603c', light: '#e8c9a0', seed: 21 },
+    'walnut-h': { w: 1024, h: 256, planks: 2, dir: 'h', base: '#5b3e2b', dark: '#24160d', light: '#8a6243', seed: 27 },
+  };
+  function make({ w, h, planks, dir = 'v', base, dark, light, seed }) {
+    const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+    const ctx = cv.getContext('2d'), img = ctx.createImageData(w, h), D = img.data;
+    const B = hex(base), K = hex(dark), L = hex(light);
+    const A = dir === 'v' ? w : h, G = dir === 'v' ? h : w; // across / along the grain
+    const pw = A / planks, P = [];
+    for (let i = 0; i < planks; i++) P.push({ tone: (hash(i, 3, seed) - 0.5) * 0.24, phase: hash(i, 7, seed) * 10, joint: hash(i, 11, seed) * G, freq: 0.7 + hash(i, 5, seed) * 0.8 });
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const a = dir === 'v' ? x : y, g = dir === 'v' ? y : x;
+      const pi = Math.min(planks - 1, (a / pw) | 0), pl = P[pi], u = a - pi * pw;
+      const ga = a / A, gg = g / G;
+      const warp = vn(ga * planks * 2, gg * 2, planks * 2, 2, seed) * 0.7 + vn(ga * planks * 6, gg * 4, planks * 6, 4, seed + 1) * 0.3;
+      const t = (u / pw) * 7 * pl.freq + warp * 2.6 + pl.phase, f = t - Math.floor(t);
+      const ring = Math.pow(Math.max(0, 1 - Math.abs(f - 0.85) / 0.1), 1.6);        // latewood line
+      const soft = 0.5 + 0.5 * Math.sin(t * Math.PI * 2);
+      const pore = vn(ga * planks * 48, gg * 10, planks * 48, 10, seed + 2);
+      const fiber = vn(ga * planks * 140, gg * 3, planks * 140, 3, seed + 4);
+      const streak = Math.pow(Math.max(0, pore - 0.5) / 0.5, 2) * 0.7 + Math.pow(fiber, 3) * 0.45;
+      const m = Math.min(1, ring * 0.55 + soft * 0.16 + streak * 0.4);
+      const hl = Math.max(0, 0.5 - soft) * 0.3 * (1 - pore);
+      const edge = Math.min(u, pw - u);
+      const jd = Math.abs(((g - pl.joint) % G + G) % G), joint = Math.min(jd, G - jd) < 1.1 ? 0.75 : 0;
+      const seam = Math.max(edge < 1.2 ? 0.85 : edge < 2.6 ? 0.3 : 0, joint);
+      const tone = 1 + pl.tone, o = (y * w + x) * 4;
+      for (let k = 0; k < 3; k++) {
+        let c = B[k] * tone;
+        c += (L[k] - c) * hl;
+        c += (K[k] - c) * m;
+        c += (K[k] * 0.55 - c) * seam;
+        D[o + k] = c;
+      }
+      D[o + 3] = 255;
+    }
+    ctx.putImageData(img, 0, 0);
+    return cv;
+  }
+  const canvas = name => cache[name] || (cache[name] = make(SPECS[name]));
+  let applied = false;
+  const applyCSS = () => {
+    if (applied) return; applied = true;
+    const root = document.documentElement.style;
+    Object.keys(SPECS).forEach(n => root.setProperty('--w-' + n, `url(${canvas(n).toDataURL('image/jpeg', 0.86)})`));
+  };
+  return { canvas, applyCSS };
+})();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fine = matchMedia('(hover:hover) and (pointer:fine)').matches;
+  const hasGsap = !!window.gsap;
+  document.getElementById('year').textContent = new Date().getFullYear();
+  requestAnimationFrame(() => setTimeout(() => window.aknietWood.applyCSS(), 30));
+
+  /* ---- smooth scroll ---- */
+  let lenis = null;
+  if (hasGsap) gsap.registerPlugin(ScrollTrigger);
+  if (!reduce && window.Lenis) {
+    lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
+    if (hasGsap) { lenis.on('scroll', ScrollTrigger.update); gsap.ticker.add(t => lenis.raf(t * 1000)); gsap.ticker.lagSmoothing(0); }
+    else { const raf = t => { lenis.raf(t); requestAnimationFrame(raf); }; requestAnimationFrame(raf); }
+    lenis.stop();
+  }
+  const scrollTo = target => lenis ? lenis.scrollTo(target, { duration: 1.4, offset: -90 }) : document.querySelector(target)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
+  document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', e => {
+    const id = a.getAttribute('href'); if (id.length < 2) return;
+    e.preventDefault(); closeMenu(); scrollTo(id);
+  }));
+
+  /* ---- preloader ---- */
+  const loader = document.getElementById('loader');
+  const finish = () => {
+    window.aknietWood.applyCSS();
+    loader.classList.add('done'); document.body.classList.remove('loading'); lenis?.start();
+    window.dispatchEvent(new Event('akniet:intro'));
+    if (hasGsap && !reduce) {
+      gsap.to('.c-3d h1 .line>span', { y: 0, duration: 1.4, ease: 'expo.out', stagger: 0.12, delay: 0.4 });
+      gsap.to('.fade-in', { opacity: 1, duration: 1.2, ease: 'power2.out', delay: 0.8, stagger: 0.1 });
+    } else {
+      document.querySelectorAll('.c-3d h1 .line>span').forEach(s => s.style.transform = 'none');
+      document.querySelectorAll('.fade-in').forEach(s => s.style.opacity = 1);
+    }
+  };
+  reduce ? finish() : setTimeout(finish, 1300);
+
+  /* ---- header hide on scroll ---- */
+  const header = document.getElementById('header'); let lastY = 0;
+  const onScroll = y => { header.classList.toggle('hidden', y > lastY && y > 500 && !document.body.classList.contains('menu-open')); lastY = y; };
+  lenis ? lenis.on('scroll', e => onScroll(e.scroll)) : addEventListener('scroll', () => onScroll(scrollY), { passive: true });
+
+  /* ---- mobile menu sheet ---- */
+  const menuBtn = document.getElementById('menu-btn');
+  function closeMenu() { document.body.classList.remove('menu-open'); menuBtn.setAttribute('aria-expanded', 'false'); }
+  menuBtn.addEventListener('click', () => {
+    const open = !document.body.classList.contains('menu-open');
+    document.body.classList.toggle('menu-open', open); menuBtn.setAttribute('aria-expanded', String(open));
+  });
+  addEventListener('keydown', e => e.key === 'Escape' && closeMenu());
+
+  /* ---- cursor ---- */
+  if (fine && !reduce) {
+    const c = document.getElementById('cursor'), ring = c.querySelector('.ring');
+    let mx = innerWidth / 2, my = innerHeight / 2, rx = mx, ry = my;
+    addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; }, { passive: true });
+    const loop = () => { rx += (mx - rx) * 0.22; ry += (my - ry) * 0.22; ring.style.transform = `translate(${rx}px,${ry}px)`; requestAnimationFrame(loop); };
+    loop();
+    document.addEventListener('mouseover', e => {
+      const v = e.target.closest('[data-cursor="view"]'), h = e.target.closest('a,button,label,input,textarea,.tile');
+      c.classList.toggle('view', !!v); c.classList.toggle('hover', !v && !!h);
+    });
+    // wood tiles: tilt + light follows pointer
+    document.querySelectorAll('.tile').forEach(w => {
+      w.addEventListener('pointermove', e => {
+        const r = w.getBoundingClientRect(), px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+        w.style.transition = 'transform .15s ease-out';
+        w.style.transform = `perspective(900px) rotateY(${(px - 0.5) * 10}deg) rotateX(${(0.5 - py) * 8}deg)`;
+        w.style.setProperty('--mx', px * 100 + '%'); w.style.setProperty('--my', py * 100 + '%');
+      });
+      w.addEventListener('pointerleave', () => { w.style.transition = 'transform .9s cubic-bezier(.19,1,.22,1)'; w.style.transform = ''; });
+    });
+  }
+
+  /* ---- form ---- */
+  const form = document.getElementById('form'), phone = document.getElementById('phone');
+  phone.addEventListener('input', () => phone.value = phone.value.replace(/[^\d+()\-\s]/g, ''));
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const okN = document.getElementById('name').value.trim().length > 1, okP = phone.value.replace(/\D/g, '').length >= 10;
+    document.getElementById('f-name').classList.toggle('invalid', !okN);
+    document.getElementById('f-phone').classList.toggle('invalid', !okP);
+    if (!okN || !okP) return form.querySelector('.invalid input').focus();
+    // TODO: подключить отправку (WhatsApp / Telegram-бот / CRM)
+    form.classList.add('sent');
+  });
+
+  if (!hasGsap || reduce) {
+    document.documentElement.classList.add('static');
+    document.querySelectorAll('.step').forEach(s => s.classList.add('active'));
+    return;
+  }
+
+  /* ---- GSAP: cards pop in batches ---- */
+  ScrollTrigger.batch('.rv', { start: 'top 90%', onEnter: els => gsap.to(els, { opacity: 1, y: 0, scale: 1, duration: 1.1, ease: 'expo.out', stagger: 0.08, overwrite: true }) });
+
+  // count-up numbers
+  document.querySelectorAll('.count').forEach(el => {
+    const to = +el.dataset.to, pad = el.textContent.length, o = { v: 0 };
+    ScrollTrigger.create({ trigger: el, start: 'top 92%', once: true, onEnter: () => gsap.to(o, { v: to, duration: 1.6, ease: 'power3.out', onUpdate: () => el.textContent = String(Math.round(o.v)).padStart(pad, '0') }) });
+  });
+
+  // process: line + steps light up
+  const steps = gsap.utils.toArray('.step');
+  ScrollTrigger.create({ trigger: '#steps', start: 'top 80%', end: 'bottom 55%', scrub: true,
+    onUpdate: self => { gsap.set('#track-line', { scaleX: self.progress }); steps.forEach((s, i) => s.classList.toggle('active', self.progress >= i / (steps.length - 1) - 0.02)); } });
+
+  // gallery rail drifts with scroll
+  gsap.fromTo('#rail-a', { x: () => 0 }, { x: () => -(document.getElementById('rail-a').scrollWidth - innerWidth), ease: 'none', scrollTrigger: { trigger: '.gallery', start: 'top bottom', end: 'bottom top', scrub: true, invalidateOnRefresh: true } });
+
+  addEventListener('load', () => ScrollTrigger.refresh());
+})();
+</script>
+
+<!-- ============ WebGL hero: wooden A-frame at terracotta dusk (Three.js) ============ -->
+<script type="module">
+let THREE;
+try { THREE = await import('https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js'); }
+catch (e) { document.documentElement.classList.add('no-webgl'); }
+
+if (THREE) {
+  const canvas = document.getElementById('gl');
+  const hero = document.getElementById('frame'); // 3D lives inside the hero bento card
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mobile = matchMedia('(max-width: 860px)').matches;
+
+  let renderer;
+  try { renderer = new THREE.WebGLRenderer({ canvas, antialias: !mobile, alpha: true, powerPreference: 'high-performance' }); }
+  catch (e) { document.documentElement.classList.add('no-webgl'); }
+
+  if (renderer) {
+    // Performance budget: capped DPR, no real-time shadows, instancing, one canvas.
+    renderer.setPixelRatio(Math.min(devicePixelRatio, mobile ? 1.5 : 1.75));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+
+    const C = { base: 0x1e1819, gold: 0xd5a039, cream: 0xfff8ec, warm: 0xffb062 };
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x3a2420, 0.028);
+    const camera = new THREE.PerspectiveCamera(mobile ? 50 : 36, 1, 0.1, 120);
+
+    // shared procedural wood (same generator as the CSS panels)
+    const maxAniso = Math.min(4, renderer.capabilities.getMaxAnisotropy());
+    const tex = (name, rx, ry) => {
+      const t = new THREE.CanvasTexture(window.aknietWood.canvas(name));
+      t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rx, ry); t.anisotropy = maxAniso;
+      return t;
+    };
+
+    // lights
+    scene.add(new THREE.HemisphereLight(0xe0a080, 0x140d0c, 0.6));
+    const moon = new THREE.DirectionalLight(0xff9a6a, 0.9); moon.position.set(-4, 6, -10); // low sunset light from behind scene.add(moon);
+    const warm = new THREE.PointLight(C.warm, 0, 16, 1.6); warm.position.set(0, 1.6, 2.6); scene.add(warm);
+    const inner = new THREE.PointLight(C.warm, 0, 9, 1.4); inner.position.set(0, 1.3, 0.2); scene.add(inner);
+
+    const oak = new THREE.MeshStandardMaterial({ map: tex('oak', 1, 1), roughness: 0.75 });
+    const mat = {
+      char: new THREE.MeshStandardMaterial({ map: tex('char', 2, 1.4), roughness: 0.85 }),
+      oak,
+      inside: new THREE.MeshStandardMaterial({ map: tex('pine', 0.6, 0.6), roughness: 0.8, side: THREE.DoubleSide }),
+      glass: new THREE.MeshBasicMaterial({ color: 0xffc679, transparent: true, opacity: 0, depthWrite: false }),
+      frame: new THREE.MeshStandardMaterial({ color: 0x17120f, roughness: 0.6 }),
+      deck: new THREE.MeshStandardMaterial({ map: tex('oak', 2, 3), roughness: 0.85 }),
+      edge: new THREE.LineBasicMaterial({ color: C.gold, transparent: true, opacity: 0.55 }),
+      ground: new THREE.MeshStandardMaterial({ color: 0x2c1f1c, roughness: 1 }),
+      pineA: new THREE.MeshStandardMaterial({ color: 0x2a2220, roughness: 1, flatShading: true }),
+      pineB: new THREE.MeshStandardMaterial({ color: 0x33292a, roughness: 1, flatShading: true }),
+      trunk: new THREE.MeshStandardMaterial({ color: 0x3a2a1f, roughness: 1 }),
+      mount: new THREE.MeshStandardMaterial({ color: 0x6a3426, roughness: 1, flatShading: true }),
+    };
+
+    // ---- A-frame house: charred-wood roof, oak trim & soffits, pine interior ----
+    const house = new THREE.Group(); scene.add(house);
+    const H = 3.4, W = 3.2, D = 4.2, T = 0.14;
+    const slope = Math.hypot(W / 2, H), ang = Math.atan2(H, W / 2);
+    const roofMats = [mat.oak, mat.oak, mat.char, mat.inside, mat.oak, mat.oak]; // +x -x +y(outside) -y(inside) +z -z
+    [-1, 1].forEach(s => {
+      const roof = new THREE.Mesh(new THREE.BoxGeometry(slope + 0.2, T, D + 0.3), roofMats);
+      roof.position.set(s * W / 4, H / 2, 0); roof.rotation.z = -s * ang; house.add(roof);
+      const e = new THREE.LineSegments(new THREE.EdgesGeometry(roof.geometry), mat.edge); e.position.copy(roof.position); e.rotation.copy(roof.rotation); house.add(e);
+    });
+    const tri = new THREE.Shape(); tri.moveTo(-W / 2 + 0.12, 0); tri.lineTo(W / 2 - 0.12, 0); tri.lineTo(0, H - 0.22); tri.closePath();
+    const front = new THREE.Mesh(new THREE.ShapeGeometry(tri), mat.glass); front.position.z = D / 2 - 0.05; front.renderOrder = 2; house.add(front);
+    const back = new THREE.Mesh(new THREE.ShapeGeometry(tri), mat.inside); back.position.z = -D / 2 + 0.05; house.add(back);
+    // interior: floor, mezzanine, warm "lamp"
+    const floor = new THREE.Mesh(new THREE.BoxGeometry(W - 0.3, 0.04, D - 0.2), mat.deck); floor.position.set(0, 0.02, 0); house.add(floor);
+    const mezz = new THREE.Mesh(new THREE.BoxGeometry(W * 0.62, 0.08, D * 0.45), mat.oak); mezz.position.set(0, H * 0.36, -D * 0.26); house.add(mezz);
+    const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 12), new THREE.MeshBasicMaterial({ color: 0xffd9a0 })); lamp.position.set(0, H * 0.62, 0.4); house.add(lamp);
+    // mullions
+    const mull = (w, h, x, y) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.06), mat.frame); m.position.set(x, y, D / 2 - 0.02); house.add(m); };
+    const span = y => (W - 0.24) * (1 - y / (H - 0.22)); // glass width at height y
+    mull(0.06, H - 0.25, 0, (H - 0.25) / 2); mull(span(H * 0.36), 0.06, 0, H * 0.36); mull(span(H * 0.62), 0.06, 0, H * 0.62);
+    // ornament ring on gable (nod to the logo)
+    const orn = new THREE.Mesh(new THREE.TorusGeometry(0.22, 0.025, 8, 40), new THREE.MeshBasicMaterial({ color: C.gold })); orn.position.set(0, H * 0.78, D / 2 + 0.02); orn.scale.setScalar(0.7); house.add(orn);
+    // deck + steps
+    const deck = new THREE.Mesh(new THREE.BoxGeometry(W + 1.6, 0.14, D + 2.2), mat.deck); deck.position.set(0, -0.07, 0.8); house.add(deck);
+    const step = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.07, 0.5), mat.deck); step.position.set(0, -0.11, D / 2 + 2.15); house.add(step);
+
+    // ---- ground + light pool ----
+    const ground = new THREE.Mesh(new THREE.CircleGeometry(60, 48), mat.ground); ground.rotation.x = -Math.PI / 2; ground.position.y = -0.14; scene.add(ground);
+    const pool = new THREE.Mesh(new THREE.CircleGeometry(4, 48), new THREE.MeshBasicMaterial({ color: C.warm, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
+    pool.rotation.x = -Math.PI / 2; pool.position.set(0, -0.12, 3.4); pool.scale.set(1, 0.6, 1); scene.add(pool);
+    const ring = new THREE.Mesh(new THREE.RingGeometry(5.6, 5.62, 128), new THREE.MeshBasicMaterial({ color: C.gold, transparent: true, opacity: 0.3 }));
+    ring.rotation.x = -Math.PI / 2; ring.position.y = -0.1; scene.add(ring);
+
+    // ---- pines: two tiers + trunk, instanced (3 draw calls for the whole forest) ----
+    const gA = new THREE.ConeGeometry(0.85, 1.8, 7); gA.translate(0, 1.4, 0);
+    const gB = new THREE.ConeGeometry(0.6, 1.6, 7); gB.translate(0, 2.5, 0);
+    const gT = new THREE.CylinderGeometry(0.08, 0.11, 0.7, 5); gT.translate(0, 0.35, 0);
+    const N = mobile ? 40 : 90;
+    const tiers = [new THREE.InstancedMesh(gA, mat.pineA, N), new THREE.InstancedMesh(gB, mat.pineB, N), new THREE.InstancedMesh(gT, mat.trunk, N)];
+    const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), v = new THREE.Vector3(), sc = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0);
+    let rnd = 7; const rand = () => (rnd = (rnd * 16807) % 2147483647) / 2147483647;
+    for (let i = 0; i < N; i++) {
+      const a = rand() * Math.PI * 2, r = 7 + rand() * 18, s = 0.7 + rand() * 1.4;
+      v.set(Math.cos(a) * r, -0.12, Math.sin(a) * r - 4);
+      // keep the clearing around the cabin and the view from the camera empty
+      if (Math.abs(v.x) < 13 && v.z > -8) v.z = -9 - rand() * 14;
+      else if (v.z > 0) v.z = -v.z - 6;
+      sc.set(s, s * (0.9 + rand() * 0.6), s); q.setFromAxisAngle(up, rand() * Math.PI);
+      m4.compose(v, q, sc); tiers.forEach(t => t.setMatrixAt(i, m4));
+    }
+    tiers.forEach(t => scene.add(t));
+
+    // ---- mountains ----
+    const mGeo = new THREE.ConeGeometry(1, 1, 4);
+    const capMat = new THREE.MeshStandardMaterial({ color: 0xe9dcc6, roughness: 1, flatShading: true });
+    [[-22, -38, 14, 11], [-6, -46, 18, 15], [14, -40, 15, 12], [30, -34, 12, 9], [-36, -30, 10, 7]].forEach(([x, z, w, h]) => {
+      const m = new THREE.Mesh(mGeo, mat.mount); m.scale.set(w, h, w * 0.7); m.position.set(x, h / 2 - 0.2, z); m.rotation.y = rand() * Math.PI; scene.add(m);
+      const cap = new THREE.Mesh(mGeo, capMat); cap.scale.set(w * 0.28, h * 0.28, w * 0.7 * 0.28); cap.position.set(x, h - h * 0.14 - 0.2, z); cap.rotation.copy(m.rotation); scene.add(cap);
+    });
+
+    // ---- low terracotta sun + glow behind the mountains ----
+    const glowCv = document.createElement('canvas'); glowCv.width = glowCv.height = 256;
+    const gctx = glowCv.getContext('2d'), grad = gctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+    grad.addColorStop(0, 'rgba(255,190,130,1)'); grad.addColorStop(0.18, 'rgba(232,120,80,.65)'); grad.addColorStop(0.5, 'rgba(168,85,58,.22)'); grad.addColorStop(1, 'rgba(168,85,58,0)');
+    gctx.fillStyle = grad; gctx.fillRect(0, 0, 256, 256);
+    const glowTex = new THREE.CanvasTexture(glowCv); glowTex.colorSpace = THREE.SRGBColorSpace;
+    const sunGlow = new THREE.Mesh(new THREE.PlaneGeometry(70, 70), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
+    sunGlow.position.set(-48, 7, -60); scene.add(sunGlow);
+    const sun = new THREE.Mesh(new THREE.CircleGeometry(2.6, 48), new THREE.MeshBasicMaterial({ color: 0xffc59a, fog: false }));
+    sun.position.set(-48, 7, -59.8); scene.add(sun);
+
+    // ---- particles: drifting dust + blinking fireflies, all in the vertex shader ----
+    const P = mobile ? 450 : 1000; const pos = new Float32Array(P * 3), seed = new Float32Array(P);
+    for (let i = 0; i < P; i++) { pos[i * 3] = (rand() - 0.5) * 30; pos[i * 3 + 1] = rand() * 12; pos[i * 3 + 2] = (rand() - 0.5) * 30; seed[i] = rand(); }
+    const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); pGeo.setAttribute('seed', new THREE.BufferAttribute(seed, 1));
+    const pMat = new THREE.ShaderMaterial({
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      uniforms: { uTime: { value: 0 }, uPR: { value: renderer.getPixelRatio() }, uColor: { value: new THREE.Color(C.cream) }, uGold: { value: new THREE.Color(C.gold) } },
+      vertexShader: `uniform float uTime;uniform float uPR;attribute float seed;varying float vS;varying float vA;
+        void main(){vec3 p=position;float fly=step(0.7,seed);
+        p.y=mix(mod(p.y-uTime*(0.2+seed*0.3),12.0),0.4+mod(p.y,3.0)+sin(uTime*0.7+seed*30.0)*0.4,fly);
+        p.x+=sin(uTime*(0.3+fly*0.4)+seed*20.0)*(0.6+fly*0.8);p.z+=cos(uTime*0.25+seed*13.0)*(0.4+fly*0.6);
+        vec4 mv=modelViewMatrix*vec4(p,1.0);gl_Position=projectionMatrix*mv;
+        gl_PointSize=(1.1+seed*2.4+fly*1.6)*uPR*(10.0/-mv.z);vS=seed;
+        float blink=mix(1.0,0.35+0.65*pow(0.5+0.5*sin(uTime*2.2+seed*60.0),3.0),fly);
+        vA=smoothstep(0.0,1.2,p.y)*smoothstep(12.0,9.0,p.y)*blink;}`,
+      fragmentShader: `uniform vec3 uColor;uniform vec3 uGold;varying float vS;varying float vA;
+        void main(){float d=length(gl_PointCoord-0.5);float a=smoothstep(0.5,0.0,d)*vA*mix(0.4,0.9,step(0.7,vS));gl_FragColor=vec4(mix(uColor,uGold,step(0.7,vS)),a);}`
+    });
+    scene.add(new THREE.Points(pGeo, pMat));
+
+    // ---- sizing ----
+    let lookShift = 0;
+    const resize = () => {
+      const w = hero.clientWidth, h = hero.clientHeight; if (!w || !h) return;
+      renderer.setSize(w, h, false); camera.aspect = w / h;
+      const wide = w / h > 1.15;
+      camera.fov = wide ? 36 : 48;
+      lookShift = 0;
+      // wide card: push the cabin to the upper right so the headline (bottom-left) stays clear
+      camera.setViewOffset(w, h, wide ? -w * 0.3 : 0, wide ? h * 0.12 : h * 0.24, w, h);
+      camera.updateProjectionMatrix();
+    };
+    resize(); new ResizeObserver(resize).observe(hero);
+
+    // ---- interaction ----
+    let mx = 0, my = 0, tx = 0, ty = 0, scrollP = 0;
+    addEventListener('pointermove', e => { mx = e.clientX / innerWidth - 0.5; my = e.clientY / innerHeight - 0.5; }, { passive: true });
+    addEventListener('scroll', () => { const r = hero.getBoundingClientRect(); scrollP = Math.max(0, Math.min(1, -r.top / r.height)); }, { passive: true });
+
+    // ---- intro: the cabin "lights up" ----
+    let intro = reduce ? 1 : 0, introStart = null;
+    addEventListener('akniet:intro', () => { introStart = performance.now(); });
+
+    // ---- render loop: paused when hero is off-screen or tab hidden ----
+    let visible = true, raf = null; const clock = new THREE.Clock();
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible && !raf) loop(); }, { threshold: 0 }).observe(hero);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden && visible && !raf) loop(); });
+
+    function frame() {
+      const t = clock.getElapsedTime();
+      if (introStart !== null && intro < 1) intro = Math.min((performance.now() - introStart) / 2600, 1);
+      const e = 1 - Math.pow(1 - intro, 3);
+      const flicker = 0.94 + Math.sin(t * 2.1) * 0.03 + Math.sin(t * 5.3) * 0.02;
+      mat.glass.opacity = 0.32 * e; pool.material.opacity = 0.2 * e;
+      warm.intensity = 14 * e * flicker; inner.intensity = 22 * e * flicker;
+      lamp.material.color.setRGB(e, 0.85 * e, 0.63 * e);
+      house.scale.setScalar(0.92 + 0.08 * e);
+      tx += (mx - tx) * 0.04; ty += (my - ty) * 0.04;
+      const orbit = 0.32 + (reduce ? 0 : Math.sin(t * 0.12) * 0.22) + tx * 0.35;
+      const r = 18 - scrollP * 3 - e * 1.5;
+      camera.position.set(Math.sin(orbit) * r, 2.4 + ty * 1.0 + scrollP * 1.5, Math.cos(orbit) * r);
+      camera.lookAt(lookShift * Math.cos(orbit), 1.7 - scrollP * 0.5, lookShift * -Math.sin(orbit));
+      sunGlow.lookAt(camera.position); sun.lookAt(camera.position);
+      orn.rotation.z = t * 0.4;
+      ring.rotation.z = t * 0.02;
+      pMat.uniforms.uTime.value = reduce ? 0 : t;
+      renderer.render(scene, camera);
+    }
+    function loop() {
+      if (!visible || document.hidden) { raf = null; return; }
+      frame(); raf = requestAnimationFrame(loop);
+    }
+    house.scale.setScalar(reduce ? 1 : 0.92);
+    reduce ? (intro = 1, frame()) : loop();
+  }
+}
+</script>
+</body>
+</html>
