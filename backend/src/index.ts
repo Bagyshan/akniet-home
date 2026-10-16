@@ -6,7 +6,7 @@ import { content } from './routes/content.js';
 import { leads } from './routes/leads.js';
 import { telegram } from './routes/telegram.js';
 import { telegramEnabled } from './telegram.js';
-import { invalidatePages, renderPage, robotsTxt, sitemapXml } from './render.js';
+import { isPage, renderPage, robotsTxt, sitemapXml } from './render.js';
 import { isLang } from './slots.js';
 
 const app = express();
@@ -19,10 +19,11 @@ app.get('/api/health', async (_req, res) => {
   await pool.query('SELECT 1');
   res.json({ ok: true });
 });
-// server-rendered pages; nginx sends / and /ky/ here
-app.get('/ssr/:lang', async (req, res) => {
-  if (!isLang(req.params.lang)) return res.sendStatus(404);
-  res.set({ 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache', 'Content-Language': req.params.lang }).send(await renderPage(req.params.lang));
+// server-rendered pages; nginx sends / and /ky/ here as /ssr/ru and /ssr/ky, /map/ as /ssr/ru/map, /ky/map/ as /ssr/ky/map
+app.get('/ssr/:lang{/:page}', async (req, res) => {
+  const { lang, page = '' } = req.params;
+  if (!isLang(lang) || !isPage(page)) return res.sendStatus(404);
+  res.set({ 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache', 'Content-Language': lang }).send(await renderPage(lang, page));
 });
 app.get('/robots.txt', (_req, res) => res.type('text/plain').send(robotsTxt()));
 app.get('/sitemap.xml', async (_req, res) => {

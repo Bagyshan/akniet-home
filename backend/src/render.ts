@@ -1,5 +1,5 @@
-// Server-side rendering of the home page (/ and /ky/).
-// The page template is the static HTML (index-stone.html and the generated ky/index.html); this module puts the admin
+// Server-side rendering of the site pages: / and /ky/, /technology/, /map/, /projects/ and their /ky/ copies.
+// The page templates are the static HTML (index-stone.html, technology/index.html… and the generated ky/…); this module puts the admin
 // content into it — the same rules the page script applies in the browser — and adds the SEO head: canonical, hreflang,
 // Open Graph, JSON-LD, verification tags and analytics. The result is cached until the admin panel saves something.
 import { readFile } from 'node:fs/promises';
@@ -10,20 +10,25 @@ import { readContent } from './content.js';
 import { listPointsFor } from './points.js';
 import { readSlotsFor, type Lang } from './slots.js';
 
-const TEMPLATES: Record<Lang, string> = { ru: 'index.html', ky: 'ky/index.html' };
+// '' is the home page; the others live in their own folder: /map/ → map/index.html
+export const PAGES = ['', 'technology', 'map', 'projects'] as const;
+export type Page = (typeof PAGES)[number];
+export const isPage = (v: unknown): v is Page => PAGES.includes(v as Page);
+const pagePath = (page: Page, lang: Lang) => (lang === 'ky' ? '/ky/' : '/') + (page ? page + '/' : '');
 const TTL = 10 * 60 * 1000;
-const cache = new Map<Lang, { html: string; at: number }>();
-const templates = new Map<Lang, string>();
+const cache = new Map<string, { html: string; at: number }>();
+const templates = new Map<string, string>();
 
 export const invalidatePages = () => cache.clear();
 
-export async function renderPage(lang: Lang): Promise<string> {
-  const hit = cache.get(lang);
+export async function renderPage(lang: Lang, page: Page = ''): Promise<string> {
+  const key = pagePath(page, lang);
+  const hit = cache.get(key);
   if (hit && Date.now() - hit.at < TTL) return hit.html;
-  if (!templates.has(lang)) templates.set(lang, await readFile(path.join(config.siteDir, TEMPLATES[lang]), 'utf8'));
+  if (!templates.has(key)) templates.set(key, await readFile(path.join(config.siteDir, key, 'index.html'), 'utf8'));
   const [fields, materials, gallery, points] = await Promise.all([readContent(), readSlotsFor('materials', lang), readSlotsFor('gallery', lang), listPointsFor(lang)]);
-  const html = build(templates.get(lang)!, lang, { ...fields, materials, gallery, points } as Content);
-  cache.set(lang, { html, at: Date.now() });
+  const html = build(templates.get(key)!, lang, page, { ...fields, materials, gallery, points } as Content);
+  cache.set(key, { html, at: Date.now() });
   return html;
 }
 
@@ -63,7 +68,7 @@ function swapText(node: any, from: string, to: string) {
 }
 const text = (el: any) => (el?.textContent || '').replace(/\s+/g, ' ').trim();
 
-function build(template: string, lang: Lang, c: Content): string {
+function build(template: string, lang: Lang, page: Page, c: Content): string {
   // linkedom serializes script text through String.replace, so "$'" or "$&" inside a script gets mangled.
   // Script bodies are kept aside as tokens and put back after serialization.
   const bodies: string[] = [];
@@ -108,30 +113,34 @@ function build(template: string, lang: Lang, c: Content): string {
     if (g.image) img.setAttribute('src', g.image);
     if (g.caption) { f.querySelector('.chip').textContent = g.caption; img.setAttribute('alt', g.caption); }
   });
-  for (const card of $$('.proj')) card.querySelector('.price b').textContent = fill(T.priceFrom, { sum: money(parseInt(text(card.querySelector('.area'))) * price) });
+  // small previews of the materials (home page)
+  c.materials.forEach((m, i) => {
+    if (m?.image) $$(`[data-mat="${i + 1}"]`).forEach(t => t.setAttribute('style', `--w:url("${m.image}")`));
+  });
+  for (const el of $$('[data-price]')) el.textContent = fill(T.priceFrom, { sum: money(+el.dataset.price * price) });
   const area = +($('#area')?.getAttribute('value') || 86);
   if ($('#calc-sum')) $('#calc-sum').textContent = money(area * price);
   if ($('#year')) $('#year').textContent = String(new Date().getFullYear());
 
-  // map points as a list: the map itself is drawn by a script, the list gives the same facts to search engines and screen readers
-  const map = $('#kg-map');
-  if (map && c.points.length) {
-    const ul = document.createElement('ul');
-    ul.className = 'sr-only';
-    for (const p of c.points) {
+  // map points as a list under the map (the same markup the page script draws): the map itself is drawn by a script,
+  // the list gives the same facts to search engines and to visitors without JavaScript
+  const list = $('#kg-list');
+  if (list) {
+    for (const p of [...c.points].sort((a, b) => b.houses - a.houses)) {
       const li = document.createElement('li');
-      li.textContent = `${p.name}: ${nf(p.houses)} ${plural(p.houses, T.map.houses)}, ${nf(p.area)} ${T.map.area}`;
-      ul.append(li);
+      const add = (tag: string, t: string) => { const e = document.createElement(tag); e.textContent = t; li.append(e); };
+      add('b', p.name); add('span', `${nf(p.houses)} ${plural(p.houses, T.map.houses)}`); add('span', `${nf(p.area)} ${T.map.area}`);
+      list.append(li);
     }
-    map.after(ul);
   }
 
   /* ---- SEO head ---- */
   const site = config.siteUrl;
-  const url = site + (lang === 'ky' ? '/ky/' : '/');
+  const url = site + pagePath(page, lang);
   const months = numRu(c.build_months_avg) + ' ' + plural(+c.build_months_avg, T.seo.monthsUnit);
   const warranty = numRu(c.warranty_years) + ' ' + plural(+c.warranty_years, T.seo.yearsUnit);
-  const description = fill(T.seo.description, { price, months, warranty });
+  // the home page description carries the current price and terms; the inner pages keep the one written in their HTML
+  const description = page ? $('meta[name="description"]')?.getAttribute('content') || '' : fill(T.seo.description, { price, months, warranty });
   const title = text($('title'));
   const ogImage = site + T.seo.ogImage;
   const head = document.head;
@@ -141,9 +150,9 @@ function build(template: string, lang: Lang, c: Content): string {
   $('meta[name="description"]')?.setAttribute('content', description);
   $$('link[rel="alternate"][hreflang]').forEach(l => l.remove());
   link({ rel: 'canonical', href: url });
-  link({ rel: 'alternate', hreflang: 'ru', href: site + '/' });
-  link({ rel: 'alternate', hreflang: 'ky', href: site + '/ky/' });
-  link({ rel: 'alternate', hreflang: 'x-default', href: site + '/' });
+  link({ rel: 'alternate', hreflang: 'ru', href: site + pagePath(page, 'ru') });
+  link({ rel: 'alternate', hreflang: 'ky', href: site + pagePath(page, 'ky') });
+  link({ rel: 'alternate', hreflang: 'x-default', href: site + pagePath(page, 'ru') });
   meta({ name: 'robots', content: 'index, follow, max-image-preview:large' });
   meta({ property: 'og:type', content: 'website' });
   meta({ property: 'og:site_name', content: T.seo.siteName });
@@ -185,7 +194,13 @@ function build(template: string, lang: Lang, c: Content): string {
         })),
       },
       { '@type': 'WebSite', '@id': site + '/#website', url: site + '/', name: T.seo.siteName, inLanguage: ['ru', 'ky'], publisher: { '@id': company } },
-      { '@type': 'WebPage', '@id': url + '#webpage', url, name: title, description, inLanguage: lang, isPartOf: { '@id': site + '/#website' }, about: { '@id': company }, primaryImageOfPage: ogImage },
+      { '@type': 'WebPage', '@id': url + '#webpage', url, name: title, description, inLanguage: lang, isPartOf: { '@id': site + '/#website' }, about: { '@id': company }, primaryImageOfPage: ogImage,
+        ...(page ? { breadcrumb: { '@id': url + '#breadcrumb' } } : {}) },
+      // inner pages: Главная → this page, the names as in the breadcrumbs on the page
+      ...(page ? [{ '@type': 'BreadcrumbList', '@id': url + '#breadcrumb', itemListElement: [
+        { '@type': 'ListItem', position: 1, name: text($('.crumbs a')), item: site + pagePath('', lang) },
+        { '@type': 'ListItem', position: 2, name: text($('.crumbs [aria-current]')), item: url },
+      ] }] : []),
       ...(faq.length ? [{ '@type': 'FAQPage', '@id': url + '#faq', inLanguage: lang, mainEntity: faq }] : []),
     ],
   };
@@ -228,12 +243,13 @@ Sitemap: ${config.siteUrl}/sitemap.xml
 
 export function sitemapXml(lastmod: Date) {
   const day = lastmod.toISOString().slice(0, 10), site = config.siteUrl;
-  const alt = `<xhtml:link rel="alternate" hreflang="ru" href="${site}/"/><xhtml:link rel="alternate" hreflang="ky" href="${site}/ky/"/><xhtml:link rel="alternate" hreflang="x-default" href="${site}/"/>`;
-  const url = (loc: string) => `<url><loc>${loc}</loc><lastmod>${day}</lastmod><changefreq>weekly</changefreq><priority>1.0</priority>${alt}</url>`;
+  const url = (page: Page, lang: Lang) => {
+    const alt = `<xhtml:link rel="alternate" hreflang="ru" href="${site}${pagePath(page, 'ru')}"/><xhtml:link rel="alternate" hreflang="ky" href="${site}${pagePath(page, 'ky')}"/><xhtml:link rel="alternate" hreflang="x-default" href="${site}${pagePath(page, 'ru')}"/>`;
+    return `<url><loc>${site}${pagePath(page, lang)}</loc><lastmod>${day}</lastmod><changefreq>weekly</changefreq><priority>${page ? '0.8' : '1.0'}</priority>${alt}</url>`;
+  };
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-${url(site + '/')}
-${url(site + '/ky/')}
+${PAGES.flatMap(page => [url(page, 'ru'), url(page, 'ky')]).join('\n')}
 </urlset>
 `;
 }

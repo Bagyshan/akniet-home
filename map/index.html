@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Карта объектов: где мы построили дома в Кыргызстане — Акниет</title>
+<meta name="description" content="Карта построенных домов «Акниет»: барнхаусы и A-frame по всему Кыргызстану — сколько домов и какой площади в каждом месте.">
+<meta name="theme-color" content="#211e22">
+<meta name="format-detection" content="telephone=no">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+<link rel="alternate" hreflang="ru" href="/map/">
+<link rel="alternate" hreflang="ky" href="/ky/map/">
+<link rel="preconnect" href="https://images.pexels.com">
+<link rel="preload" href="../assets/fonts/unbounded-cyrillic-92a538.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/onest-cyrillic-dea2c9.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../site.css">
+<link rel="stylesheet" href="../assets/map/kg-map.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}</script>
+</head>
+<body>
+
+<div class="cursor" id="cursor" aria-hidden="true"><div class="ring"><span>Смотреть</span></div></div>
+
+<header class="header" id="header">
+  <a href="../" class="logo" aria-label="Акниет — на главную"><img src="../assets/mark-gold.png" alt="" width="26" height="24"><span>АКНИЕТ</span></a>
+  <nav aria-label="Разделы">
+    <a href="../projects/">Проекты</a>
+    <a href="../technology/">Технологии</a>
+    <a href="../map/" aria-current="page">Карта объектов</a>
+    <a href="../#price">Цены</a>
+    <a href="../#faq">Вопросы</a>
+  </nav>
+  <div style="display:flex;gap:8px;align-items:center">
+    <div class="lang" role="group" aria-label="Язык сайта"><a href="./" data-lang-link="ru" hreflang="ru" lang="ru" aria-current="true">РУС</a><a href="../ky/map/" data-lang-link="ky" hreflang="ky" lang="ky">КЫР</a></div>
+    <a data-contact="phone" href="tel:+996500208487" class="h-phone">+996 500 20 84 87</a>
+    <a href="#contact" class="btn gold">Рассчитать дом</a>
+    <button class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="sheet" aria-label="Меню"><span></span><span></span></button>
+  </div>
+</header>
+<nav class="sheet" id="sheet" aria-label="Меню">
+  <a href="../projects/">Проекты и кейсы <span>→</span></a>
+  <a href="../technology/">Технологии <span>→</span></a>
+  <a href="../map/" aria-current="page">Карта объектов <span>→</span></a>
+  <a href="../#price">Цены и расчёт <span>→</span></a>
+  <a href="../#faq">Вопросы <span>→</span></a>
+  <a href="#contact">Контакты <span>→</span></a>
+  <div class="sheet-contacts">
+    <a data-contact="phone" href="tel:+996500208487">+996 500 20 84 87</a>
+    <a data-contact="whatsapp" href="https://wa.me/996500208487" target="_blank" rel="noopener">WhatsApp</a>
+    <a data-contact="telegram" href="https://t.me/+996500208487" target="_blank" rel="noopener">Telegram</a>
+  </div>
+</nav>
+
+<main id="top">
+<!-- ============ PAGE HEAD ============ -->
+<section class="page-hero">
+  <div class="wrap">
+    <div class="card slate c-page" style="--bg:url(../assets/stone/dark-rock.webp)">
+      <nav class="crumbs" aria-label="Навигационная цепочка"><a href="../">Главная</a><span aria-hidden="true">/</span><span aria-current="page">Карта объектов</span></nav>
+      <h1>Карта<br><span>объектов</span></h1>
+      <div class="page-bottom"><p>Строим по всему Кыргызстану — от Бишкека и Иссык-Куля до Нарына и Оша. На карте отмечено, сколько домов мы построили в каждом месте.</p><div class="page-links"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MAP ============ -->
+<section id="objects">
+  <div class="wrap bento">
+    <div class="card c-map rv">
+      <div class="map-head">
+        <p class="map-hint"><i aria-hidden="true"></i><span class="hint-hover">Наведите на точку — покажем, сколько домов мы там построили</span><span class="hint-touch">Нажмите на точку — покажем, сколько домов мы там построили</span></p>
+      </div>
+      <!-- points come from the admin panel (GET /api/content → points) -->
+      <div class="kg-box big" id="kg-map" role="region" aria-label="Карта Кыргызстана: места, где мы построили дома" data-geo="../assets/map/kg-geo.js" data-engine="../assets/map/kg-map.js" data-relief="../assets/map/relief.webp"></div>
+    </div>
+    <div class="card soft c-places rv">
+      <h2>Где уже <span>стоят наши дома</span></h2>
+      <!-- the same points as on the map (admin panel → Карта) -->
+      <ul class="kg-list" id="kg-list"></ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section id="contact">
+  <div class="wrap bento" style="margin-top:clamp(40px,5vw,80px)">
+    <div class="card cream c-form rv">
+      <h2>Рассчитаем<br>ваш <span>дом</span></h2>
+      <p class="lead">Оставьте контакты — свяжемся в течение рабочего дня, ответим на вопросы и бесплатно рассчитаем смету.</p>
+      <span class="chip gold" style="margin:-12px 0 28px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v8h14v-8M12 8v12M12 8S10.5 3.5 8 4.2 8.5 8 12 8Zm0 0s1.5-4.5 4-3.8S15.5 8 12 8Z"/></svg>Эскизный проект и тёплый пол — в подарок</span>
+      <form class="form" id="form" novalidate>
+        <div class="pick" id="pick" hidden><span>Вы выбрали: <b id="pick-text"></b></span><button type="button" id="pick-x" aria-label="Убрать выбор">×</button></div>
+        <input type="hidden" name="project" id="f-project"><input type="hidden" name="area" id="f-area">
+        <div class="fld" id="f-name"><input id="name" name="name" placeholder=" " autocomplete="name"><label for="name">Ваше имя</label><span class="err">Укажите имя</span></div>
+        <div class="fld" id="f-phone"><input id="phone" name="phone" type="tel" inputmode="tel" placeholder=" " autocomplete="tel"><label for="phone">Телефон</label><span class="err">Введите номер полностью, например +996 500 20 84 87</span></div>
+        <span class="cap" id="cap-type">Какой дом интересует</span>
+        <div class="seg" role="radiogroup" aria-labelledby="cap-type">
+          <input type="radio" name="type" id="c1" value="Барнхаус" checked><label for="c1">Барнхаус</label>
+          <input type="radio" name="type" id="c2" value="A-frame"><label for="c2">A-frame</label>
+          <input type="radio" name="type" id="c3" value="Нужен совет"><label for="c3">Нужен совет</label>
+        </div>
+        <span class="cap" id="cap-via">Как удобнее связаться</span>
+        <div class="seg" role="radiogroup" aria-labelledby="cap-via">
+          <input type="radio" name="via" id="v1" value="Звонок" checked><label for="v1">Звонок</label>
+          <input type="radio" name="via" id="v2" value="WhatsApp"><label for="v2">WhatsApp</label>
+          <input type="radio" name="via" id="v3" value="Telegram"><label for="v3">Telegram</label>
+        </div>
+        <div class="fld full"><textarea id="msg" name="msg" placeholder=" "></textarea><label for="msg">Пара слов о проекте (необязательно)</label></div>
+        <div class="hp" aria-hidden="true"><label>Ваш сайт <input name="website" tabindex="-1" autocomplete="off"></label></div>
+        <p class="form-err" id="form-err" role="alert" hidden>Не получилось отправить заявку. Позвоните нам или напишите в WhatsApp: <a data-contact="phone" href="tel:+996500208487">+996 500 20 84 87</a></p>
+        <button class="btn ink" type="submit">Отправить заявку <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <p class="form-note">Нажимая кнопку, вы соглашаетесь на обработку персональных данных.</p>
+        <div class="sent-msg" role="status" aria-live="polite"><span class="chip ink" style="justify-self:start">Заявка принята</span><h3 id="sent-title">Спасибо! Скоро позвоним.</h3><p style="color:rgba(49,45,50,.7)">Свяжемся в течение рабочего дня. Пока можно посмотреть наши стройки в <a data-contact="instagram" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener" style="text-decoration:underline">Instagram</a>.</p></div>
+      </form>
+    </div>
+    <div class="card slate c-social rv" style="--bg:url(../assets/stone/black-rock.webp)">
+      <span class="eyebrow" style="margin:4px 4px 8px">Позвоните или напишите</span>
+      <a data-contact="phone" class="phone" href="tel:+996500208487">+996 500 20 84 87 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></a>
+      <a data-contact="whatsapp" href="https://wa.me/996500208487" target="_blank" rel="noopener">WhatsApp <span>+996 500 20 84 87 ↗</span></a>
+      <a data-contact="telegram" href="https://t.me/+996500208487" target="_blank" rel="noopener">Telegram <span>+996 500 20 84 87 ↗</span></a>
+      <a data-contact="email" href="mailto:akniethome305@gmail.com">Почта <span>akniethome305@gmail.com</span></a>
+      <a data-contact="route" href="https://2gis.kg/bishkek/directions/points/%7C74.624823%2C42.883309" target="_blank" rel="noopener">Офис <span data-cms="address">г. Бишкек, ул. Осмонкула, 113</span></a>
+    </div>
+    <div class="card soft c-social c-follow rv">
+      <div><span class="eyebrow">Мы в соцсетях</span><p class="follow-text">Каждую стройку показываем от фундамента до ключей</p></div>
+      <div class="socials">
+        <a data-contact="instagram" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener">Instagram</a>
+        <a data-contact="tiktok" href="https://www.tiktok.com/@akniet_home" target="_blank" rel="noopener">TikTok</a>
+        <a data-contact="threads" href="https://www.threads.net/@akniet.home" target="_blank" rel="noopener">Threads</a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="card graphite">
+      <div class="foot-top">
+        <p style="font-family:var(--f-head);font-weight:300;font-size:clamp(22px,2.2vw,32px);line-height:1.25;max-width:20ch">Барнхаусы и A&#8209;frame дома <span style="color:var(--gold)">под ключ</span></p>
+        <div><h3>Навигация</h3><ul><li><a href="../projects/">Проекты и кейсы</a></li><li><a href="../technology/">Технологии</a></li><li><a href="../map/" aria-current="page">Карта объектов</a></li><li><a href="../#price">Цены</a></li><li><a href="../#faq">Вопросы</a></li></ul></div>
+        <div><h3>Соцсети</h3><ul><li><a data-contact="instagram" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener">Instagram</a></li><li><a data-contact="tiktok" href="https://www.tiktok.com/@akniet_home" target="_blank" rel="noopener">TikTok</a></li><li><a data-contact="threads" href="https://www.threads.net/@akniet.home" target="_blank" rel="noopener">Threads</a></li></ul></div>
+        <div><h3>Контакты</h3><ul><li><a data-contact="phone" href="tel:+996500208487">+996 500 20 84 87</a></li><li><a data-contact="whatsapp" href="https://wa.me/996500208487" target="_blank" rel="noopener">WhatsApp</a> · <a data-contact="telegram" href="https://t.me/+996500208487" target="_blank" rel="noopener">Telegram</a></li><li><a data-contact="email" href="mailto:akniethome305@gmail.com">akniethome305@gmail.com</a></li></ul></div>
+        <div><h3>Офис</h3><address class="office"><span data-cms="address">г. Бишкек, ул. Осмонкула, 113</span><span data-cms="hours">Пн–Сб, 10:00–20:00</span><a data-contact="route" href="https://2gis.kg/bishkek/directions/points/%7C74.624823%2C42.883309" target="_blank" rel="noopener" class="route">Построить маршрут в 2ГИС ↗</a></address></div>
+      </div>
+      <div class="foot-logo logo3d rv" id="logo3d" data-model="../assets/3d-models/akniet-logo.js"><canvas aria-label="Логотип Акниет в 3D" role="img"></canvas><img src="../assets/logo-light.png" alt="Акниет" loading="lazy"><span class="spin-hint">Покрутите логотип</span></div>
+      <div class="foot-bottom"><span>© <span id="year">2026</span> Акниет</span><a class="dev" href="https://webspace.kg" target="_blank" rel="noopener"><img src="../assets/favicon.png" alt="" width="20" height="20" loading="lazy" decoding="async">Разработано WebSpace</a><a href="#top">Наверх ↑</a></div>
+    </div>
+  </div>
+</footer>
+
+<nav class="mbar" id="mbar" aria-label="Быстрая связь">
+  <a data-contact="phone" href="tel:+996500208487" aria-label="Позвонить"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></a>
+  <a data-contact="whatsapp" href="https://wa.me/996500208487" target="_blank" rel="noopener">WhatsApp</a>
+  <a href="#contact" class="go">Рассчитать дом</a>
+</nav>
+
+<script type="application/json" id="i18n">{
+ "sent": {
+  "Звонок": "Спасибо! Скоро позвоним.",
+  "WhatsApp": "Спасибо! Скоро напишем в WhatsApp.",
+  "Telegram": "Спасибо! Скоро напишем в Telegram."
+ },
+ "priceFrom": "от {sum}",
+ "m2": "м²",
+ "m": "м",
+ "areaText": "{n} квадратных метров",
+ "calcProject": "{style} (калькулятор)",
+ "scheme": "Схема: {floor}",
+ "secondLight": "Второй свет",
+ "specs": [
+  "Площадь",
+  "Спальни",
+  "Санузлы"
+ ],
+ "words": {
+  "1 этаж": "1 этаж",
+  "2 этаж": "2 этаж",
+  "Антресоль": "Антресоль",
+  "Кухня-гостиная": "Кухня-гостиная",
+  "Санузел": "Санузел",
+  "Санузел 2": "Санузел 2",
+  "Прихожая": "Прихожая",
+  "Спальня": "Спальня",
+  "Спальня 2": "Спальня 2",
+  "Спальня 3": "Спальня 3",
+  "Вход": "Вход",
+  "Холл": "Холл",
+  "Постирочная": "Постирочная",
+  "Гардероб": "Гардероб",
+  "Барнхаус": "Барнхаус",
+  "A-frame": "A-frame"
+ },
+ "map": {
+  "zoomIn": "Приблизить",
+  "zoomOut": "Отдалить",
+  "houses": "дом построен,дома построено,домов построено",
+  "area": "м² — общая площадь"
+ },
+ "days": {
+  "Mo-Fr": "Пн–Пт",
+  "Mo-Sa": "Пн–Сб",
+  "Mo-Su": "Ежедневно"
+ },
+ "seo": {
+  "siteName": "Акниет",
+  "description": "Барнхаусы и A-frame под ключ по всему Кыргызстану: ${price} за м², в среднем {months}, металлический каркас, гарантия {warranty}. Эскиз и тёплый пол — в подарок.",
+  "monthsUnit": "месяц,месяца,месяцев",
+  "yearsUnit": "год,года,лет",
+  "priceRange": "${price} за м²",
+  "services": [
+   "Строительство барнхауса под ключ",
+   "Строительство A-frame дома под ключ"
+  ],
+  "country": "Кыргызстан",
+  "city": "Бишкек",
+  "ogLocale": "ru_RU",
+  "ogImage": "/assets/og/og-ru.jpg"
+ }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="../assets/site.js"></script>
+<script type="module" src="../assets/logo3d.js"></script>
+</body>
+</html>
