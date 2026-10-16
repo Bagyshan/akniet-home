@@ -6,6 +6,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { parseHTML } from 'linkedom';
 import { config } from './config.js';
+import { readCatalogFor, type PageCase, type PageProject } from './catalog.js';
 import { readContent } from './content.js';
 import { listPointsFor } from './points.js';
 import { readSlotsFor, type Lang } from './slots.js';
@@ -26,14 +27,17 @@ export async function renderPage(lang: Lang, page: Page = ''): Promise<string> {
   const hit = cache.get(key);
   if (hit && Date.now() - hit.at < TTL) return hit.html;
   if (!templates.has(key)) templates.set(key, await readFile(path.join(config.siteDir, key, 'index.html'), 'utf8'));
-  const [fields, materials, gallery, points] = await Promise.all([readContent(), readSlotsFor('materials', lang), readSlotsFor('gallery', lang), listPointsFor(lang)]);
-  const html = build(templates.get(key)!, lang, page, { ...fields, materials, gallery, points } as Content);
+  const [fields, materials, gallery, points, catalog] = await Promise.all([readContent(), readSlotsFor('materials', lang), readSlotsFor('gallery', lang), listPointsFor(lang), readCatalogFor(lang)]);
+  const html = build(templates.get(key)!, lang, page, { ...fields, materials, gallery, points, ...catalog } as Content);
   cache.set(key, { html, at: Date.now() });
   return html;
 }
 
 type Slot = Record<string, string> | null;
-type Content = Record<string, any> & { materials: Slot[]; gallery: Slot[]; points: { name: string; houses: number; area: number; lat: number; lon: number }[] };
+type Content = Record<string, any> & {
+  materials: Slot[]; gallery: Slot[]; points: { name: string; houses: number; area: number; lat: number; lon: number }[];
+  projects: PageProject[]; cases: PageCase[]; faq: { q: string; a: string }[];
+};
 
 /* ---- the same helpers as the page script ---- */
 const plural = (n: number, forms: string) => {
@@ -79,6 +83,9 @@ function build(template: string, lang: Lang, page: Page, c: Content): string {
   const bodyOf = (el: any) => bodies[+/@@script(\d+)@@/.exec(el.textContent)![1]];
   const T = JSON.parse(bodyOf($('#i18n')));
   const price = +c.price_m2 > 0 ? +c.price_m2 : 440;
+
+  /* ---- projects, cases, FAQ from the admin panel: the first card in each list is the template ---- */
+  renderCatalog(document, lang, c, T, price);
 
   /* ---- content ---- */
   for (const el of $$('[data-cms]')) {
@@ -230,6 +237,116 @@ function build(template: string, lang: Lang, page: Page, c: Content): string {
     head.append(s);
   }
   return document.toString().replace(/\/\*@@script(\d+)@@\*\//g, (_, i) => bodies[+i]);
+}
+
+/* ---- lists from the admin panel ---- */
+// {price} … in a FAQ answer → the same marked-up values as in the page (filled from the content right after)
+const FAQ_UNITS: Record<Lang, Record<string, [string, string]>> = {
+  ru: { '{months}': ['build_months_avg', 'месяц,месяца,месяцев'], '{months_min}': ['build_months_min', 'месяца,месяцев,месяцев,месяца'], '{warranty}': ['warranty_years', 'год,года,лет'] },
+  ky: { '{months}': ['build_months_avg', 'ай,ай,ай'], '{months_min}': ['build_months_min', 'айдан,айдан,айдан'], '{warranty}': ['warranty_years', 'жыл,жыл,жыл'] },
+};
+const esc = (s: string) => s.replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch]!);
+const area = (v: number) => (Math.round(v * 10) / 10).toLocaleString('ru-RU');
+
+function renderCatalog(document: any, lang: Lang, c: Content, T: any, price: number) {
+  const $ = (s: string): any => document.querySelector(s);
+  const styleName = (p: { style: string }) => (p.style === 'af' ? 'A-frame' : 'Барнхаус'); // the form's radio values
+  const styleLabel = (p: { style: string }) => T.words[styleName(p)] || styleName(p);
+  const priceText = (p: PageProject) => fill(T.priceFrom, { sum: money(p.price || p.area * price) });
+  const setText = (root: any, sel: string, t: string) => { const e = root.querySelector(sel); if (e) e.textContent = t; };
+  const setArea = (root: any, n: number) => {
+    const e = root.querySelector('.area'); if (!e) return;
+    const small = e.querySelector('small'); e.textContent = String(n); if (small) e.append(small);
+  };
+  // the card's price follows the price per m² (data-price) unless the project has its own price
+  const setPrice = (root: any, p: PageProject) => {
+    const b = root.querySelector('[data-price]'); if (!b) return;
+    b.textContent = priceText(p);
+    if (p.price) b.removeAttribute('data-price'); else b.setAttribute('data-price', String(p.area));
+  };
+  const setImage = (root: any, sel: string, src: string | null, alt: string) => {
+    const img = root.querySelector(sel); if (!img) return;
+    if (src) img.setAttribute('src', src);
+    img.setAttribute('alt', alt);
+  };
+  const fillList = <T>(list: any, items: T[], fillOne: (card: any, item: T) => void) => {
+    if (!list) return;
+    const tpl = list.firstElementChild; if (!tpl) return;
+    const cards = items.map(item => { const card = tpl.cloneNode(true); fillOne(card, item); return card; });
+    list.replaceChildren(...cards);
+  };
+
+  // home page: short cards of the projects marked «на главной»
+  const home = $('[data-list="home-projects"]');
+  const onHome = c.projects.filter(p => p.on_home);
+  if (home && !onHome.length) home.closest('section')?.remove();
+  else fillList(home, onHome, (card, p) => {
+    card.setAttribute('href', 'projects/#' + p.slug);
+    setImage(card, 'img', p.image, `${styleLabel(p)} «${p.name}»`);
+    setText(card, '.pimg .chip', styleLabel(p));
+    setText(card, 'h3', `«${p.name}»`);
+    setArea(card, p.area); setPrice(card, p);
+  });
+
+  // projects page: detailed cards
+  fillList($('[data-list="projects"]'), c.projects, (card, p) => {
+    card.setAttribute('id', p.slug); card.setAttribute('data-style', p.style);
+    setImage(card, '.pd-img img', p.image, `${styleLabel(p)} «${p.name}»`);
+    setText(card, '.pd-img .chip', styleLabel(p));
+    setText(card, 'h3', `«${p.name}»`);
+    setArea(card, p.area);
+    setText(card, '.pd-text', p.text);
+    const dd = card.querySelectorAll('.pd-specs dd');
+    [p.beds, p.baths, p.floors].forEach((v, i) => dd[i] && (dd[i].textContent = String(v)));
+    const rooms = card.querySelector('.pd-rooms');
+    if (rooms) rooms.innerHTML = p.plan.map(f => (p.plan.length > 1 ? `<li class="fl">${esc(f.name)}</li>` : '')
+      + f.rooms.map(r => `<li><span>${esc(r.name)}</span><span>${area(r.w * r.h)} ${T.m2}</span></li>`).join('')).join('');
+    setPrice(card, p);
+    card.querySelector('[data-plan]')?.setAttribute('data-plan', p.slug);
+    card.querySelector('[data-lead]')?.setAttribute('data-lead', JSON.stringify({ type: styleName(p), project: `«${p.name}»`, area: p.area }));
+  });
+
+  // cases
+  const cases = $('[data-list="cases"]');
+  if (cases && !c.cases.length) cases.closest('section')?.remove();
+  else fillList(cases, c.cases, (card, k) => {
+    setImage(card, '.pimg img', k.image, k.title);
+    setText(card, '.pimg .chip', k.region);
+    const eyebrow = card.querySelector('.eyebrow'), more = card.querySelector('.more-link');
+    if (k.project) {
+      eyebrow.textContent = `${styleLabel(k.project)} «${k.project.name}»`;
+      more.setAttribute('href', '#' + k.project.slug);
+    } else { eyebrow.remove(); more.remove(); }
+    setText(card, 'h3', k.title);
+    const dd = card.querySelectorAll('.case-facts dd');
+    [k.area, k.term, k.season].forEach((v, i) => dd[i] && (dd[i].textContent = v));
+    setText(card, '.body > p', k.story);
+  });
+
+  // FAQ
+  const faq = $('[data-list="faq"]');
+  if (faq) {
+    const tpl = faq.querySelector('details'), more = faq.querySelector('.faq-more');
+    faq.querySelectorAll('details').forEach((d: any) => d.remove());
+    const units = FAQ_UNITS[lang];
+    for (const item of c.faq) {
+      const d = tpl.cloneNode(true), sum = d.querySelector('summary'), icon = sum.querySelector('i');
+      sum.textContent = item.q; sum.append(icon);
+      d.querySelector('.a').innerHTML = esc(item.a).replace(/\{(price|months|months_min|warranty)\}/g, (t: string) =>
+        t === '{price}' ? '$<span data-cms="price_m2">440</span>' : `<span data-cms="${units[t][0]}" data-unit="${units[t][1]}"></span>`);
+      faq.insertBefore(d, more);
+    }
+  }
+
+  // calculator: «Как в проектах» buttons are the project areas
+  const presets = $('[data-list="presets"]');
+  if (presets && c.projects.length) {
+    const tpl = presets.querySelector('button');
+    presets.querySelectorAll('button').forEach((b: any) => b.remove());
+    for (const a of [...new Set(c.projects.map(p => p.area))].sort((x, y) => x - y).slice(0, 6)) {
+      const b = tpl.cloneNode(true); b.setAttribute('data-area', String(a)); b.textContent = `${a} ${T.m2}`; presets.append(b);
+    }
+  }
 }
 
 /* ---- robots.txt and sitemap.xml ---- */

@@ -150,52 +150,34 @@
   }
   filterBtns.forEach(b => b.addEventListener('click', () => setFilter(b.dataset.f)));
 
-  /* ---- projects: floor plans (rooms in metres: x, y, w, h, name) ---- */
-  const PLANS = {
-    tau: { name: 'Тау', type: 'A-frame', area: 43, beds: 1, baths: 1, floors: [
-      { n: '1 этаж', w: 6, h: 5.5, rooms: [[0, 0, 6, 3.5, 'Кухня-гостиная'], [0, 3.5, 2.4, 2, 'Санузел'], [2.4, 3.5, 3.6, 2, 'Прихожая']] },
-      { n: 'Антресоль', w: 6, h: 5.5, void: [0, 0, 6, 3.8], rooms: [[0, 3.8, 6, 1.7, 'Спальня']] }] },
-    karagay: { name: 'Карагай', type: 'A-frame', area: 68, beds: 2, baths: 1, floors: [
-      { n: '1 этаж', w: 7, h: 7, rooms: [[0, 0, 7, 4, 'Кухня-гостиная'], [0, 4, 3.5, 3, 'Спальня'], [3.5, 4, 2, 3, 'Санузел'], [5.5, 4, 1.5, 3, 'Вход']] },
-      { n: '2 этаж', w: 7, h: 7, void: [0, 0, 7, 4.3], rooms: [[0, 4.3, 7, 2.7, 'Спальня 2']] }] },
-    jailoo: { name: 'Жайлау', type: 'Барнхаус', area: 86, beds: 2, baths: 1, floors: [
-      { n: '1 этаж', w: 12, h: 7.2, rooms: [[0, 0, 6, 7.2, 'Кухня-гостиная'], [6, 0, 3.4, 4, 'Спальня'], [9.4, 0, 2.6, 4, 'Спальня 2'], [6, 4, 2.2, 3.2, 'Холл'], [8.2, 4, 2, 3.2, 'Санузел'], [10.2, 4, 1.8, 3.2, 'Постирочная']] }] },
-    alatoo: { name: 'Ала-Тоо', type: 'Барнхаус', area: 120, beds: 3, baths: 2, floors: [
-      { n: '1 этаж', w: 10, h: 7, rooms: [[0, 0, 6, 7, 'Кухня-гостиная'], [6, 0, 4, 3.6, 'Спальня'], [6, 3.6, 2, 3.4, 'Санузел'], [8, 3.6, 2, 3.4, 'Прихожая']] },
-      { n: '2 этаж', w: 10, h: 7, void: [0, 5, 10, 2], rooms: [[0, 0, 3.6, 3.4, 'Спальня 2'], [3.6, 0, 2.8, 5, 'Холл'], [6.4, 0, 3.6, 3.4, 'Спальня 3'], [0, 3.4, 3.6, 1.6, 'Санузел 2'], [6.4, 3.4, 3.6, 1.6, 'Гардероб']] }] },
-  };
+  /* ---- projects: floor plans ---- */
+  // The projects come from the admin panel (#cms → projects, the server puts them there); this copy of the stock
+  // projects is for a static page without the server. Drawing: assets/plan.js
+  let PROJECTS = [{"id":1,"slug":"tau","style":"af","name":"Тау","area":43,"beds":1,"baths":1,"price":null,"plan":[{"name":"1 этаж","w":6,"h":5.5,"void":null,"image":null,"rooms":[{"x":0,"y":0,"w":6,"h":3.5,"name":"Кухня-гостиная"},{"x":0,"y":3.5,"w":2.4,"h":2,"name":"Санузел"},{"x":2.4,"y":3.5,"w":3.6,"h":2,"name":"Прихожая"}]},{"name":"Антресоль","w":6,"h":5.5,"void":[0,0,6,3.8],"image":null,"rooms":[{"x":0,"y":3.8,"w":6,"h":1.7,"name":"Спальня"}]}]},{"id":2,"slug":"karagay","style":"af","name":"Карагай","area":68,"beds":2,"baths":1,"price":null,"plan":[{"name":"1 этаж","w":7,"h":7,"void":null,"image":null,"rooms":[{"x":0,"y":0,"w":7,"h":4,"name":"Кухня-гостиная"},{"x":0,"y":4,"w":3.5,"h":3,"name":"Спальня"},{"x":3.5,"y":4,"w":2,"h":3,"name":"Санузел"},{"x":5.5,"y":4,"w":1.5,"h":3,"name":"Вход"}]},{"name":"2 этаж","w":7,"h":7,"void":[0,0,7,4.3],"image":null,"rooms":[{"x":0,"y":4.3,"w":7,"h":2.7,"name":"Спальня 2"}]}]},{"id":3,"slug":"jailoo","style":"barn","name":"Жайлау","area":86,"beds":2,"baths":1,"price":null,"plan":[{"name":"1 этаж","w":12,"h":7.2,"void":null,"image":null,"rooms":[{"x":0,"y":0,"w":6,"h":7.2,"name":"Кухня-гостиная"},{"x":6,"y":0,"w":3.4,"h":4,"name":"Спальня"},{"x":9.4,"y":0,"w":2.6,"h":4,"name":"Спальня 2"},{"x":6,"y":4,"w":2.2,"h":3.2,"name":"Холл"},{"x":8.2,"y":4,"w":2,"h":3.2,"name":"Санузел"},{"x":10.2,"y":4,"w":1.8,"h":3.2,"name":"Постирочная"}]}]},{"id":4,"slug":"alatoo","style":"barn","name":"Ала-Тоо","area":120,"beds":3,"baths":2,"price":null,"plan":[{"name":"1 этаж","w":10,"h":7,"void":null,"image":null,"rooms":[{"x":0,"y":0,"w":6,"h":7,"name":"Кухня-гостиная"},{"x":6,"y":0,"w":4,"h":3.6,"name":"Спальня"},{"x":6,"y":3.6,"w":2,"h":3.4,"name":"Санузел"},{"x":8,"y":3.6,"w":2,"h":3.4,"name":"Прихожая"}]},{"name":"2 этаж","w":10,"h":7,"void":[0,5,10,2],"image":null,"rooms":[{"x":0,"y":0,"w":3.6,"h":3.4,"name":"Спальня 2"},{"x":3.6,"y":0,"w":2.8,"h":5,"name":"Холл"},{"x":6.4,"y":0,"w":3.6,"h":3.4,"name":"Спальня 3"},{"x":0,"y":3.4,"w":3.6,"h":1.6,"name":"Санузел 2"},{"x":6.4,"y":3.4,"w":3.6,"h":1.6,"name":"Гардероб"}]}]}];
+  const projectBy = slug => PROJECTS.find(p => p.slug === slug);
+  const styleName = p => p.style === 'af' ? 'A-frame' : 'Барнхаус'; // the form's radio values
+  const projectPrice = p => money(p.price || p.area * PRICE_M2);
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const m2 = v => (Math.round(v * 10) / 10).toLocaleString('ru-RU');
-  function planSVG(f) {
-    const pad = 0.7, ink = '#312d32';
-    let g = `<svg viewBox="${-pad} ${-pad} ${f.w + pad * 2} ${f.h + pad * 2}" role="img" aria-label="${fill(T.scheme, { floor: word(f.n) })}" font-family="Onest, sans-serif">
-      <defs><pattern id="hatch" width=".3" height=".3" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2=".3" stroke="#d5a039" stroke-width=".05"/></pattern></defs>
-      <text x="${f.w / 2}" y="-.25" font-size=".28" text-anchor="middle" fill="${ink}" opacity=".55">${m2(f.w)} ${T.m}</text>
-      <text x="${f.w + .25}" y="${f.h / 2}" font-size=".28" text-anchor="middle" fill="${ink}" opacity=".55" transform="rotate(90 ${f.w + .25} ${f.h / 2})">${m2(f.h)} ${T.m}</text>`;
-    if (f.void) { const [x, y, w, h] = f.void; g += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#hatch)"/><text x="${x + w / 2}" y="${y + h / 2}" font-size=".3" text-anchor="middle" dominant-baseline="middle" fill="#8a6114">${T.secondLight}</text>`; }
-    f.rooms.forEach(([x, y, w, h, n]) => {
-      const fs = Math.min(0.36, (w - 0.4) / (word(n).length * 0.62));
-      g += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#fff8ec" stroke="${ink}" stroke-width=".06"/>
-        <text x="${x + w / 2}" y="${y + h / 2 - fs * 0.15}" font-size="${fs}" font-weight="600" text-anchor="middle" fill="${ink}">${word(n)}</text>
-        <text x="${x + w / 2}" y="${y + h / 2 + fs * 1.05}" font-size="${fs * 0.85}" text-anchor="middle" fill="#8a6114">${m2(w * h)} ${T.m2}</text>`;
-    });
-    return g + `<rect x="0" y="0" width="${f.w}" height="${f.h}" fill="none" stroke="${ink}" stroke-width=".2"/></svg>`;
-  }
+  const planHTML = f => window.AknietPlan.html({ ...f, rooms: f.rooms.map(r => ({ ...r, name: word(r.name) })) },
+    { m: T.m, m2: T.m2, secondLight: T.secondLight, label: fill(T.scheme, { floor: word(f.name) }) });
   // the dialog sits in the top layer, so the custom cursor moves inside it while it is open
   const cursorEl = $id('cursor');
   const plan = $id('plan'), planSvg = plan?.querySelector('.plan-svg'), floorsEl = plan?.querySelector('.floors');
   function showFloor(p, i) {
-    planSvg.innerHTML = planSVG(p.floors[i]);
+    planSvg.innerHTML = planHTML(p.plan[i]);
     floorsEl.querySelectorAll('button').forEach((b, j) => b.setAttribute('aria-pressed', String(i === j)));
   }
-  function openPlan(id) {
-    const p = PLANS[id], price = money(p.area * PRICE_M2);
-    plan.querySelector('.plan-style').textContent = word(p.type);
+  function openPlan(slug) {
+    const p = projectBy(slug); if (!p) return;
+    const price = projectPrice(p);
+    plan.querySelector('.plan-style').textContent = word(styleName(p));
     plan.querySelector('#plan-title').textContent = `«${p.name}» · ${p.area} ${T.m2}`;
-    plan.querySelector('.plan-specs').innerHTML = [[T.specs[0], p.area + ' ' + T.m2], [T.specs[1], p.beds], [T.specs[2], p.baths]].map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
-    plan.querySelector('.plan-rooms').innerHTML = p.floors.map(f => (p.floors.length > 1 ? `<li class="fl">${word(f.n)}</li>` : '') + f.rooms.map(([, , w, h, n]) => `<li><span>${word(n)}</span><span>${m2(w * h)} ${T.m2}</span></li>`).join('')).join('');
+    plan.querySelector('.plan-specs').innerHTML = [[T.specs[0], p.area + ' ' + T.m2], [T.specs[1], p.beds], [T.specs[2], p.baths]].map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('');
+    plan.querySelector('.plan-rooms').innerHTML = p.plan.map(f => (p.plan.length > 1 ? `<li class="fl">${esc(word(f.name))}</li>` : '') + f.rooms.map(r => `<li><span>${esc(word(r.name))}</span><span>${m2(r.w * r.h)} ${T.m2}</span></li>`).join('')).join('');
     plan.querySelector('.plan-price b').textContent = priceFrom(price);
-    plan.querySelector('.plan-go').dataset.lead = JSON.stringify({ type: p.type, project: `«${p.name}»`, area: p.area, price: priceFrom(price) });
-    floorsEl.innerHTML = p.floors.length > 1 ? p.floors.map((f, i) => `<button type="button">${word(f.n)}</button>`).join('') : '';
+    plan.querySelector('.plan-go').dataset.lead = JSON.stringify({ type: styleName(p), project: `«${p.name}»`, area: p.area, price: priceFrom(price) });
+    floorsEl.innerHTML = p.plan.length > 1 ? p.plan.map(f => `<button type="button">${esc(word(f.name))}</button>`).join('') : '';
     floorsEl.querySelectorAll('button').forEach((b, i) => b.addEventListener('click', () => showFloor(p, i)));
     showFloor(p, 0);
     plan.showModal(); plan.append(cursorEl); lenis?.stop(); document.documentElement.style.overflow = 'hidden';
@@ -207,7 +189,7 @@
     plan.addEventListener('close', unlock);
     plan.addEventListener('click', e => { if (e.target === plan) closePlan(); });
     plan.querySelector('.plan-close').addEventListener('click', closePlan);
-    document.querySelectorAll('[data-plan]').forEach(b => b.addEventListener('click', () => openPlan(b.dataset.plan)));
+    document.addEventListener('click', e => { const b = e.target.closest('[data-plan]'); if (b) openPlan(b.dataset.plan); });
   }
 
   /* ---- content from the admin panel (GET /api/content); the HTML keeps the defaults ---- */
@@ -270,6 +252,7 @@
       if (g.image) img.src = g.image;
       if (g.caption) { f.querySelector('.chip').textContent = g.caption; img.alt = g.caption; }
     });
+    if (c.projects) PROJECTS = c.projects;
     if (c.points) { mapPoints = c.points; kgMap?.setPoints(mapPoints); drawList(); }
     if (hasGsap) ScrollTrigger.refresh();
   }
@@ -307,6 +290,20 @@
   const embedded = $id('cms');
   if (embedded) applyContent(JSON.parse(embedded.textContent));
   else if (location.protocol !== 'file:') fetch('/api/content?lang=' + document.documentElement.lang).then(r => r.ok ? r.json() : null).then(c => c && applyContent(c)).catch(() => {});
+
+  /* ---- FAQ: 4 questions, the rest behind «Показать ещё» ---- */
+  const faqBox = document.querySelector('.faq'), faqMore = $id('faq-more');
+  if (faqBox && faqMore && faqBox.querySelectorAll('details').length > 4) {
+    faqBox.classList.add('short'); faqMore.hidden = false;
+    faqMore.addEventListener('click', () => {
+      const open = faqBox.classList.toggle('short') === false;
+      faqMore.setAttribute('aria-expanded', String(open));
+      faqMore.querySelector('span').textContent = open ? T.faqLess : T.faqMore;
+      if (open) faqBox.querySelectorAll('details')[4].querySelector('summary').focus({ preventScroll: true });
+      else scrollTo('#faq');
+      if (hasGsap) ScrollTrigger.refresh();
+    });
+  }
 
   /* ---- metal frame scheme draws itself once in view ---- */
   const frameSvg = $id('frame-svg');

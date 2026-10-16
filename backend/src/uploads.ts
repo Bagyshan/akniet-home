@@ -4,8 +4,8 @@ import path from 'node:path';
 import sharp from 'sharp';
 import { config } from './config.js';
 
-// Longest side after compression: material cards are small, gallery photos are larger
-const MAX_SIDE = { material: 1100, gallery: 1600 } as const;
+// Longest side after compression: material cards are small, gallery and project photos are larger, floor plan drawings keep detail
+const MAX_SIDE = { material: 1100, gallery: 1600, project: 1600, plan: 2000 } as const;
 export type UploadKind = keyof typeof MAX_SIDE;
 export const isUploadKind = (k: unknown): k is UploadKind => typeof k === 'string' && Object.hasOwn(MAX_SIDE, k);
 

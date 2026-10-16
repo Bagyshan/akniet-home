@@ -358,7 +358,8 @@ dialog.plan[open]{animation:dlg .5s var(--ease)}
 dialog.plan::backdrop{background:rgba(20,18,21,.74);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .plan-in{display:grid;grid-template-columns:1.25fr 1fr;max-height:calc(100dvh - 24px);overflow:auto;overscroll-behavior:contain}
 .plan-fig{background:var(--field);color:var(--ink);padding:clamp(20px,2.4vw,32px);display:flex;flex-direction:column;justify-content:center;gap:14px}
-.plan-svg svg{display:block;width:100%;height:auto;max-height:62vh}
+.plan-svg svg,.plan-svg img{display:block;width:100%;height:auto;max-height:62vh}
+.plan-svg img{object-fit:contain;border-radius:8px}
 .plan-cap{font-size:12px;color:rgba(49,45,50,.55)}
 .floors{display:flex;gap:4px;align-self:flex-start;padding:4px;border-radius:999px;background:#ebe0cd}
 .floors:empty{display:none}
@@ -472,6 +473,12 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 .faq details[open] summary i{transform:rotate(45deg);background:var(--gold)}
 .faq details[open] summary i::before,.faq details[open] summary i::after{background:var(--ink)}
 .faq .a{padding:0 24px 22px;color:var(--dim);max-width:64ch}
+/* the first 4 questions are shown, the rest open with «Показать ещё» (without JS everything stays visible) */
+.faq.short details:nth-of-type(n+5){display:none}
+.faq-more{justify-self:start;margin-top:6px}
+.faq-more svg{transform:rotate(90deg)}
+.faq-more:hover svg{transform:rotate(90deg) translateX(3px)}
+.faq-more[aria-expanded="true"] svg,.faq-more[aria-expanded="true"]:hover svg{transform:rotate(-90deg)}
 .faq details[open] .a{animation:faq .5s var(--ease)}
 @keyframes faq{from{opacity:0;transform:translateY(-6px)}}
 .c-ask{grid-column:9/13;align-self:start;position:sticky;top:96px;display:flex;flex-direction:column;gap:28px}
@@ -675,8 +682,23 @@ section[id],article[id],[id="gift"]{scroll-margin-top:96px}
   .mats i{border-radius:12px}
   .steps{grid-template-columns:1fr}
   .form{grid-template-columns:1fr}
-  .foot-top{grid-template-columns:1fr 1fr}
-  .foot-top>:first-child{grid-column:1/-1}
+  /* footer: tagline, then menu | socials side by side, then contacts and office full width, split by thin lines */
+  .footer .card{padding:28px 20px 20px}
+  .foot-top{grid-template-columns:1fr 1fr;gap:0 16px}
+  .foot-top>*{padding:22px 0;border-top:1px solid var(--line)}
+  .foot-top>:first-child{grid-column:1/-1;padding-top:0;border-top:0}
+  .foot-top>:nth-child(n+4){grid-column:1/-1}
+  .foot-top h3{margin-bottom:10px}
+  .foot-top ul{gap:10px}
+  .foot-top>:nth-child(4) li:first-child a{font-family:var(--f-head);font-size:22px;letter-spacing:-.02em;color:var(--cream)}
+  .foot-top>:nth-child(4) li{overflow-wrap:anywhere}
+  .office{gap:4px}
+  .office .route{margin-top:8px}
+  .foot-logo{margin:0 -20px;padding:4px 0 20px}
+  .logo3d canvas{width:100%;aspect-ratio:1}
+  .foot-logo img{width:min(82%,360px)}
+  .foot-bottom{display:grid;grid-template-columns:1fr auto;gap:14px;padding-top:18px;border-top:1px solid var(--line)}
+  .foot-bottom .dev{grid-column:1/-1;order:3;justify-content:center;padding:12px;border-radius:14px;background:rgba(255,248,236,.04)}
   .proj-grid{grid-template-columns:1fr}
   .proj-head .filter{width:100%}
   .filter button{flex:1;padding:0 10px}

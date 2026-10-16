@@ -1,4 +1,5 @@
 import express, { Router, type NextFunction, type Request, type Response } from 'express';
+import { clean, deleteItem, isKind, listItems, reorder, saveItem, type Kind } from '../catalog.js';
 import { CONTENT_FIELDS, checkValue, isContentKey, readContent, writeContent, type ContentKey } from '../content.js';
 import { pool } from '../db.js';
 import { cleanPoint, deletePoint, listPoints, savePoint } from '../points.js';
@@ -98,7 +99,7 @@ admin.delete('/slots/:section/:slot', async (req, res) => {
   res.json({ ok: true });
 });
 
-// POST /api/admin/upload?kind=material|gallery  body: the image file itself
+// POST /api/admin/upload?kind=material|gallery|project|plan  body: the image file itself
 admin.post('/upload', express.raw({ type: 'image/*', limit: '15mb' }), async (req, res) => {
   const kind = req.query.kind;
   if (!isUploadKind(kind)) return res.status(422).json({ ok: false, errors: ['kind'] });
@@ -129,5 +130,55 @@ admin.put('/points/:id', async (req, res) => {
 admin.delete('/points/:id', async (req, res) => {
   if (!Number.isInteger(Number(req.params.id))) return res.status(404).json({ ok: false });
   const n = await deletePoint(Number(req.params.id));
+  res.status(n ? 200 : 404).json({ ok: Boolean(n) });
+});
+
+// ---- projects and cases: /api/admin/catalog/projects, /api/admin/catalog/cases ----
+const kindOf = (req: Request, res: Response): Kind | null => {
+  const k = String(req.params.kind);
+  if (isKind(k)) return k;
+  res.status(404).json({ ok: false, error: 'no such list' });
+  return null;
+};
+const idOf = (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  if (Number.isInteger(id) && id > 0) return id;
+  res.status(404).json({ ok: false });
+  return null;
+};
+admin.get('/catalog/:kind', async (req, res) => {
+  const kind = kindOf(req, res); if (!kind) return;
+  res.json(await listItems(kind));
+});
+// POST — a new item at the end of the list; PUT /:id — the same body
+admin.post('/catalog/:kind', async (req, res) => {
+  const kind = kindOf(req, res); if (!kind) return;
+  const [data, errors] = clean(kind, req.body ?? {});
+  if (errors.length) return res.status(422).json({ ok: false, errors });
+  const r = await saveItem(kind, data, res.locals.user);
+  if (r.error) return res.status(422).json({ ok: false, errors: [r.error] });
+  res.status(201).json({ ok: true, id: r.id });
+});
+// PUT /api/admin/catalog/projects/order  { "ids": [3, 1, 2] }
+admin.put('/catalog/:kind/order', async (req, res) => {
+  const kind = kindOf(req, res); if (!kind) return;
+  const ids = req.body?.ids;
+  if (!Array.isArray(ids) || !ids.every(i => Number.isInteger(i) && i > 0) || ids.length > 500) return res.status(422).json({ ok: false, errors: ['ids'] });
+  await reorder(kind, ids);
+  res.json({ ok: true });
+});
+admin.put('/catalog/:kind/:id', async (req, res) => {
+  const kind = kindOf(req, res); if (!kind) return;
+  const id = idOf(req, res); if (!id) return;
+  const [data, errors] = clean(kind, req.body ?? {});
+  if (errors.length) return res.status(422).json({ ok: false, errors });
+  const r = await saveItem(kind, data, res.locals.user, id);
+  if (r.error) return res.status(422).json({ ok: false, errors: [r.error] });
+  res.status(r.id ? 200 : 404).json({ ok: Boolean(r.id), id: r.id });
+});
+admin.delete('/catalog/:kind/:id', async (req, res) => {
+  const kind = kindOf(req, res); if (!kind) return;
+  const id = idOf(req, res); if (!id) return;
+  const n = await deleteItem(kind, id);
   res.status(n ? 200 : 404).json({ ok: Boolean(n) });
 });

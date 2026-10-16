@@ -25,7 +25,7 @@ COPY map/ /usr/share/nginx/html/map/
 COPY projects/ /usr/share/nginx/html/projects/
 COPY --from=ky /src/ky/ /usr/share/nginx/html/ky/
 COPY site.css /usr/share/nginx/html/
-COPY assets/site.js assets/logo3d.js /usr/share/nginx/html/assets/
+COPY assets/site.js assets/logo3d.js assets/plan.js /usr/share/nginx/html/assets/
 COPY assets/stone/ /usr/share/nginx/html/assets/stone/
 COPY assets/wood/ /usr/share/nginx/html/assets/wood/
 COPY assets/map/ /usr/share/nginx/html/assets/map/

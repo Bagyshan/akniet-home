@@ -1,0 +1,188 @@
+import { pool } from './db.js';
+import type { Lang } from './slots.js';
+
+// Projects (/projects/ and the short cards on the home page), cases (built houses) and FAQ, edited in the admin panel.
+// Every text has a Kyrgyz twin "<field>_ky"; the page gets one text in its language (Russian while there is no translation).
+export const KINDS = ['projects', 'cases', 'faq'] as const;
+export type Kind = (typeof KINDS)[number];
+export const isKind = (k: unknown): k is Kind => KINDS.includes(k as Kind);
+
+export type Room = { x: number; y: number; w: number; h: number; name: string; name_ky: string | null };
+export type Floor = { name: string; name_ky: string | null; w: number; h: number; void: [number, number, number, number] | null; image: string | null; rooms: Room[] };
+export type Project = {
+  slug: string; style: 'af' | 'barn'; name: string; name_ky: string | null; area: number; beds: number; baths: number;
+  floors: string; floors_ky: string | null; text: string; text_ky: string | null; price: number | null;
+  image: string | null; on_home: boolean; plan: Floor[];
+};
+export type Case = {
+  image: string | null; region: string; region_ky: string | null; title: string; title_ky: string | null;
+  area: string; term: string; term_ky: string | null; season: string; season_ky: string | null; story: string; story_ky: string | null;
+  project: number | null; // id of the project the case was built from
+};
+// {price} {months} {months_min} {warranty} in an answer become the values from the admin «Основное» tab
+export type Faq = { q: string; q_ky: string | null; a: string; a_ky: string | null };
+type Item<T> = { id: number; position: number; data: T };
+
+// Photos uploaded through the admin panel, plus the stock demo photos the site started with
+const IMAGE_RE = /^(\/uploads\/[a-f0-9]{32}\.webp|https:\/\/images\.pexels\.com\/photos\/\d+\/[\w.-]+\?[\w=&]+)$/;
+const SLUG_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
+/* ---- validation: returns [clean data, errors] ---- */
+class Check {
+  errors: string[] = [];
+  constructor(private b: Record<string, unknown>) {}
+  text(key: string, label: string, max: number, required = true) {
+    const v = this.b[key];
+    const s = typeof v === 'string' ? v.trim() : v == null ? '' : null;
+    if (s === null || s.length > max) { this.errors.push(`${label}: текст до ${max} символов`); return ''; }
+    if (!s && required) this.errors.push(`${label}: заполните поле`);
+    return s;
+  }
+  ky(key: string, label: string, max: number) { return this.text(key, label + ' (кыр)', max, false) || null; }
+  num(key: string, label: string, min: number, max: number, { int = false, optional = false } = {}): number | null {
+    const v = this.b[key];
+    if (optional && (v === null || v === undefined || v === '')) return null;
+    const n = typeof v === 'number' ? v : typeof v === 'string' ? Number(v.replace(',', '.')) : NaN;
+    if (!Number.isFinite(n) || n < min || n > max || (int && !Number.isInteger(n))) { this.errors.push(`${label}: ${int ? 'целое ' : ''}число от ${min} до ${max}`); return min; }
+    return Math.round(n * 100) / 100;
+  }
+  image(key: string, label: string) {
+    const v = this.b[key];
+    if (v === null || v === undefined || v === '') return null;
+    if (typeof v === 'string' && IMAGE_RE.test(v)) return v;
+    this.errors.push(`${label}: загрузите фото через админку`);
+    return null;
+  }
+}
+
+function cleanFloor(raw: unknown, n: number): [Floor, string[]] {
+  const c = new Check(raw && typeof raw === 'object' ? (raw as Record<string, unknown>) : {});
+  const at = `Этаж ${n}`;
+  const f: Floor = {
+    name: c.text('name', `${at}: название`, 30), name_ky: c.ky('name_ky', `${at}: название`, 30),
+    w: c.num('w', `${at}: ширина дома, м`, 1, 60)!, h: c.num('h', `${at}: длина дома, м`, 1, 60)!,
+    void: null, image: c.image('image', `${at}: картинка планировки`), rooms: [],
+  };
+  const r = raw as Record<string, unknown>;
+  if (Array.isArray(r?.void)) {
+    const v = r.void.map(Number);
+    if (v.length === 4 && v.every(x => Number.isFinite(x) && x >= 0 && x <= 60) && v[2] > 0 && v[3] > 0) f.void = v as Floor['void'];
+    else c.errors.push(`${at}: второй свет — четыре числа`);
+  }
+  const rooms = Array.isArray(r?.rooms) ? r.rooms : [];
+  if (rooms.length > 24) c.errors.push(`${at}: не больше 24 комнат`);
+  rooms.slice(0, 24).forEach((room, i) => {
+    const rc = new Check(room && typeof room === 'object' ? room : {});
+    const ra = `${at}, комната ${i + 1}`;
+    f.rooms.push({
+      name: rc.text('name', `${ra}: название`, 30), name_ky: rc.ky('name_ky', `${ra}: название`, 30),
+      x: rc.num('x', `${ra}: X`, 0, 60)!, y: rc.num('y', `${ra}: Y`, 0, 60)!,
+      w: rc.num('w', `${ra}: ширина`, 0.3, 60)!, h: rc.num('h', `${ra}: длина`, 0.3, 60)!,
+    });
+    c.errors.push(...rc.errors);
+  });
+  if (!f.image && !f.rooms.length) c.errors.push(`${at}: добавьте комнаты или загрузите картинку планировки`);
+  return [f, c.errors];
+}
+
+export function cleanProject(b: Record<string, unknown>): [Project, string[]] {
+  const c = new Check(b);
+  const slug = c.text('slug', 'Адрес на странице', 40);
+  if (slug && !SLUG_RE.test(slug)) c.errors.push('Адрес на странице: латинские буквы, цифры и дефис, например ala-too');
+  const p: Project = {
+    slug, style: b.style === 'af' ? 'af' : 'barn',
+    name: c.text('name', 'Название', 40), name_ky: c.ky('name_ky', 'Название', 40),
+    area: c.num('area', 'Площадь, м²', 10, 2000)!, beds: c.num('beds', 'Спальни', 0, 30, { int: true })!, baths: c.num('baths', 'Санузлы', 0, 30, { int: true })!,
+    floors: c.text('floors', 'Этажи', 30), floors_ky: c.ky('floors_ky', 'Этажи', 30),
+    text: c.text('text', 'Описание', 400), text_ky: c.ky('text_ky', 'Описание', 400),
+    price: c.num('price', 'Цена под ключ, $', 1000, 1e7, { optional: true }),
+    image: c.image('image', 'Фото'), on_home: b.on_home === true, plan: [],
+  };
+  const plan = Array.isArray(b.plan) ? b.plan : [];
+  if (!plan.length) c.errors.push('Планировка: добавьте хотя бы один этаж');
+  if (plan.length > 4) c.errors.push('Планировка: не больше 4 этажей');
+  plan.slice(0, 4).forEach((f, i) => { const [floor, errs] = cleanFloor(f, i + 1); p.plan.push(floor); c.errors.push(...errs); });
+  return [p, c.errors];
+}
+
+export function cleanCase(b: Record<string, unknown>): [Case, string[]] {
+  const c = new Check(b);
+  const k: Case = {
+    image: c.image('image', 'Фото'),
+    region: c.text('region', 'Место', 50), region_ky: c.ky('region_ky', 'Место', 50),
+    title: c.text('title', 'Заголовок', 80), title_ky: c.ky('title_ky', 'Заголовок', 80),
+    area: c.text('area', 'Площадь', 30),
+    term: c.text('term', 'Срок', 30), term_ky: c.ky('term_ky', 'Срок', 30),
+    season: c.text('season', 'Сезон', 30), season_ky: c.ky('season_ky', 'Сезон', 30),
+    story: c.text('story', 'История', 600), story_ky: c.ky('story_ky', 'История', 600),
+    project: c.num('project', 'Проект', 1, 1e9, { int: true, optional: true }),
+  };
+  return [k, c.errors];
+}
+export function cleanFaq(b: Record<string, unknown>): [Faq, string[]] {
+  const c = new Check(b);
+  const f: Faq = { q: c.text('q', 'Вопрос', 200), q_ky: c.ky('q_ky', 'Вопрос', 200), a: c.text('a', 'Ответ', 1500), a_ky: c.ky('a_ky', 'Ответ', 1500) };
+  for (const t of [f.a, f.a_ky].join(' ').match(/\{[^}]*\}/g) || []) if (!FAQ_TOKENS.includes(t)) c.errors.push(`Ответ: неизвестная вставка ${t} — можно ${FAQ_TOKENS.join(', ')}`);
+  return [f, c.errors];
+}
+export const FAQ_TOKENS = ['{price}', '{months}', '{months_min}', '{warranty}'];
+
+export const clean = (kind: Kind, b: Record<string, unknown>): [Project | Case | Faq, string[]] =>
+  kind === 'projects' ? cleanProject(b) : kind === 'cases' ? cleanCase(b) : cleanFaq(b);
+
+/* ---- storage ---- */
+export async function listItems<T = Project | Case | Faq>(kind: Kind): Promise<Item<T>[]> {
+  return (await pool.query<Item<T>>(`SELECT id, position, data FROM ${kind} ORDER BY position, id`)).rows;
+}
+
+export async function saveItem(kind: Kind, data: Project | Case | Faq, user: string, id?: number) {
+  if (kind === 'projects') {
+    const { rows } = await pool.query(`SELECT id FROM projects WHERE data->>'slug' = $1 AND id <> $2`, [(data as Project).slug, id ?? 0]);
+    if (rows.length) return { error: 'Адрес на странице уже занят другим проектом' };
+  }
+  const { rows } = id
+    ? await pool.query<{ id: number }>(`UPDATE ${kind} SET data = $1, updated_at = now(), updated_by = $2 WHERE id = $3 RETURNING id`, [data, user, id])
+    : await pool.query<{ id: number }>(`INSERT INTO ${kind} (position, data, updated_by) VALUES ((SELECT coalesce(max(position) + 1, 0) FROM ${kind}), $1, $2) RETURNING id`, [data, user]);
+  return { id: rows[0]?.id ?? null };
+}
+
+export const deleteItem = async (kind: Kind, id: number) => (await pool.query(`DELETE FROM ${kind} WHERE id = $1`, [id])).rowCount ?? 0;
+
+// ids in the new order; the ones left out keep their place after them
+export async function reorder(kind: Kind, ids: number[]) {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    for (const [i, id] of ids.entries()) await client.query(`UPDATE ${kind} SET position = $1 WHERE id = $2`, [i, id]);
+    await client.query('COMMIT');
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
+}
+
+/* ---- for the page: one language, the fields the page uses ---- */
+const pick = (d: Record<string, any>, f: string, lang: Lang) => (lang === 'ky' && d[f + '_ky']) || d[f];
+
+export type PageProject = Omit<Project, `${string}_ky` | 'plan'> & { id: number; plan: (Omit<Floor, 'name_ky' | 'rooms'> & { rooms: Omit<Room, 'name_ky'>[] })[] };
+export type PageCase = Omit<Case, `${string}_ky` | 'project'> & { project: { slug: string; name: string; style: Project['style'] } | null };
+
+export async function readCatalogFor(lang: Lang) {
+  const [projects, cases, faq] = await Promise.all([listItems<Project>('projects'), listItems<Case>('cases'), listItems<Faq>('faq')]);
+  const ps: PageProject[] = projects.map(({ id, data: d }) => ({
+    id, slug: d.slug, style: d.style, name: pick(d, 'name', lang), area: d.area, beds: d.beds, baths: d.baths,
+    floors: pick(d, 'floors', lang), text: pick(d, 'text', lang), price: d.price, image: d.image, on_home: d.on_home,
+    plan: d.plan.map(f => ({ name: pick(f, 'name', lang), w: f.w, h: f.h, void: f.void, image: f.image, rooms: f.rooms.map(r => ({ x: r.x, y: r.y, w: r.w, h: r.h, name: pick(r, 'name', lang) })) })),
+  }));
+  const byId = new Map(ps.map(p => [p.id, p]));
+  const cs: PageCase[] = cases.map(({ data: d }) => {
+    const p = d.project ? byId.get(d.project) : undefined;
+    return {
+      image: d.image, region: pick(d, 'region', lang), title: pick(d, 'title', lang), area: d.area, term: pick(d, 'term', lang),
+      season: pick(d, 'season', lang), story: pick(d, 'story', lang), project: p ? { slug: p.slug, name: p.name, style: p.style } : null,
+    };
+  });
+  return { projects: ps, cases: cs, faq: faq.map(({ data: d }) => ({ q: pick(d, 'q', lang) as string, a: pick(d, 'a', lang) as string })) };
+}

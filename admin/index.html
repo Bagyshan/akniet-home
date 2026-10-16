@@ -124,6 +124,64 @@ dialog::backdrop{background:rgba(20,18,21,.72)}
 .toast.show{transform:translate(-50%,0);visibility:visible}
 .toast.err{background:var(--err);color:#fff}
 .note{margin-top:24px;font-size:12.5px;color:rgba(255,248,236,.4)}
+/* projects, cases, FAQ: lists + editor */
+.cat-list{display:grid;gap:8px}
+.cat-row{display:grid;grid-template-columns:96px 1fr auto;gap:14px;align-items:center;padding:10px;border-radius:16px;background:rgba(24,22,25,.45);box-shadow:inset 0 0 0 1px var(--line)}
+.cat-row.noimg{grid-template-columns:1fr auto;padding-left:16px}
+.cat-row img{width:96px;height:72px;object-fit:cover;border-radius:12px;background:#555}
+.cat-row b{display:block;font-family:var(--f-head);font-weight:500;font-size:15px;overflow-wrap:anywhere}
+.cat-row .meta{font-size:12.5px;color:var(--dim);margin-top:2px}
+.cat-row .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.cat-acts{display:flex;gap:6px;align-items:center}
+.cat-acts .btn.sm{min-width:38px;padding:0 10px}
+dialog.wide{width:min(1120px,calc(100% - 24px))}
+.ce{padding:22px;display:grid;gap:16px}
+.ce-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.ce-close{width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,248,236,.1);cursor:pointer;font-size:20px}
+.ce-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ce-grid .s2{grid-column:span 2}.ce-grid .s4{grid-column:1/-1}
+.ce .fld input,.ce .fld select,.ce .fld textarea{width:100%;min-height:44px;padding:10px 12px;border-radius:12px;border:1.5px solid transparent;background:rgba(24,22,25,.55);outline:none;font:inherit;color:inherit;resize:vertical}
+.ce .fld textarea{min-height:96px;line-height:1.45}
+.ce .fld input:focus,.ce .fld select:focus,.ce .fld textarea:focus{border-color:var(--gold)}
+.ce-photo{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.ce-photo .thumb{width:160px;aspect-ratio:4/3;border-radius:12px;background:#555 center/cover;flex:none}
+.check{display:flex;gap:10px;align-items:center;min-height:44px;cursor:pointer}
+.check input{width:20px;height:20px;accent-color:var(--gold)}
+.ce-sec{border-top:1px solid var(--line);padding-top:16px;display:grid;gap:12px}
+.ce-sec>h2{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.floor{display:grid;grid-template-columns:1.6fr 1fr;gap:16px;padding:14px;border-radius:16px;background:rgba(24,22,25,.45);box-shadow:inset 0 0 0 1px var(--line)}
+.floor-prev{background:#f4ebdc;border-radius:12px;padding:12px;align-self:start;position:sticky;top:0}
+.floor-prev svg,.floor-prev img{display:block;width:100%;height:auto;max-height:420px;object-fit:contain}
+.floor-prev .warn{margin-top:8px;font-size:12.5px;color:#a33a24}
+.rooms{display:grid;gap:6px}
+.room{display:grid;grid-template-columns:1.3fr 1.3fr repeat(4,54px) 58px 36px;gap:6px;align-items:center}
+.room.head{font-size:11px;font-weight:600;letter-spacing:.06em;color:rgba(255,248,236,.45)}
+.room input{width:100%;min-width:0;min-height:38px;padding:6px 8px;border-radius:10px;border:1.5px solid transparent;background:rgba(24,22,25,.55);outline:none;font-size:13.5px}
+.room input:focus{border-color:var(--gold)}
+.ce-photo .thumb:not([style*=url]){display:grid;place-items:center;background:rgba(24,22,25,.55)}
+.room .ar{font-size:12.5px;color:var(--dim);text-align:right}
+.room button{width:36px;height:36px;border-radius:10px;border:0;background:rgba(255,248,236,.08);cursor:pointer}
+.ce-err{padding:10px 14px;border-radius:12px;background:rgba(224,120,94,.15);box-shadow:inset 0 0 0 1px rgba(224,120,94,.5);color:#f3b3a2;font-size:13.5px}
+.ce-err ul{margin:4px 0 0;padding-left:18px}
+.ce-foot{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;position:sticky;bottom:0;padding:12px 0 0;background:var(--ink)}
+.ce-foot div{display:flex;gap:8px;flex-wrap:wrap}
+code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,236,.08)}
+@media (max-width:900px){
+  .ce-grid{grid-template-columns:1fr 1fr}
+  .floor{grid-template-columns:1fr}
+  .floor-prev{position:static}
+  .room{grid-template-columns:repeat(4,1fr) 56px 36px}
+  .room>input:nth-child(1),.room>input:nth-child(2){grid-column:span 3}
+  .room>input:nth-child(2){grid-column:span 3}
+  .room.head{display:none}
+}
+@media (max-width:600px){
+  .ce .pair{grid-template-columns:1fr}
+  .ce{padding:16px}
+  .cat-row{grid-template-columns:72px 1fr}
+  .cat-row img{width:72px;height:56px}
+  .cat-acts{grid-column:1/-1;justify-content:flex-end}
+}
 @media (max-width:1000px){.slots{grid-template-columns:repeat(3,1fr)}}
 @media (max-width:900px){
   .lead{grid-template-columns:1fr 1fr}
@@ -147,6 +205,9 @@ dialog::backdrop{background:rgba(20,18,21,.72)}
     <button role="tab" aria-selected="true" aria-controls="p-leads">Заявки</button>
     <button role="tab" aria-selected="false" aria-controls="p-main">Основное</button>
     <button role="tab" aria-selected="false" aria-controls="p-contacts">Контакты</button>
+    <button role="tab" aria-selected="false" aria-controls="p-projects">Проекты</button>
+    <button role="tab" aria-selected="false" aria-controls="p-cases">Кейсы</button>
+    <button role="tab" aria-selected="false" aria-controls="p-faq">Вопросы</button>
     <button role="tab" aria-selected="false" aria-controls="p-materials">Материалы</button>
     <button role="tab" aria-selected="false" aria-controls="p-gallery">Галерея</button>
     <button role="tab" aria-selected="false" aria-controls="p-map">Карта</button>
@@ -173,6 +234,21 @@ dialog::backdrop{background:rgba(20,18,21,.72)}
     <h1>Контакты</h1>
     <p class="muted">Меняются везде: шапка, меню, кнопки связи, контакты и подвал, а также карточка компании для поисковиков.</p>
     <form class="content-form" data-group="contacts"><div class="fields"></div><button class="btn gold" type="submit">Сохранить</button></form>
+  </section>
+
+  <section id="p-projects" role="tabpanel" class="card" hidden>
+    <div class="bar"><div><h1>Проекты</h1><p class="muted">Страница «Проекты и кейсы» (/projects/) и короткие карточки на главной — для проектов с галочкой «На главной». Порядок — как в списке, меняется стрелками. Площади из проектов становятся кнопками калькулятора «Как в проектах».</p></div><button class="btn gold" type="button" data-add="projects">+ Добавить проект</button></div>
+    <div class="cat-list" id="l-projects"></div>
+  </section>
+
+  <section id="p-cases" role="tabpanel" class="card" hidden>
+    <div class="bar"><div><h1>Кейсы</h1><p class="muted">Блок «Кейсы — построенные дома» на странице «Проекты и кейсы». Если удалить все кейсы, блок исчезнет со страницы.</p></div><button class="btn gold" type="button" data-add="cases">+ Добавить кейс</button></div>
+    <div class="cat-list" id="l-cases"></div>
+  </section>
+
+  <section id="p-faq" role="tabpanel" class="card" hidden>
+    <div class="bar"><div><h1>Вопросы</h1><p class="muted">«Частые вопросы» на главной: сначала видно 4 вопроса, остальные — по кнопке «Показать ещё вопросы».</p></div><button class="btn gold" type="button" data-add="faq">+ Добавить вопрос</button></div>
+    <div class="cat-list" id="l-faq"></div>
   </section>
 
   <section id="p-materials" role="tabpanel" class="card" hidden>
@@ -240,10 +316,12 @@ dialog::backdrop{background:rgba(20,18,21,.72)}
     </form>
   </div>
 </dialog>
+<dialog id="ce" class="wide" aria-labelledby="ce-title"><form class="ce" id="ce-form" novalidate></form></dialog>
 <datalist id="kinds"><option value="Дерево"><option value="Камень"><option value="Металл"><option value="Утеплитель"><option value="Отделка"></datalist>
 <datalist id="kinds-ky"><option value="Жыгач"><option value="Таш"><option value="Металл"><option value="Жылуулагыч"><option value="Жасалга"></datalist>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="/assets/plan.js"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
@@ -528,6 +606,233 @@ dialog::backdrop{background:rgba(20,18,21,.72)}
     try { await api('/api/admin/points/' + editing.id, { method: 'DELETE' }); editing = null; pts = await api('/api/admin/points'); renderPoints(); toast('Точка удалена'); }
     catch { toast('Не удалось удалить', true); }
   });
+
+  /* ---- projects, cases, FAQ: lists (add / delete / reorder) and the editor ---- */
+  const CAT = { projects: [], cases: [], faq: [] };
+  const STYLE = { af: 'A-frame', barn: 'Барнхаус' };
+  const num = v => { const n = Number(String(v).trim().replace(',', '.')); return String(v).trim() === '' || !Number.isFinite(n) ? null : n; };
+  const area = v => (Math.round(v * 10) / 10).toLocaleString('ru-RU');
+  // Latin address for the project anchor (/projects/#ala-too)
+  const TR = { а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', ң: 'n', о: 'o', ө: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ү: 'u', ф: 'f', х: 'h', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'sch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya' };
+  const slugify = s => s.toLowerCase().split('').map(ch => TR[ch] ?? ch).join('').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
+
+  async function loadCat(kind) {
+    try {
+      CAT[kind] = await api('/api/admin/catalog/' + kind);
+      if (kind === 'cases' && !CAT.projects.length) CAT.projects = await api('/api/admin/catalog/projects');
+      renderCat(kind);
+    } catch { toast('Не удалось загрузить список', true); }
+  }
+  const ROW = {
+    projects: d => ({ img: d.image, title: `«${d.name}»`, meta: `${STYLE[d.style]} · ${area(d.area)} м² · спален: ${d.beds} · санузлов: ${d.baths} · этажей в схеме: ${d.plan.length}`, tags: [d.on_home && ['gold', 'на главной'], !d.name_ky || !d.text_ky ? ['warn', 'нет перевода'] : null] }),
+    cases: d => ({ img: d.image, title: d.title, meta: `${d.region} · ${d.area} · ${d.term}` + (d.project ? ` · проект: ${CAT.projects.find(p => p.id === d.project)?.data.name || '—'}` : ''), tags: [!d.title_ky || !d.story_ky ? ['warn', 'нет перевода'] : null] }),
+    faq: d => ({ title: d.q, meta: d.a.length > 140 ? d.a.slice(0, 140) + '…' : d.a, tags: [!d.q_ky || !d.a_ky ? ['warn', 'нет перевода'] : null] }),
+  };
+  function renderCat(kind) {
+    const box = $('#l-' + kind), list = CAT[kind];
+    if (!list.length) return box.replaceChildren(el('div', { className: 'empty', textContent: 'Пока пусто — нажмите «Добавить»' }));
+    box.replaceChildren(...list.map((it, i) => {
+      const r = ROW[kind](it.data);
+      const move = (dir, label) => { const b = el('button', { type: 'button', className: 'btn sm', textContent: dir < 0 ? '↑' : '↓', disabled: i + dir < 0 || i + dir >= list.length, 'aria-label': label }); b.addEventListener('click', () => moveCat(kind, i, dir)); return b; };
+      const edit = el('button', { type: 'button', className: 'btn sm', textContent: 'Изменить' }); edit.addEventListener('click', () => openCat(kind, it));
+      return el('article', { className: 'cat-row' + (r.img ? '' : ' noimg') },
+        ...(r.img ? [el('img', { src: r.img, alt: '', loading: 'lazy' })] : []),
+        el('div', {}, el('b', { textContent: r.title }), el('div', { className: 'meta', textContent: r.meta }),
+          el('div', { className: 'tags' }, ...r.tags.filter(Boolean).map(([c, t]) => el('span', { className: 'chip ' + c, textContent: t })))),
+        el('div', { className: 'cat-acts' }, move(-1, 'Выше'), move(1, 'Ниже'), edit));
+    }));
+  }
+  async function moveCat(kind, i, dir) {
+    const list = CAT[kind];
+    [list[i], list[i + dir]] = [list[i + dir], list[i]];
+    renderCat(kind);
+    try { await api(`/api/admin/catalog/${kind}/order`, { method: 'PUT', body: JSON.stringify({ ids: list.map(x => x.id) }) }); toast('Порядок сохранён'); }
+    catch { toast('Не удалось сохранить порядок', true); loadCat(kind); }
+  }
+  for (const k of Object.keys(CAT)) loaders['p-' + k] = () => loadCat(k);
+  document.querySelectorAll('[data-add]').forEach(b => b.addEventListener('click', () => openCat(b.dataset.add, null)));
+
+  /* ---- editor ---- */
+  const ce = $('#ce'), ceForm = $('#ce-form');
+  let ceKind = null, ceItem = null, draft = null;
+  const fld = (label, input, cls = '') => el('div', { className: 'fld ' + cls }, el('label', { textContent: label }), input);
+  // a text field bound to draft[key]; area: textarea
+  function inp(key, { max = 200, area: big = false, ky = false, ph = '', obj = draft, onChange } = {}) {
+    const e = el(big ? 'textarea' : 'input', { value: obj[key] ?? '', maxLength: max, placeholder: ph, autocomplete: 'off', ...(ky ? { lang: 'ky' } : {}) });
+    e.addEventListener('input', () => { obj[key] = e.value; onChange?.(e.value); });
+    return e;
+  }
+  function numInp(key, { obj = draft, ph = '', onChange } = {}) {
+    const e = el('input', { type: 'text', inputMode: 'decimal', value: obj[key] == null ? '' : String(obj[key]).replace('.', ','), placeholder: ph, autocomplete: 'off' });
+    e.addEventListener('input', () => { obj[key] = num(e.value); onChange?.(); });
+    return e;
+  }
+  // RU + KY side by side
+  const pair = (label, key, opts = {}) => el('div', { className: 'fld s4' }, el('label', { textContent: label }),
+    el('div', { className: 'pair' },
+      el('div', {}, el('span', { textContent: 'РУС' }), inp(key, opts)),
+      el('div', {}, el('span', { textContent: 'КЫР' }), inp(key + '_ky', { ...opts, ky: true, ph: 'пусто — на /ky/ будет русский текст' }))));
+  async function upload(file, kind) {
+    if (file.size > 15 * 1024 * 1024) throw Object.assign(new Error('big'), { data: { errors: ['Файл больше 15 МБ'] } });
+    return api('/api/admin/upload?kind=' + kind, { method: 'POST', body: file, headers: { 'Content-Type': file.type || 'image/jpeg' } });
+  }
+  function photoField(label, obj, key, kind, onChange) {
+    const thumb = el('div', { className: 'thumb' }), state = el('span', { className: 'up-state' });
+    const show = () => { thumb.style.backgroundImage = obj[key] ? `url("${obj[key]}")` : ''; state.textContent = obj[key] ? '' : 'нет фото'; };
+    const file = el('input', { type: 'file', accept: 'image/jpeg,image/png,image/webp' });
+    file.style.cssText = 'position:absolute;opacity:0;width:1px;height:1px';
+    const pick = el('button', { type: 'button', className: 'btn sm', textContent: 'Загрузить' }); pick.addEventListener('click', () => file.click());
+    const del = el('button', { type: 'button', className: 'btn sm danger', textContent: 'Убрать' }); del.addEventListener('click', () => { obj[key] = null; show(); onChange?.(); });
+    file.addEventListener('change', async () => {
+      const f = file.files[0]; file.value = ''; if (!f) return;
+      state.textContent = 'Сжимаем…';
+      try { const r = await upload(f, kind); obj[key] = r.url; show(); onChange?.(); state.textContent = `${r.width}×${r.height}, ${Math.round(r.bytes / 1024)} КБ`; }
+      catch (err) { show(); toast(errText(err, 'Не удалось загрузить фото'), true); }
+    });
+    show();
+    return el('div', { className: 'fld s4' }, el('label', { textContent: label }), el('div', { className: 'ce-photo' }, thumb, pick, del, file, state));
+  }
+
+  const BLANK = {
+    projects: () => ({ slug: '', style: 'barn', name: '', name_ky: '', area: null, beds: 1, baths: 1, floors: '1', floors_ky: '', text: '', text_ky: '', price: null, image: null, on_home: false,
+      plan: [{ name: '1 этаж', name_ky: '1-кабат', w: 10, h: 8, void: null, image: null, rooms: [{ x: 0, y: 0, w: 6, h: 8, name: 'Кухня-гостиная', name_ky: 'Ашкана-конок бөлмө' }] }] }),
+    cases: () => ({ image: null, region: '', region_ky: '', title: '', title_ky: '', area: '', term: '', term_ky: '', season: '', season_ky: '', story: '', story_ky: '', project: null }),
+    faq: () => ({ q: '', q_ky: '', a: '', a_ky: '' }),
+  };
+  const TITLES = { projects: ['Новый проект', 'Проект'], cases: ['Новый кейс', 'Кейс'], faq: ['Новый вопрос', 'Вопрос'] };
+
+  function openCat(kind, item) {
+    ceKind = kind; ceItem = item; draft = structuredClone(item ? item.data : BLANK[kind]());
+    const head = el('div', { className: 'ce-head' }, el('h1', { id: 'ce-title', textContent: item ? `${TITLES[kind][1]}: ${ROW[kind](item.data).title}` : TITLES[kind][0] }));
+    const x = el('button', { type: 'button', className: 'ce-close', textContent: '×', 'aria-label': 'Закрыть' }); x.addEventListener('click', () => ce.close()); head.append(x);
+    const err = el('div', { className: 'ce-err', id: 'ce-err', hidden: true });
+    const body = { projects: projectForm, cases: caseForm, faq: faqForm }[kind]();
+    const del = el('button', { type: 'button', className: 'btn sm danger', textContent: 'Удалить', hidden: !item }); del.addEventListener('click', deleteCat);
+    const cancel = el('button', { type: 'button', className: 'btn sm', textContent: 'Отмена' }); cancel.addEventListener('click', () => ce.close());
+    ceForm.replaceChildren(head, ...body, err, el('div', { className: 'ce-foot' }, del, el('div', {}, cancel, el('button', { type: 'submit', className: 'btn sm gold', textContent: 'Сохранить' }))));
+    ce.showModal(); ce.scrollTop = 0;
+  }
+
+  function faqForm() {
+    return [el('div', { className: 'ce-grid' },
+      pair('Вопрос', 'q', { max: 200 }),
+      pair('Ответ', 'a', { max: 1500, area: true })),
+      el('p', { className: 'muted', innerHTML: 'В ответе можно вставить значения из вкладки «Основное» — сайт подставит их сам: <code>{price}</code> — цена за м² («$440»), <code>{months}</code> — средний срок («2 месяца»), <code>{months_min}</code> — минимальный срок после «от» («от 1,5 месяца»; по-кыргызски перед «баштап»), <code>{warranty}</code> — гарантия («5 лет»).' })];
+  }
+
+  function caseForm() {
+    const sel = el('select', {});
+    sel.append(el('option', { value: '', textContent: '— без ссылки на проект —' }), ...CAT.projects.map(p => el('option', { value: p.id, textContent: `${STYLE[p.data.style]} «${p.data.name}»`, selected: p.id === draft.project })));
+    sel.addEventListener('change', () => { draft.project = sel.value ? Number(sel.value) : null; });
+    return [el('div', { className: 'ce-grid' },
+      photoField('Фото (лучше горизонтальное)', draft, 'image', 'gallery'),
+      pair('Заголовок', 'title', { max: 80 }),
+      pair('Место (бейдж на фото)', 'region', { max: 50, ph: 'Иссык-Кульская область' }),
+      fld('Площадь', inp('area', { max: 30, ph: '68 м²' }), 's2'),
+      fld('По какому проекту', sel, 's2'),
+      pair('Срок стройки', 'term', { max: 30, ph: '2 месяца' }),
+      pair('Сезон', 'season', { max: 30, ph: 'Зима' }),
+      pair('История', 'story', { max: 600, area: true }))];
+  }
+
+  function projectForm() {
+    const slug = inp('slug', { max: 40, ph: 'например ala-too' });
+    let slugTouched = !!draft.slug;
+    slug.addEventListener('input', () => { slugTouched = true; });
+    const name = inp('name', { max: 40, onChange: v => { if (!slugTouched) { draft.slug = slugify(v); slug.value = draft.slug; } } });
+    const style = el('select', {}, ...Object.entries(STYLE).map(([v, t]) => el('option', { value: v, textContent: t, selected: draft.style === v })));
+    style.addEventListener('change', () => { draft.style = style.value; });
+    const home = el('input', { type: 'checkbox', checked: !!draft.on_home }); home.addEventListener('change', () => { draft.on_home = home.checked; });
+    const floorsBox = el('div', { className: 'rooms', style: 'gap:12px' });
+    const addFloor = el('button', { type: 'button', className: 'btn sm', textContent: '+ Этаж' });
+    addFloor.addEventListener('click', () => {
+      if (draft.plan.length >= 4) return toast('Не больше 4 этажей', true);
+      const last = draft.plan.at(-1) || { w: 10, h: 8 };
+      draft.plan.push({ name: `${draft.plan.length + 1} этаж`, name_ky: `${draft.plan.length + 1}-кабат`, w: last.w, h: last.h, void: null, image: null, rooms: [] });
+      renderFloors();
+    });
+    const renderFloors = () => floorsBox.replaceChildren(...draft.plan.map((f, i) => floorEditor(f, i, renderFloors)));
+    renderFloors();
+    return [
+      el('div', { className: 'ce-grid' },
+        photoField('Фото проекта', draft, 'image', 'project'),
+        el('div', { className: 'fld s2' }, el('label', { textContent: 'Название (без кавычек)' }),
+          el('div', { className: 'pair' }, el('div', {}, el('span', { textContent: 'РУС' }), name), el('div', {}, el('span', { textContent: 'КЫР' }), inp('name_ky', { max: 40, ky: true, ph: 'пусто — как по-русски' })))),
+        fld('Стиль', style),
+        fld('Адрес на странице: /projects/#…', slug),
+        fld('Площадь, м²', numInp('area', { ph: '86' })),
+        fld('Спальни', numInp('beds')),
+        fld('Санузлы', numInp('baths')),
+        fld('Цена под ключ, $', numInp('price', { ph: 'пусто — площадь × цена за м²' })),
+        pair('Этажи (как в карточке)', 'floors', { max: 30, ph: '1 + антресоль' }),
+        pair('Описание', 'text', { max: 400, area: true }),
+        el('label', { className: 'check s4' }, home, 'Показывать на главной (короткая карточка в «Готовых проектах»)')),
+      el('div', { className: 'ce-sec' },
+        el('h2', {}, 'Планировка', addFloor),
+        el('p', { className: 'muted', textContent: 'Размеры в метрах. X и Y — где начинается комната от левого верхнего угла дома, ширина — по горизонтали, длина — по вертикали. Схема справа обновляется сразу и выглядит так же, как на сайте. Вместо схемы можно загрузить картинку этажа — тогда на сайте будет она, а комнаты останутся списком под фото проекта.' }),
+        floorsBox),
+    ];
+  }
+
+  function floorEditor(f, i, rerender) {
+    const prev = el('div', { className: 'floor-prev' });
+    const draw = () => {
+      const warn = f.rooms.filter(r => r.x + r.w > f.w + 0.01 || r.y + r.h > f.h + 0.01).map(r => r.name || 'без названия');
+      prev.innerHTML = window.AknietPlan.html(f, { m: 'м', m2: 'м²', secondLight: 'Второй свет', label: f.name });
+      if (warn.length) prev.append(el('div', { className: 'warn', textContent: 'Выходит за размер дома: ' + warn.join(', ') }));
+    };
+    const vd = el('input', { type: 'checkbox', checked: !!f.void });
+    const voidBox = el('div', { className: 'ce-grid', hidden: !f.void });
+    const vfield = (j, label) => { const e = el('input', { type: 'text', inputMode: 'decimal', value: f.void ? String(f.void[j]).replace('.', ',') : '' }); e.addEventListener('input', () => { f.void[j] = num(e.value) ?? 0; draw(); }); return fld(label, e); };
+    const fillVoid = () => voidBox.replaceChildren(vfield(0, 'Второй свет: X'), vfield(1, 'Y'), vfield(2, 'Ширина'), vfield(3, 'Длина'));
+    vd.addEventListener('change', () => { f.void = vd.checked ? [0, 0, f.w, Math.round(f.h / 2 * 10) / 10] : null; voidBox.hidden = !vd.checked; fillVoid(); draw(); });
+    fillVoid();
+    const rooms = el('div', { className: 'rooms' });
+    const renderRooms = () => rooms.replaceChildren(
+      el('div', { className: 'room head' }, ...['Комната (рус)', 'Комната (кыр)', 'X', 'Y', 'Ширина', 'Длина', 'Площадь', ''].map(t => el('span', { textContent: t }))),
+      ...f.rooms.map((r, j) => {
+        const ar = el('span', { className: 'ar', textContent: area(r.w * r.h) + ' м²' });
+        const upd = () => { ar.textContent = area((r.w || 0) * (r.h || 0)) + ' м²'; draw(); };
+        const rm = el('button', { type: 'button', textContent: '✕', 'aria-label': 'Удалить комнату' }); rm.addEventListener('click', () => { f.rooms.splice(j, 1); renderRooms(); draw(); });
+        const n = inp('name', { obj: r, max: 30, ph: 'Спальня', onChange: draw }), nk = inp('name_ky', { obj: r, max: 30, ky: true, ph: 'кыргызча' });
+        n.setAttribute('aria-label', 'Комната'); nk.setAttribute('aria-label', 'Комната — кыргызча');
+        const ns = ['x', 'y', 'w', 'h'].map(k => { const e = numInp(k, { obj: r, onChange: upd, ph: { x: 'X', y: 'Y', w: 'шир.', h: 'дл.' }[k] }); e.setAttribute('aria-label', { x: 'X', y: 'Y', w: 'Ширина', h: 'Длина' }[k]); return e; });
+        return el('div', { className: 'room' }, n, nk, ...ns, ar, rm);
+      }));
+    renderRooms();
+    const addRoom = el('button', { type: 'button', className: 'btn sm', textContent: '+ Комната' });
+    addRoom.addEventListener('click', () => { f.rooms.push({ x: 0, y: 0, w: 3, h: 3, name: '', name_ky: '' }); renderRooms(); draw(); rooms.querySelector('.room:last-child input')?.focus(); });
+    const delFloor = el('button', { type: 'button', className: 'btn sm danger', textContent: 'Удалить этаж' });
+    delFloor.addEventListener('click', () => { if (draft.plan.length < 2) return toast('Нужен хотя бы один этаж', true); if (confirm(`Удалить «${f.name}»?`)) { draft.plan.splice(i, 1); rerender(); } });
+    draw();
+    return el('div', { className: 'floor' },
+      el('div', { style: 'display:grid;gap:12px;align-content:start' },
+        el('div', { className: 'pair' }, fld('Этаж (рус)', inp('name', { obj: f, max: 30, onChange: draw })), fld('Этаж (кыр)', inp('name_ky', { obj: f, max: 30, ky: true }))),
+        el('div', { className: 'pair' }, fld('Ширина дома, м', numInp('w', { obj: f, onChange: draw })), fld('Длина дома, м', numInp('h', { obj: f, onChange: draw }))),
+        el('label', { className: 'check' }, vd, 'Второй свет (заштрихованная зона)'), voidBox,
+        rooms, el('div', { style: 'display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between' }, addRoom, delFloor),
+        photoField('Картинка этажа вместо схемы (необязательно)', f, 'image', 'plan', draw)),
+      prev);
+  }
+
+  ceForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = e.submitter; btn.disabled = true;
+    const err = $('#ce-err'); err.hidden = true;
+    try {
+      await api('/api/admin/catalog/' + ceKind + (ceItem ? '/' + ceItem.id : ''), { method: ceItem ? 'PUT' : 'POST', body: JSON.stringify(draft) });
+      ce.close(); toast('Сохранено — сайт обновится в течение минуты');
+      loadCat(ceKind);
+    } catch (er) {
+      err.replaceChildren(el('b', { textContent: 'Не сохранено:' }), el('ul', {}, ...(er.data?.errors || ['ошибка сервера']).map(t => el('li', { textContent: t }))));
+      err.hidden = false; err.scrollIntoView({ block: 'nearest' });
+    } finally { btn.disabled = false; }
+  });
+  async function deleteCat() {
+    if (!confirm('Удалить безвозвратно?')) return;
+    try { await api(`/api/admin/catalog/${ceKind}/${ceItem.id}`, { method: 'DELETE' }); ce.close(); toast('Удалено'); loadCat(ceKind); }
+    catch { toast('Не удалось удалить', true); }
+  }
 
   $('#ed-reset').addEventListener('click', async () => {
     if (!confirm(`Вернуть стоковую карточку №${cur.i + 1}?`)) return;

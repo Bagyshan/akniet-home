@@ -75,7 +75,8 @@
       <div class="filter" role="group" aria-label="Стиль боюнча чыпка"><button type="button" data-f="all" aria-pressed="true">Баары</button><button type="button" data-f="af" aria-pressed="false">A-frame</button><button type="button" data-f="barn" aria-pressed="false">Барнхаус</button></div>
       <span class="proj-note">Баа болжолдуу: 1 м² үчүн $<span data-cms="price_m2">440</span> баада эсептелген</span>
     </div>
-    <div class="pd-list">
+    <!-- cards: admin panel → Проекты (the server fills them in) -->
+    <div class="pd-list" data-list="projects">
       <article class="card pd rv" id="tau" data-style="af">
         <div class="pd-img" data-cursor="view"><img src="https://images.pexels.com/photos/19737830/pexels-photo-19737830.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1000" alt="Тоолордун фонундагы A-frame «Тау»" loading="lazy"><span class="chip">A-frame</span></div>
         <div class="pd-body">
@@ -137,12 +138,46 @@
   </div>
 </section>
 
+<!-- ============ PRICE CALCULATOR ============ -->
+<section id="price">
+  <div class="wrap">
+    <div class="sec-title"><h2 class="rv">Сиздин үйүңүз<br><span>канча турат</span></h2><p class="rv">Ачкычка чейин 1 м² — $<span data-cms="price_m2">440</span>: долбоор менен пайдубалдан жылуу полго чейин. Болжолдуу бааны көрүү үчүн стилди жана аянтты тандаңыз.</p></div>
+    <div class="bento">
+      <div class="card soft c-calc rv">
+        <div class="calc-row">
+          <span class="cap" id="cap-style">Стиль</span>
+          <div class="seg dark" role="radiogroup" aria-labelledby="cap-style">
+            <input type="radio" name="cstyle" id="cs1" value="Барнхаус" checked><label for="cs1">Барнхаус</label>
+            <input type="radio" name="cstyle" id="cs2" value="A-frame"><label for="cs2">A-frame</label>
+          </div>
+        </div>
+        <div class="calc-row">
+          <div class="cap-line"><label class="cap" for="area">Үйдүн аянты</label><output id="area-out" for="area">86 м²</output></div>
+          <input type="range" id="area" min="40" max="200" step="1" value="86" aria-describedby="area-hint">
+          <div class="presets" id="area-hint" data-list="presets"><span>Долбоорлордогудай:</span><button type="button" data-area="43">43 м²</button><button type="button" data-area="68">68 м²</button><button type="button" data-area="86">86 м²</button><button type="button" data-area="120">120 м²</button></div>
+        </div>
+        <ul class="calc-inc">
+          <li>Долбоор жана пайдубал</li><li>Көтөрүүчү металл каркас</li><li>Базальт менен жылуулоо</li><li>Чатыр, фасад, терезе, эшик</li><li>Жасалга, сантехника, электр</li><li>Ванна бөлмөсүн жабдуу</li>
+        </ul>
+      </div>
+      <div class="card gold c-calc-out rv" aria-live="polite">
+        <span class="eyebrow" style="opacity:.8">Болжолдуу, ачкычка чейин</span>
+        <div><div class="calc-sum">баштапкы баа <b id="calc-sum">$37 840</b></div><p class="calc-meta"><span id="calc-style">Барнхаус</span> · <span id="calc-area">86</span> м² · орточо <span data-cms="build_months_avg" data-unit="ай,ай,ай">2 ай</span></p></div>
+        <div class="calc-gift"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v8h14v-8M12 8v12M12 8S10.5 3.5 8 4.2 8.5 8 12 8Zm0 0s1.5-4.5 4-3.8S15.5 8 12 8Z"/></svg><span>+ эскиздик долбоор жана жылуу пол белекке</span></div>
+        <a href="#contact" class="btn ink" id="calc-go">Так смета алуу <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <p class="calc-note">Так баа долбоорго, жер тилкеге жана жасалгага жараша болот — акысыз эсептеп беребиз.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ============ CASES ============ -->
 <!-- TODO: демо-кейсы — заменить на реальные построенные дома (фото, место, площадь, срок, история) -->
 <section id="cases">
   <div class="wrap">
     <div class="sec-title"><h2 class="rv">Кейстер — <span>курулган</span><br>үйлөр</h2><p class="rv">Үлгү үчүн демо-кейстер — сиздин объекттер менен алмаштырабыз.</p></div>
-    <div class="cases">
+    <!-- cards: admin panel → Кейсы -->
+    <div class="cases" data-list="cases">
       <article class="card case rv">
         <div class="pimg"><img src="https://images.pexels.com/photos/9209878/pexels-photo-9209878.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=800" alt="Ысык-Көлдөгү эс алуу үйү" loading="lazy"><span class="chip">Ысык-Көл облусу</span></div>
         <div class="body">
@@ -327,11 +362,14 @@
   "city": "Бишкек",
   "ogLocale": "ky_KG",
   "ogImage": "/assets/og/og-ky.jpg"
- }
+ },
+ "faqMore": "Дагы суроолорду көрсөтүү",
+ "faqLess": "Жыйноо"
 }</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="../../assets/plan.js"></script>
 <script src="../../assets/site.js"></script>
 <script type="module" src="../../assets/logo3d.js"></script>
 </body>
