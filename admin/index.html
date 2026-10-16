@@ -431,7 +431,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
   /* ---- numbered slots: stock cards are read from the live home page ---- */
   const SECTIONS = {
     materials: {
-      kind: 'material', title: 'Карточка материала',
+      kind: 'material', title: 'Карточка материала', page: 'technology/',
       fields: [['kind', 'Категория (бейдж сверху)', 24], ['title', 'Название материала', 60], ['subtitle', 'Где используется (подзаголовок)', 80]],
       stock: doc => [...doc.querySelectorAll('.tile[data-slot]')].map(t => ({
         image: /--w:\s*url\(["']?([^"')]+)/.exec(t.getAttribute('style'))?.[1],
@@ -441,7 +441,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
       })),
     },
     gallery: {
-      kind: 'gallery', title: 'Фото галереи',
+      kind: 'gallery', title: 'Фото галереи', page: '',
       fields: [['caption', 'Подпись на фото', 60]],
       stock: doc => [...doc.querySelectorAll('.shot[data-slot]')].map(f => ({
         image: f.querySelector('img').getAttribute('src'),
@@ -450,7 +450,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
       })),
     },
   };
-  let docs = null; // { ru, ky } — the live pages, source of the stock cards
+  const docs = {}; // page → { ru, ky }: the live pages, source of the stock cards (materials — /technology/, gallery — the home page)
   const state = { materials: null, gallery: null }; // { stock: [], stockKy: [], custom: [] }
   const abs = src => src && new URL(src, location.origin + '/').href;
   // What a page in `lang` shows: custom text of that language → custom Russian → stock of that language
@@ -485,11 +485,13 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
   }
   async function loadSlots(sec) {
     try {
-      if (!docs) {
+      const page = SECTIONS[sec].page;
+      if (!docs[page]) {
         const parse = async url => new DOMParser().parseFromString(await (await fetch(url, { cache: 'no-store' })).text(), 'text/html');
-        docs = { ru: await parse('/'), ky: await parse('/ky/') };
+        docs[page] = { ru: await parse('/' + page), ky: await parse('/ky/' + page) };
       }
-      state[sec] = { stock: SECTIONS[sec].stock(docs.ru), stockKy: SECTIONS[sec].stock(docs.ky), custom: await api('/api/admin/slots/' + sec) };
+      const d = docs[page];
+      state[sec] = { stock: SECTIONS[sec].stock(d.ru), stockKy: SECTIONS[sec].stock(d.ky), custom: await api('/api/admin/slots/' + sec) };
       renderSlots(sec);
     } catch { toast('Не удалось загрузить карточки', true); }
   }
