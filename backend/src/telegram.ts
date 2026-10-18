@@ -5,7 +5,7 @@ export const telegramEnabled = Boolean(token && chatId);
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!);
 
-export type LeadMessage = { id: number; name: string; phone: string; house_type?: string | null; contact_via?: string | null; project?: string | null; area?: number | null; terrace?: number | null; message?: string | null; lang?: string };
+export type LeadMessage = { id: number; name: string; phone: string; house_type?: string | null; contact_via?: string | null; project?: string | null; area?: number | null; terrace?: number | null; terrace_type?: string | null; message?: string | null; lang?: string };
 
 export function formatLead(l: LeadMessage): string {
   return [
@@ -13,7 +13,7 @@ export function formatLead(l: LeadMessage): string {
     `👤 ${esc(l.name)}`,
     `📞 ${esc(l.phone)}${l.contact_via ? ` · ${esc(l.contact_via)}` : ''}`,
     l.house_type && `🏠 ${esc(l.house_type)}`,
-    l.project && `📐 ${esc(l.project)}${l.area ? `, ${l.area} м²` : ''}${l.terrace ? ` + терраса ${l.terrace} м²` : ''}`,
+    l.project && `📐 ${esc(l.project)}${l.area ? `, ${l.area} м²` : ''}${l.terrace ? ` + ${l.terrace_type === 'closed' ? 'закрытая ' : l.terrace_type === 'open' ? 'открытая ' : ''}терраса ${l.terrace} м²` : ''}`,
     l.message && `💬 ${esc(l.message)}`,
   ].filter(Boolean).join('\n');
 }

@@ -33,9 +33,12 @@
   "<h2>Где уже <span>стоят наши дома</span></h2>": "<h2>Биздин үйлөр <span>кайда турат</span></h2>",
   "<b>Официальная гарантия</b><span><span data-cms=\"warranty_years\" data-unit=\"год,года,лет\">5 лет</span> на дом</span>": "<b>Расмий кепилдик</b><span>Үйгө <span data-cms=\"warranty_years\" data-unit=\"жыл,жыл,жыл\">5 жыл</span></span>",
   "<p class=\"rv\">$<span data-cms=\"price_m2\">440</span> за м² под ключ — от проекта и фундамента до тёплого пола. Выберите стиль и площадь, чтобы увидеть ориентир.</p>": "<p class=\"rv\">Ачкычка чейин 1 м² — $<span data-cms=\"price_m2\">440</span>: долбоор менен пайдубалдан жылуу полго чейин. Болжолдуу бааны көрүү үчүн стилди жана аянтты тандаңыз.</p>",
-  "<span class=\"proj-note\" data-needs=\"price_terrace_m2\" hidden>Терраса — $<span data-cms=\"price_terrace_m2\"></span> за м²</span>": "<span class=\"proj-note\" data-needs=\"price_terrace_m2\" hidden>Терраса: 1 м² үчүн $<span data-cms=\"price_terrace_m2\"></span></span>",
-  "<p class=\"tk-terrace\" data-needs=\"price_terrace_m2\" hidden>Терраса — $<span data-cms=\"price_terrace_m2\"></span>/м²</p>": "<p class=\"tk-terrace\" data-needs=\"price_terrace_m2\" hidden>Терраса — $<span data-cms=\"price_terrace_m2\"></span>/м²</p>",
-  "<p class=\"calc-hint\" id=\"terrace-hint\">$<span data-cms=\"price_terrace_m2\"></span> за м²: фундамент, каркас, настил, ограждение со ступенями и крыша. 0 — без террасы</p>": "<p class=\"calc-hint\" id=\"terrace-hint\">1 м² үчүн $<span data-cms=\"price_terrace_m2\"></span>: пайдубал, каркас, төшөм, тосмо менен тепкичтер жана чатыр. 0 — террасасыз</p>"
+  "<span class=\"proj-note\" data-needs=\"terrace_open\">Открытая терраса — $<span data-cms=\"price_terrace_open_m2\">300</span> за м²</span>": "<span class=\"proj-note\" data-needs=\"terrace_open\">Ачык терраса: 1 м² үчүн $<span data-cms=\"price_terrace_open_m2\">300</span></span>",
+  "<span class=\"proj-note\" data-needs=\"terrace_closed\">Закрытая терраса — $<span data-cms=\"price_terrace_closed_m2\">350</span> за м²</span>": "<span class=\"proj-note\" data-needs=\"terrace_closed\">Жабык терраса: 1 м² үчүн $<span data-cms=\"price_terrace_closed_m2\">350</span></span>",
+  "<p class=\"tk-terrace\" data-needs=\"terrace_open\">Открытая терраса — $<span data-cms=\"price_terrace_open_m2\">300</span>/м²</p>": "<p class=\"tk-terrace\" data-needs=\"terrace_open\">Ачык терраса — $<span data-cms=\"price_terrace_open_m2\">300</span>/м²</p>",
+  "<p class=\"tk-terrace\" data-needs=\"terrace_closed\">Закрытая терраса — $<span data-cms=\"price_terrace_closed_m2\">350</span>/м²</p>": "<p class=\"tk-terrace\" data-needs=\"terrace_closed\">Жабык терраса — $<span data-cms=\"price_terrace_closed_m2\">350</span>/м²</p>",
+  "<label for=\"ct1\" data-needs=\"terrace_open\">Открытая<small>$<span data-cms=\"price_terrace_open_m2\">300</span>/м²</small></label>": "<label for=\"ct1\" data-needs=\"terrace_open\">Ачык<small>$<span data-cms=\"price_terrace_open_m2\">300</span>/м²</small></label>",
+  "<label for=\"ct2\" data-needs=\"terrace_closed\">Закрытая<small>$<span data-cms=\"price_terrace_closed_m2\">350</span>/м²</small></label>": "<label for=\"ct2\" data-needs=\"terrace_closed\">Жабык<small>$<span data-cms=\"price_terrace_closed_m2\">350</span>/м²</small></label>"
  },
  "text": {
   "Акниет — дома из дерева и камня": "Акниет — жыгач жана таштан үйлөр",
@@ -441,10 +444,12 @@
   "Показать ещё вопросы": "Дагы суроолорду көрсөтүү",
   "Терраса": "Терраса",
   "0 м²": "0 м²",
-  "12 м²": "12 м²",
-  "17,5 м²": "17,5 м²",
-  "15 м²": "15 м²",
-  "18 м²": "18 м²"
+  "Тип террасы": "Террасанын түрү",
+  "Фундамент, каркас, настил, ограждение со ступенями и крыша, у закрытой — ещё стены и остекление. 0 — без террасы": "Пайдубал, каркас, төшөм, тосмо менен тепкичтер жана чатыр, жабык террасада — дагы дубалдар жана айнектер. 0 — террасасыз",
+  "12 м², открытая": "12 м², ачык",
+  "17,5 м², открытая": "17,5 м², ачык",
+  "15 м², закрытая": "15 м², жабык",
+  "18 м², закрытая": "18 м², жабык"
  },
  "js": {
   "sent": {
@@ -508,13 +513,18 @@
    "city": "Бишкек",
    "ogLocale": "ky_KG",
    "ogImage": "/assets/og/og-ky.jpg",
-   "terraceService": "Терраса куруу"
+   "terraceOpenService": "Ачык терраса куруу",
+   "terraceClosedService": "Жабык терраса куруу"
   },
   "faqMore": "Дагы суроолорду көрсөтүү",
   "faqLess": "Жыйноо",
-  "plusTerrace": " + терраса {n} м²",
-  "calcSplit": "Үй {house} + терраса {n} м² — {terrace}",
+  "plusTerrace": " + {kind} терраса {n} м²",
+  "calcSplit": "Үй {house} + {kind} терраса {n} м² — {terrace}",
   "noTerrace": "жок",
-  "terraceNone": "террасасыз"
+  "terraceNone": "террасасыз",
+  "terraceKind": {
+   "open": "ачык",
+   "closed": "жабык"
+  }
  }
 }

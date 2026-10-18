@@ -83,12 +83,15 @@ function build(template: string, lang: Lang, page: Page, c: Content): string {
   const bodyOf = (el: any) => bodies[+/@@script(\d+)@@/.exec(el.textContent)![1]];
   const T = JSON.parse(bodyOf($('#i18n')));
   const price = +c.price_m2 > 0 ? +c.price_m2 : 440;
-  const terracePrice = +c.price_terrace_m2 > 0 ? +c.price_terrace_m2 : 0; // 0 — not set, the terrace is not shown
+  // per m² of an open and a closed terrace; 0 — not set, that kind is not offered
+  const terracePrice = { open: +c.price_terrace_open_m2 > 0 ? +c.price_terrace_open_m2 : 0, closed: +c.price_terrace_closed_m2 > 0 ? +c.price_terrace_closed_m2 : 0 };
+  const deck = (m2: number, type?: string) => m2 * (type === 'closed' ? terracePrice.closed : terracePrice.open);
 
   /* ---- projects, cases, FAQ from the admin panel: the first card in each list is the template ---- */
   renderCatalog(document, lang, c, T, price, terracePrice);
-  // blocks about the terrace stay hidden until its price is set in the admin panel
-  if (terracePrice) $$('[data-needs="price_terrace_m2"]').forEach(e => e.removeAttribute('hidden'));
+  // blocks about the terrace stay hidden until a terrace price is set in the admin panel; the same for each kind
+  const needs: Record<string, boolean> = { terrace: !!(terracePrice.open || terracePrice.closed), terrace_open: !!terracePrice.open, terrace_closed: !!terracePrice.closed };
+  for (const e of $$('[data-needs]')) needs[e.dataset.needs] ? e.removeAttribute('hidden') : e.setAttribute('hidden', '');
 
   /* ---- content ---- */
   for (const el of $$('[data-cms]')) {
@@ -127,7 +130,7 @@ function build(template: string, lang: Lang, page: Page, c: Content): string {
   c.materials.forEach((m, i) => {
     if (m?.image) $$(`[data-mat="${i + 1}"]`).forEach(t => t.setAttribute('style', `--w:url("${m.image}")`));
   });
-  for (const el of $$('[data-price]')) el.textContent = fill(T.priceFrom, { sum: money(+el.dataset.price * price + +(el.dataset.terrace || 0) * terracePrice) });
+  for (const el of $$('[data-price]')) el.textContent = fill(T.priceFrom, { sum: money(+el.dataset.price * price + deck(+(el.dataset.terrace || 0), el.dataset.terraceType)) });
   const area = +($('#area')?.getAttribute('value') || 86);
   if ($('#calc-sum')) $('#calc-sum').textContent = money(area * price);
   if ($('#year')) $('#year').textContent = String(new Date().getFullYear());
@@ -198,7 +201,7 @@ function build(template: string, lang: Lang, page: Page, c: Content): string {
         areaServed: { '@type': 'Country', name: T.seo.country },
         priceRange: fill(T.seo.priceRange, { price }),
         sameAs: [c.instagram, c.tiktok, c.threads].filter(Boolean),
-        makesOffer: [...T.seo.services.map((name: string) => [name, price]), ...(terracePrice ? [[T.seo.terraceService, terracePrice]] : [])].map(([name, p]) => ({
+        makesOffer: [...T.seo.services.map((name: string) => [name, price]), ...(terracePrice.open ? [[T.seo.terraceOpenService, terracePrice.open]] : []), ...(terracePrice.closed ? [[T.seo.terraceClosedService, terracePrice.closed]] : [])].map(([name, p]) => ({
           '@type': 'Offer', itemOffered: { '@type': 'Service', name, areaServed: { '@type': 'Country', name: T.seo.country } },
           priceSpecification: { '@type': 'UnitPriceSpecification', price: p, priceCurrency: 'USD', unitText: 'м²', referenceQuantity: { '@type': 'QuantitativeValue', value: 1, unitCode: 'MTK' } },
         })),
@@ -251,11 +254,11 @@ const FAQ_UNITS: Record<Lang, Record<string, [string, string]>> = {
 const esc = (s: string) => s.replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch]!);
 const area = (v: number) => (Math.round(v * 10) / 10).toLocaleString('ru-RU');
 
-function renderCatalog(document: any, lang: Lang, c: Content, T: any, price: number, terracePrice: number) {
+function renderCatalog(document: any, lang: Lang, c: Content, T: any, price: number, terracePrice: { open: number; closed: number }) {
   const $ = (s: string): any => document.querySelector(s);
   const styleName = (p: { style: string }) => (p.style === 'af' ? 'A-frame' : 'Барнхаус'); // the form's radio values
   const styleLabel = (p: { style: string }) => T.words[styleName(p)] || styleName(p);
-  const priceText = (p: PageProject) => fill(T.priceFrom, { sum: money(p.price || p.area * price + p.terrace * terracePrice) });
+  const priceText = (p: PageProject) => fill(T.priceFrom, { sum: money(p.price || p.area * price + p.terrace * terracePrice[p.terrace_type]) });
   const setText = (root: any, sel: string, t: string) => { const e = root.querySelector(sel); if (e) e.textContent = t; };
   const setArea = (root: any, n: number) => {
     const e = root.querySelector('.area'); if (!e) return;
@@ -265,8 +268,8 @@ function renderCatalog(document: any, lang: Lang, c: Content, T: any, price: num
   const setPrice = (root: any, p: PageProject) => {
     const b = root.querySelector('[data-price]'); if (!b) return;
     b.textContent = priceText(p);
-    if (p.price) { b.removeAttribute('data-price'); b.removeAttribute('data-terrace'); }
-    else { b.setAttribute('data-price', String(p.area)); b.setAttribute('data-terrace', String(p.terrace)); }
+    for (const a of ['data-price', 'data-terrace', 'data-terrace-type']) b.removeAttribute(a);
+    if (!p.price) { b.setAttribute('data-price', String(p.area)); b.setAttribute('data-terrace', String(p.terrace)); b.setAttribute('data-terrace-type', p.terrace_type); }
   };
   const setImage = (root: any, sel: string, src: string | null, alt: string) => {
     const img = root.querySelector(sel); if (!img) return;
@@ -301,13 +304,13 @@ function renderCatalog(document: any, lang: Lang, c: Content, T: any, price: num
     setArea(card, p.area);
     setText(card, '.pd-text', p.text);
     const dd = card.querySelectorAll('.pd-specs dd');
-    [p.beds, p.baths, p.floors, p.terrace ? `${area(p.terrace)} ${T.m2}` : T.noTerrace].forEach((v, i) => dd[i] && (dd[i].textContent = String(v)));
+    [p.beds, p.baths, p.floors, p.terrace ? `${area(p.terrace)} ${T.m2}, ${T.terraceKind[p.terrace_type]}` : T.noTerrace].forEach((v, i) => dd[i] && (dd[i].textContent = String(v)));
     const rooms = card.querySelector('.pd-rooms');
     if (rooms) rooms.innerHTML = p.plan.map(f => (p.plan.length > 1 ? `<li class="fl">${esc(f.name)}</li>` : '')
       + f.rooms.map(r => `<li><span>${esc(r.name)}</span><span>${area(r.w * r.h)} ${T.m2}</span></li>`).join('')).join('');
     setPrice(card, p);
     card.querySelector('[data-plan]')?.setAttribute('data-plan', p.slug);
-    card.querySelector('[data-lead]')?.setAttribute('data-lead', JSON.stringify({ type: styleName(p), project: `«${p.name}»`, area: p.area, ...(p.terrace ? { terrace: Math.round(p.terrace) } : {}) }));
+    card.querySelector('[data-lead]')?.setAttribute('data-lead', JSON.stringify({ type: styleName(p), project: `«${p.name}»`, area: p.area, ...(p.terrace ? { terrace: Math.round(p.terrace), terrace_type: p.terrace_type } : {}) }));
   });
 
   // cases
@@ -334,11 +337,12 @@ function renderCatalog(document: any, lang: Lang, c: Content, T: any, price: num
     faq.querySelectorAll('details').forEach((d: any) => d.remove());
     const units = FAQ_UNITS[lang];
     for (const item of c.faq) {
-      if (!terracePrice && /\{terrace_price\}/.test(item.a)) continue; // the terrace price is not set yet
+      // a question about a terrace whose price is not set is not shown
+      if ((!terracePrice.open && /\{terrace_open_price\}/.test(item.a)) || (!terracePrice.closed && /\{terrace_closed_price\}/.test(item.a))) continue;
       const d = tpl.cloneNode(true), sum = d.querySelector('summary'), icon = sum.querySelector('i');
       sum.textContent = item.q; sum.append(icon);
-      d.querySelector('.a').innerHTML = esc(item.a).replace(/\{(price|terrace_price|months|months_min|warranty)\}/g, (t: string) =>
-        t === '{price}' ? '$<span data-cms="price_m2">440</span>' : t === '{terrace_price}' ? '$<span data-cms="price_terrace_m2"></span>'
+      d.querySelector('.a').innerHTML = esc(item.a).replace(/\{(price|terrace_open_price|terrace_closed_price|months|months_min|warranty)\}/g, (t: string) =>
+        t === '{price}' ? '$<span data-cms="price_m2">440</span>' : t === '{terrace_open_price}' ? '$<span data-cms="price_terrace_open_m2"></span>' : t === '{terrace_closed_price}' ? '$<span data-cms="price_terrace_closed_m2"></span>'
           : `<span data-cms="${units[t][0]}" data-unit="${units[t][1]}"></span>`);
       faq.insertBefore(d, more);
     }
@@ -352,7 +356,8 @@ function renderCatalog(document: any, lang: Lang, c: Content, T: any, price: num
     for (const a of [...new Set(c.projects.map(p => p.area))].sort((x, y) => x - y).slice(0, 6)) {
       const b = tpl.cloneNode(true); b.setAttribute('data-area', String(a)); b.textContent = `${a} ${T.m2}`;
       // the preset also sets the terrace of that project
-      b.setAttribute('data-terrace', String(Math.round(c.projects.find(p => p.area === a)!.terrace)));
+      const p = c.projects.find(x => x.area === a)!;
+      b.setAttribute('data-terrace', String(Math.round(p.terrace))); b.setAttribute('data-terrace-type', p.terrace_type);
       presets.append(b);
     }
   }

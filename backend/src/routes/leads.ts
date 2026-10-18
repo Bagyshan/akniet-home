@@ -30,13 +30,14 @@ leads.post('/', async (req, res) => {
     project: str(b.project, 200) || null,
     area: area > 0 && area < 2000 ? area : null,
     terrace: terrace > 0 && terrace < 1000 ? terrace : null,
+    terrace_type: terrace > 0 && (b.terrace_type === 'open' || b.terrace_type === 'closed') ? b.terrace_type : null,
     message: str(b.msg, 2000) || null,
   };
 
   const { rows } = await pool.query<{ id: number }>(
-    `INSERT INTO leads (name, phone, house_type, contact_via, project, area, terrace, message, lang)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
-    [lead.name, lead.phone, lead.house_type, lead.contact_via, lead.project, lead.area, lead.terrace, lead.message, lead.lang],
+    `INSERT INTO leads (name, phone, house_type, contact_via, project, area, terrace, terrace_type, message, lang)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`,
+    [lead.name, lead.phone, lead.house_type, lead.contact_via, lead.project, lead.area, lead.terrace, lead.terrace_type, lead.message, lead.lang],
   );
   const id = Number(rows[0].id);
   res.status(201).json({ ok: true, id });

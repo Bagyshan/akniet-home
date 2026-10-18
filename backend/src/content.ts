@@ -7,7 +7,8 @@ type Field = { label: string; group: 'main' | 'contacts'; type: FieldType; defau
 // null — значение не задано, на сайте остаётся то, что в вёрстке (заглушка).
 export const CONTENT_FIELDS = {
   price_m2:         { group: 'main', label: 'Цена за м², $', type: 'number', default: 440 },
-  price_terrace_m2: { group: 'main', label: 'Цена террасы за м², $', type: 'number', default: null, hint: 'Фундамент и каркас, настил, ограждение со ступенями, крыша. Пусто — терраса на сайте не показывается' },
+  price_terrace_open_m2:   { group: 'main', label: 'Открытая терраса, цена за м², $', type: 'number', default: null, hint: 'Фундамент и каркас, настил, ограждение со ступенями, крыша. Пусто — открытая терраса на сайте не предлагается' },
+  price_terrace_closed_m2: { group: 'main', label: 'Закрытая терраса, цена за м², $', type: 'number', default: null, hint: 'Пусто — закрытая терраса на сайте не предлагается' },
   warranty_years:   { group: 'main', label: 'Гарантия, лет', type: 'number', default: 5 },
   build_months_avg: { group: 'main', label: 'Срок стройки в среднем, месяцев', type: 'number', default: 2 },
   build_months_min: { group: 'main', label: 'Минимальный срок стройки, месяцев', type: 'number', default: 1.5, hint: 'Можно дробное: 1,5' },

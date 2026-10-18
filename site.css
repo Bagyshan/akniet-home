@@ -415,6 +415,8 @@ dialog.plan::backdrop{background:rgba(20,18,21,.74);backdrop-filter:blur(6px);-w
 .seg.dark{background:rgba(24,22,25,.5);grid-template-columns:1fr 1fr}
 .seg.dark input:checked+label{background:var(--cream);color:var(--ink)}
 .seg.dark input:focus-visible+label{outline-color:var(--gold)}
+.seg label small{display:block;font-size:12px;font-weight:500;opacity:.7;line-height:1.2}
+.seg input:disabled+label{opacity:.4;cursor:not-allowed}
 input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:44px;margin:4px 0;background:transparent;cursor:pointer;--p:29%}
 input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:6px;background:linear-gradient(90deg,var(--gold) var(--p),rgba(255,248,236,.14) var(--p))}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;margin-top:-11px;border-radius:50%;background:var(--cream);border:7px solid var(--gold);box-shadow:0 4px 14px rgba(0,0,0,.45)}

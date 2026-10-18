@@ -362,7 +362,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
     const row = el('article', { className: 'lead' },
       el('div', { className: 'd' }, '№' + l.id, el('br'), fmtDate(l.created_at)),
       el('div', {}, el('b', { textContent: l.name }, ...(l.lang === 'ky' ? [el('span', { className: 'lang-tag', textContent: 'КЫР', title: 'Заявка с кыргызской версии сайта' })] : [])), el('a', { href: 'tel:' + l.phone.replace(/[^\d+]/g, ''), textContent: l.phone })),
-      el('div', {}, el('b', { textContent: l.house_type || '—' }), el('span', { className: 'd', textContent: (l.contact_via || '') + (l.project ? ' · ' + l.project : '') + (l.area ? ', ' + l.area + ' м²' : '') + (l.terrace ? ' + терраса ' + l.terrace + ' м²' : '') })),
+      el('div', {}, el('b', { textContent: l.house_type || '—' }), el('span', { className: 'd', textContent: (l.contact_via || '') + (l.project ? ' · ' + l.project : '') + (l.area ? ', ' + l.area + ' м²' : '') + (l.terrace ? ` + ${l.terrace_type === 'closed' ? 'закрытая ' : l.terrace_type === 'open' ? 'открытая ' : ''}терраса ${l.terrace} м²` : '') })),
       el('div', { className: 'm', textContent: l.message || '' }),
       el('div', { className: 'st' }, sel, el('div', { className: 'tg', textContent: l.telegram_sent ? 'отправлено в Telegram' : 'в Telegram не отправлено' })));
     row.dataset.status = l.status;
@@ -404,7 +404,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
       for (const [v, t] of Object.entries(f.options)) sel.append(el('option', { value: v, textContent: t, selected: v === (f.value ?? f.default) }));
       return sel;
     }
-    return el('input', { id: 'c-' + f.key, name: f.key, ...INPUT[f.type], value: f.value === null ? '' : isNum(f.type) ? String(f.value).replace('.', ',') : f.value, placeholder: f.default === null ? 'не задано — на сайте заглушка «00»' : 'по умолчанию: ' + f.default });
+    return el('input', { id: 'c-' + f.key, name: f.key, ...INPUT[f.type], value: f.value === null ? '' : isNum(f.type) ? String(f.value).replace('.', ',') : f.value, placeholder: f.default === null ? (f.key.startsWith('price_terrace') ? 'пусто — этот вид террасы не предлагается' : 'не задано — на сайте заглушка «00»') : 'по умолчанию: ' + f.default });
   }
   async function loadFields() {
     if (fields) return;
@@ -628,7 +628,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
     } catch { toast('Не удалось загрузить список', true); }
   }
   const ROW = {
-    projects: d => ({ img: d.image, title: `«${d.name}»`, meta: `${STYLE[d.style]} · ${area(d.area)} м²${d.terrace ? ` + терраса ${area(d.terrace)} м²` : ''} · спален: ${d.beds} · санузлов: ${d.baths} · этажей в схеме: ${d.plan.length}`, tags: [d.on_home && ['gold', 'на главной'], !d.name_ky || !d.text_ky ? ['warn', 'нет перевода'] : null] }),
+    projects: d => ({ img: d.image, title: `«${d.name}»`, meta: `${STYLE[d.style]} · ${area(d.area)} м²${d.terrace ? ` + ${d.terrace_type === 'closed' ? 'закрытая' : 'открытая'} терраса ${area(d.terrace)} м²` : ''} · спален: ${d.beds} · санузлов: ${d.baths} · этажей в схеме: ${d.plan.length}`, tags: [d.on_home && ['gold', 'на главной'], !d.name_ky || !d.text_ky ? ['warn', 'нет перевода'] : null] }),
     cases: d => ({ img: d.image, title: d.title, meta: `${d.region} · ${d.area} · ${d.term}` + (d.project ? ` · проект: ${CAT.projects.find(p => p.id === d.project)?.data.name || '—'}` : ''), tags: [!d.title_ky || !d.story_ky ? ['warn', 'нет перевода'] : null] }),
     faq: d => ({ title: d.q, meta: d.a.length > 140 ? d.a.slice(0, 140) + '…' : d.a, tags: [!d.q_ky || !d.a_ky ? ['warn', 'нет перевода'] : null] }),
   };
@@ -698,7 +698,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
   }
 
   const BLANK = {
-    projects: () => ({ slug: '', style: 'barn', name: '', name_ky: '', area: null, terrace: 0, beds: 1, baths: 1, floors: '1', floors_ky: '', text: '', text_ky: '', price: null, image: null, on_home: false,
+    projects: () => ({ slug: '', style: 'barn', name: '', name_ky: '', area: null, terrace: 0, terrace_type: 'open', beds: 1, baths: 1, floors: '1', floors_ky: '', text: '', text_ky: '', price: null, image: null, on_home: false,
       plan: [{ name: '1 этаж', name_ky: '1-кабат', w: 10, h: 8, void: null, image: null, rooms: [{ x: 0, y: 0, w: 6, h: 8, name: 'Кухня-гостиная', name_ky: 'Ашкана-конок бөлмө' }] }] }),
     cases: () => ({ image: null, region: '', region_ky: '', title: '', title_ky: '', area: '', term: '', term_ky: '', season: '', season_ky: '', story: '', story_ky: '', project: null }),
     faq: () => ({ q: '', q_ky: '', a: '', a_ky: '' }),
@@ -721,7 +721,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
     return [el('div', { className: 'ce-grid' },
       pair('Вопрос', 'q', { max: 200 }),
       pair('Ответ', 'a', { max: 1500, area: true })),
-      el('p', { className: 'muted', innerHTML: 'В ответе можно вставить значения из вкладки «Основное» — сайт подставит их сам: <code>{price}</code> — цена за м² («$440»), <code>{terrace_price}</code> — цена террасы за м² (пока она не задана, такой вопрос на сайте скрыт), <code>{months}</code> — средний срок («2 месяца»), <code>{months_min}</code> — минимальный срок после «от» («от 1,5 месяца»; по-кыргызски перед «баштап»), <code>{warranty}</code> — гарантия («5 лет»).' })];
+      el('p', { className: 'muted', innerHTML: 'В ответе можно вставить значения из вкладки «Основное» — сайт подставит их сам: <code>{price}</code> — цена за м² («$440»), <code>{terrace_open_price}</code> и <code>{terrace_closed_price}</code> — цена открытой и закрытой террасы за м² (пока цена не задана, такой вопрос на сайте скрыт), <code>{months}</code> — средний срок («2 месяца»), <code>{months_min}</code> — минимальный срок после «от» («от 1,5 месяца»; по-кыргызски перед «баштап»), <code>{warranty}</code> — гарантия («5 лет»).' })];
   }
 
   function caseForm() {
@@ -746,6 +746,8 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
     const name = inp('name', { max: 40, onChange: v => { if (!slugTouched) { draft.slug = slugify(v); slug.value = draft.slug; } } });
     const style = el('select', {}, ...Object.entries(STYLE).map(([v, t]) => el('option', { value: v, textContent: t, selected: draft.style === v })));
     style.addEventListener('change', () => { draft.style = style.value; });
+    const terraceType = el('select', {}, ...[['open', 'Открытая'], ['closed', 'Закрытая']].map(([v, t]) => el('option', { value: v, textContent: t, selected: (draft.terrace_type || 'open') === v })));
+    terraceType.addEventListener('change', () => { draft.terrace_type = terraceType.value; });
     const home = el('input', { type: 'checkbox', checked: !!draft.on_home }); home.addEventListener('change', () => { draft.on_home = home.checked; });
     const floorsBox = el('div', { className: 'rooms', style: 'gap:12px' });
     const addFloor = el('button', { type: 'button', className: 'btn sm', textContent: '+ Этаж' });
@@ -768,13 +770,14 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
         fld('Спальни', numInp('beds')),
         fld('Санузлы', numInp('baths')),
         fld('Терраса, м²', numInp('terrace', { ph: '0 — без террасы' })),
+        fld('Терраса', terraceType),
         fld('Цена под ключ, $', numInp('price', { ph: 'пусто — площадь × цена за м²' })),
         pair('Этажи (как в карточке)', 'floors', { max: 30, ph: '1 + антресоль' }),
         pair('Описание', 'text', { max: 400, area: true }),
         el('label', { className: 'check s4' }, home, 'Показывать на главной (короткая карточка в «Готовых проектах»)')),
       el('div', { className: 'ce-sec' },
         el('h2', {}, 'Планировка', addFloor),
-        el('p', { className: 'muted', textContent: 'Размеры в метрах. Отметка «терр.» превращает комнату в террасу: она рисуется настилом и может выходить за контур дома (например, Y больше длины дома — терраса перед входом). Площадь террасы для цены — поле «Терраса, м²» выше. X и Y — где начинается комната от левого верхнего угла дома, ширина — по горизонтали, длина — по вертикали. Схема справа обновляется сразу и выглядит так же, как на сайте. Вместо схемы можно загрузить картинку этажа — тогда на сайте будет она, а комнаты останутся списком под фото проекта.' }),
+        el('p', { className: 'muted', textContent: 'Размеры в метрах. Отметка «терр.» превращает комнату в террасу: она рисуется настилом и может выходить за контур дома (например, Y больше длины дома — терраса перед входом). Площадь и тип террасы для цены — поля «Терраса, м²» и «Терраса» выше. X и Y — где начинается комната от левого верхнего угла дома, ширина — по горизонтали, длина — по вертикали. Схема справа обновляется сразу и выглядит так же, как на сайте. Вместо схемы можно загрузить картинку этажа — тогда на сайте будет она, а комнаты останутся списком под фото проекта.' }),
         floorsBox),
     ];
   }

@@ -8,10 +8,11 @@ export type Kind = (typeof KINDS)[number];
 export const isKind = (k: unknown): k is Kind => KINDS.includes(k as Kind);
 
 // terrace: drawn as a deck and may stick out of the house outline
+export type TerraceType = 'open' | 'closed';
 export type Room = { x: number; y: number; w: number; h: number; name: string; name_ky: string | null; terrace?: boolean };
 export type Floor = { name: string; name_ky: string | null; w: number; h: number; void: [number, number, number, number] | null; image: string | null; rooms: Room[] };
 export type Project = {
-  slug: string; style: 'af' | 'barn'; name: string; name_ky: string | null; area: number; terrace: number; beds: number; baths: number;
+  slug: string; style: 'af' | 'barn'; name: string; name_ky: string | null; area: number; terrace: number; terrace_type: TerraceType; beds: number; baths: number;
   floors: string; floors_ky: string | null; text: string; text_ky: string | null; price: number | null;
   image: string | null; on_home: boolean; plan: Floor[];
 };
@@ -20,7 +21,7 @@ export type Case = {
   area: string; term: string; term_ky: string | null; season: string; season_ky: string | null; story: string; story_ky: string | null;
   project: number | null; // id of the project the case was built from
 };
-// {price} {terrace_price} {months} {months_min} {warranty} in an answer become the values from the admin «Основное» tab
+// {price} {terrace_open_price} {terrace_closed_price} {months} {months_min} {warranty} in an answer become the values from the admin «Основное» tab
 export type Faq = { q: string; q_ky: string | null; a: string; a_ky: string | null };
 type Item<T> = { id: number; position: number; data: T };
 
@@ -94,7 +95,7 @@ export function cleanProject(b: Record<string, unknown>): [Project, string[]] {
   const p: Project = {
     slug, style: b.style === 'af' ? 'af' : 'barn',
     name: c.text('name', 'Название', 40), name_ky: c.ky('name_ky', 'Название', 40),
-    area: c.num('area', 'Площадь, м²', 10, 2000)!, terrace: c.num('terrace', 'Терраса, м²', 0, 500, { optional: true }) ?? 0, beds: c.num('beds', 'Спальни', 0, 30, { int: true })!, baths: c.num('baths', 'Санузлы', 0, 30, { int: true })!,
+    area: c.num('area', 'Площадь, м²', 10, 2000)!, terrace: c.num('terrace', 'Терраса, м²', 0, 500, { optional: true }) ?? 0, terrace_type: b.terrace_type === 'closed' ? 'closed' : 'open', beds: c.num('beds', 'Спальни', 0, 30, { int: true })!, baths: c.num('baths', 'Санузлы', 0, 30, { int: true })!,
     floors: c.text('floors', 'Этажи', 30), floors_ky: c.ky('floors_ky', 'Этажи', 30),
     text: c.text('text', 'Описание', 400), text_ky: c.ky('text_ky', 'Описание', 400),
     price: c.num('price', 'Цена под ключ, $', 1000, 1e7, { optional: true }),
@@ -127,7 +128,7 @@ export function cleanFaq(b: Record<string, unknown>): [Faq, string[]] {
   for (const t of [f.a, f.a_ky].join(' ').match(/\{[^}]*\}/g) || []) if (!FAQ_TOKENS.includes(t)) c.errors.push(`Ответ: неизвестная вставка ${t} — можно ${FAQ_TOKENS.join(', ')}`);
   return [f, c.errors];
 }
-export const FAQ_TOKENS = ['{price}', '{terrace_price}', '{months}', '{months_min}', '{warranty}'];
+export const FAQ_TOKENS = ['{price}', '{terrace_open_price}', '{terrace_closed_price}', '{months}', '{months_min}', '{warranty}'];
 
 export const clean = (kind: Kind, b: Record<string, unknown>): [Project | Case | Faq, string[]] =>
   kind === 'projects' ? cleanProject(b) : kind === 'cases' ? cleanCase(b) : cleanFaq(b);
@@ -174,7 +175,7 @@ export type PageCase = Omit<Case, `${string}_ky` | 'project'> & { project: { slu
 export async function readCatalogFor(lang: Lang) {
   const [projects, cases, faq] = await Promise.all([listItems<Project>('projects'), listItems<Case>('cases'), listItems<Faq>('faq')]);
   const ps: PageProject[] = projects.map(({ id, data: d }) => ({
-    id, slug: d.slug, style: d.style, name: pick(d, 'name', lang), area: d.area, terrace: d.terrace || 0, beds: d.beds, baths: d.baths,
+    id, slug: d.slug, style: d.style, name: pick(d, 'name', lang), area: d.area, terrace: d.terrace || 0, terrace_type: d.terrace_type === 'closed' ? 'closed' : 'open', beds: d.beds, baths: d.baths,
     floors: pick(d, 'floors', lang), text: pick(d, 'text', lang), price: d.price, image: d.image, on_home: d.on_home,
     plan: d.plan.map(f => ({ name: pick(f, 'name', lang), w: f.w, h: f.h, void: f.void, image: f.image, rooms: f.rooms.map(r => ({ x: r.x, y: r.y, w: r.w, h: r.h, name: pick(r, 'name', lang), ...(r.terrace ? { terrace: true } : {}) })) })),
   }));
