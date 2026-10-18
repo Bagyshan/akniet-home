@@ -82,7 +82,16 @@ h2{font:400 18px/1.2 var(--f-head);margin:0}
 .prev .cap.chip{background:rgba(33,30,34,.65)}
 
 /* editor dialog */
-dialog{width:min(860px,calc(100% - 24px));max-height:calc(100dvh - 24px);padding:0;border:0;border-radius:var(--r);background:var(--ink);color:var(--cream);box-shadow:0 30px 80px -20px rgba(0,0,0,.8),inset 0 0 0 1px var(--line)}
+dialog{width:min(860px,calc(100% - 24px));max-width:none;max-height:calc(100dvh - 24px);padding:0;border:0;border-radius:var(--r);background:var(--ink);color:var(--cream);box-shadow:0 30px 80px -20px rgba(0,0,0,.8),inset 0 0 0 1px var(--line);overflow:hidden}
+/* the content scrolls inside the window (thin bar in the window colours), the page behind stays put */
+.ed,.ce{max-height:calc(100dvh - 24px);overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(255,248,236,.22) transparent}
+.ed::-webkit-scrollbar,.ce::-webkit-scrollbar{width:8px}
+.ed::-webkit-scrollbar-thumb,.ce::-webkit-scrollbar-thumb{background:rgba(255,248,236,.22);border-radius:8px;border:2px solid transparent;background-clip:padding-box}
+.ed::-webkit-scrollbar-track,.ce::-webkit-scrollbar-track{background:transparent}
+html{scrollbar-gutter:stable;scrollbar-color:#4a444c var(--page,#211e22)}
+html:has(dialog[open]){overflow:hidden}
+.ed-x{position:absolute;top:12px;right:12px;z-index:3}
+#ed-heading{padding-right:48px}
 dialog::backdrop{background:rgba(20,18,21,.72)}
 .ed{display:grid;grid-template-columns:220px 1fr;gap:20px;padding:22px}
 .ed .prev{align-self:start}
@@ -133,9 +142,11 @@ dialog::backdrop{background:rgba(20,18,21,.72)}
 .cat-acts{display:flex;gap:6px;align-items:center}
 .cat-acts .btn.sm{min-width:38px;padding:0 10px}
 dialog.wide{width:min(1120px,calc(100% - 24px))}
-.ce{padding:22px;display:grid;gap:16px}
-.ce-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.ce-close{width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,248,236,.1);cursor:pointer;font-size:20px}
+.ce{padding:0 22px 22px;display:grid;gap:16px}
+.ce-head{position:sticky;top:0;z-index:3;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px 0 12px;background:var(--ink);box-shadow:0 10px 12px -10px rgba(0,0,0,.6)}
+.ce-head h1{min-width:0;overflow-wrap:anywhere}
+.ce-close{width:44px;height:44px;flex:none;border-radius:50%;border:0;background:rgba(255,248,236,.1);cursor:pointer;font-size:20px}
+.ce-close:hover{background:rgba(255,248,236,.18)}
 .ce-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .ce-grid .s2{grid-column:span 2}.ce-grid .s4{grid-column:1/-1}
 .ce .fld input,.ce .fld select,.ce .fld textarea{width:100%;min-height:44px;padding:10px 12px;border-radius:12px;border:1.5px solid transparent;background:rgba(24,22,25,.55);outline:none;font:inherit;color:inherit;resize:vertical}
@@ -163,7 +174,7 @@ dialog.wide{width:min(1120px,calc(100% - 24px))}
 .room button{width:36px;height:36px;border-radius:10px;border:0;background:rgba(255,248,236,.08);cursor:pointer}
 .ce-err{padding:10px 14px;border-radius:12px;background:rgba(224,120,94,.15);box-shadow:inset 0 0 0 1px rgba(224,120,94,.5);color:#f3b3a2;font-size:13.5px}
 .ce-err ul{margin:4px 0 0;padding-left:18px}
-.ce-foot{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;position:sticky;bottom:0;padding:12px 0 0;background:var(--ink)}
+.ce-foot{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;position:sticky;bottom:0;z-index:3;padding:12px 0 22px;margin-bottom:-22px;background:var(--ink);box-shadow:0 -10px 12px -10px rgba(0,0,0,.6)}
 .ce-foot div{display:flex;gap:8px;flex-wrap:wrap}
 code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,236,.08)}
 @media (max-width:900px){
@@ -176,8 +187,15 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
   .room.head{display:none}
 }
 @media (max-width:600px){
+  dialog,dialog.wide{width:calc(100% - 16px)}
+  dialog,.ed,.ce{max-height:calc(100dvh - 16px)}
   .ce .pair{grid-template-columns:1fr}
-  .ce{padding:16px}
+  .ce{padding:0 16px 16px}
+  .ce-foot{padding-bottom:16px;margin-bottom:-16px}
+  .ce-grid{grid-template-columns:1fr}
+  .ce-grid .s2{grid-column:auto}
+  .room{grid-template-columns:1fr 1fr 1fr 1fr}
+  .room>input:nth-child(1),.room>input:nth-child(2){grid-column:span 2}
   .cat-row{grid-template-columns:72px 1fr}
   .cat-row img{width:72px;height:56px}
   .cat-acts{grid-column:1/-1;justify-content:flex-end}
@@ -189,8 +207,9 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
   .fields{grid-template-columns:1fr}
   header{border-radius:var(--r)}
   .slots{grid-template-columns:repeat(2,1fr)}
-  .ed{grid-template-columns:1fr}
-  .ed .prev{max-width:240px}
+  .ed{grid-template-columns:1fr;padding-top:64px}
+  .ed .prev{max-width:180px}
+  .ed .pv-lang{max-width:180px}
 }
 </style>
 </head>
@@ -302,6 +321,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
 </div>
 
 <dialog id="ed" aria-labelledby="ed-heading">
+  <button type="button" class="ce-close ed-x" id="ed-x" aria-label="Закрыть">×</button>
   <div class="ed">
     <div><div class="prev" id="ed-prev"></div><div class="pv-lang" role="group" aria-label="Язык превью"><button type="button" data-pl="ru" aria-pressed="true">РУС</button><button type="button" data-pl="ky" aria-pressed="false">КЫР</button></div></div>
     <form id="ed-form">
@@ -523,7 +543,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
     $('#ed-fields').querySelectorAll('input').forEach(inp => inp.addEventListener('input', edPreview));
     $('#ed-reset').hidden = !state[sec].custom[i];
     edPreview();
-    ed.showModal();
+    ed.showModal(); ed.querySelector('.ed').scrollTop = 0;
   }
   $('#ed-file').addEventListener('change', async e => {
     const file = e.target.files[0]; e.target.value = ''; if (!file) return;
@@ -538,6 +558,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
   });
   $('#ed-photo-reset').addEventListener('click', () => { cur.image = ''; $('#ed-up').textContent = 'стоковое фото'; edPreview(); });
   $('#ed-cancel').addEventListener('click', () => ed.close());
+  $('#ed-x').addEventListener('click', () => ed.close());
   ed.addEventListener('click', e => { if (e.target === ed) ed.close(); });
   $('#ed-form').addEventListener('submit', async e => {
     e.preventDefault();
@@ -713,7 +734,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
     const del = el('button', { type: 'button', className: 'btn sm danger', textContent: 'Удалить', hidden: !item }); del.addEventListener('click', deleteCat);
     const cancel = el('button', { type: 'button', className: 'btn sm', textContent: 'Отмена' }); cancel.addEventListener('click', () => ce.close());
     ceForm.replaceChildren(head, ...body, err, el('div', { className: 'ce-foot' }, del, el('div', {}, cancel, el('button', { type: 'submit', className: 'btn sm gold', textContent: 'Сохранить' }))));
-    ce.showModal(); ce.scrollTop = 0;
+    ce.showModal(); ceForm.scrollTop = 0;
   }
 
   function extraForm() {

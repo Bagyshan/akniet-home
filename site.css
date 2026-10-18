@@ -46,7 +46,7 @@
   --f-text:"Onest",system-ui,sans-serif;
 }
 *,*::before,*::after{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;scrollbar-gutter:stable;scrollbar-color:#4a444c var(--page)}
 html.lenis,html.lenis body{height:auto}
 .lenis.lenis-smooth{scroll-behavior:auto!important}
 body{margin:0;background:var(--page);color:var(--cream);font-family:var(--f-text);font-size:16px;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
@@ -375,7 +375,8 @@ dialog.plan{width:min(1040px,calc(100% - 24px));max-width:none;max-height:calc(1
 dialog.plan[open]{animation:dlg .5s var(--ease)}
 @keyframes dlg{from{opacity:0;transform:translateY(18px) scale(.98)}}
 dialog.plan::backdrop{background:rgba(20,18,21,.74);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-.plan-in{display:grid;grid-template-columns:1.25fr 1fr;max-height:calc(100dvh - 24px);overflow:auto;overscroll-behavior:contain}
+.plan-in{display:grid;grid-template-columns:1.25fr 1fr;grid-template-rows:minmax(0,1fr);max-height:calc(100dvh - 24px);overflow:hidden}
+.plan-fig,.plan-info{min-height:0;min-width:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
 .plan-fig{background:var(--field);color:var(--ink);padding:clamp(20px,2.4vw,32px);display:flex;flex-direction:column;justify-content:center;gap:14px}
 .plan-svg svg,.plan-svg img{display:block;width:100%;height:auto;max-height:62vh}
 .plan-svg img{object-fit:contain;border-radius:8px}
@@ -386,11 +387,15 @@ dialog.plan::backdrop{background:rgba(20,18,21,.74);backdrop-filter:blur(6px);-w
 .floors button[aria-pressed="true"]{background:var(--ink);color:var(--cream)}
 .plan-info{padding:clamp(24px,2.6vw,36px);display:flex;flex-direction:column;gap:18px}
 .plan-info .chip{align-self:flex-start}
-.plan-info h3{font-size:clamp(28px,2.6vw,40px)}
-.plan-specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(64px,1fr));gap:8px;margin:0}
+.plan-info h3{font-size:clamp(26px,2.6vw,40px);overflow-wrap:anywhere}
+.plan-info>.chip,.plan-info h3{margin-right:52px}
+/* content scrolling up fades out under the close button */
+.plan-info,.plan-in{--fade:linear-gradient(to bottom,transparent 0,#000 64px);}
+.plan-info{-webkit-mask-image:var(--fade);mask-image:var(--fade);padding-top:64px}
+.plan-specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:8px;margin:0}
 .plan-specs div{background:rgba(255,248,236,.06);border-radius:14px;padding:10px 12px}
 .plan-specs dt{font-size:12px;color:var(--dim)}
-.plan-specs dd{margin:0;font-family:var(--f-head);font-size:18px}
+.plan-specs dd{margin:0;font-family:var(--f-head);font-size:17px;line-height:1.25;overflow-wrap:anywhere}
 .plan-rooms{list-style:none;margin:0;padding:0;font-size:14px}
 .plan-rooms li{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--line);color:rgba(255,248,236,.8)}
 .plan-rooms li.fl{color:var(--gold);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border:0;padding-top:12px}
@@ -746,8 +751,12 @@ section[id],article[id],[id="gift"]{scroll-margin-top:96px}
   .c-ask{position:static}
 }
 @media (max-width:820px){
-  .plan-in{grid-template-columns:1fr}
+  .plan-in{grid-template-columns:1fr;grid-template-rows:none;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
+  .plan-fig,.plan-info{overflow:visible;-webkit-mask-image:none;mask-image:none}
+  .plan-in{-webkit-mask-image:var(--fade);mask-image:var(--fade)}
+  .plan-fig{padding-top:64px}
   .plan-info{padding-top:20px}
+  .plan-info>.chip,.plan-info h3{margin-right:0}
 }
 @media (max-width:700px){
   :root{--r:22px;--gap:10px}
@@ -838,12 +847,13 @@ section[id],article[id],[id="gift"]{scroll-margin-top:96px}
 dialog.quiz{width:min(640px,calc(100% - 24px));max-width:none;max-height:calc(100dvh - 24px);padding:0;border:0;border-radius:var(--r);background:var(--field);color:var(--ink);box-shadow:0 40px 90px -20px rgba(0,0,0,.85);overflow:hidden}
 dialog.quiz[open]{animation:dlg .5s var(--ease)}
 dialog.quiz::backdrop{background:rgba(20,18,21,.74);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-.quiz-in{max-height:calc(100dvh - 24px);overflow:auto;overscroll-behavior:contain;padding:clamp(20px,3vw,36px)}
-.quiz-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.quiz-in{max-height:calc(100dvh - 24px);overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding:0 clamp(20px,3vw,36px) clamp(20px,3vw,36px)}
+.quiz-top{position:sticky;top:0;z-index:2;padding:clamp(20px,3vw,36px) 0 22px;background:var(--field);box-shadow:0 10px 14px -8px var(--field)}
+.quiz-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .quiz-top .eyebrow{color:var(--gold-ink)}
 .quiz-x{width:44px;height:44px;flex:none;border:0;border-radius:50%;background:rgba(49,45,50,.08);color:var(--ink);font-size:24px;line-height:1;cursor:pointer}
 .quiz-x:hover{background:rgba(49,45,50,.14)}
-.quiz-bar{height:4px;margin:14px 0 26px;border-radius:4px;background:rgba(49,45,50,.1);overflow:hidden}
+.quiz-bar{height:4px;margin:14px 0 0;border-radius:4px;background:rgba(49,45,50,.1);overflow:hidden}
 .quiz-bar i{display:block;height:100%;background:var(--gold);transform-origin:left;transform:scaleX(0);transition:transform .4s var(--ease)}
 .quiz h3{font-size:clamp(24px,2.6vw,34px);line-height:1.15;outline:none}
 .quiz-opts{display:grid;gap:10px;margin-top:22px}
@@ -866,7 +876,36 @@ dialog.quiz::backdrop{background:rgba(20,18,21,.74);backdrop-filter:blur(6px);-w
 .quiz-note{margin:16px 0 18px;font-size:14px;color:rgba(49,45,50,.72)}
 .quiz-sent{display:grid;gap:14px;justify-items:start;padding:10px 0}
 .quiz-sent p{color:rgba(49,45,50,.72)}
-@media (max-width:560px){.quiz .form{grid-template-columns:1fr}.quiz .seg{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:560px){
+  dialog.quiz{width:calc(100% - 16px);max-height:calc(100dvh - 16px)}
+  .quiz-in{max-height:calc(100dvh - 16px)}
+  .quiz .form{grid-template-columns:1fr}
+  .quiz .seg{grid-template-columns:repeat(3,1fr)}
+  .quiz-pick{grid-template-columns:84px 1fr}
+  .quiz-pick img,.quiz-noimg{width:84px;height:68px}
+}
+.quiz-again{margin-top:6px}
+.quiz-done{display:flex;gap:10px;align-items:center;padding:14px 16px;border-radius:16px;background:rgba(49,45,50,.08);font-size:14.5px}
+.quiz-done b{font-weight:600}
+
+/* thin scrollbars in the colours of each window instead of the default grey bar */
+.plan-fig,.quiz-in{scrollbar-width:thin;scrollbar-color:rgba(49,45,50,.28) transparent}
+.plan-info,.plan-in,.sheet{scrollbar-width:thin;scrollbar-color:rgba(255,248,236,.22) transparent}
+.plan-fig::-webkit-scrollbar,.plan-info::-webkit-scrollbar,.plan-in::-webkit-scrollbar,.quiz-in::-webkit-scrollbar{width:8px}
+.plan-fig::-webkit-scrollbar-thumb,.quiz-in::-webkit-scrollbar-thumb{background:rgba(49,45,50,.28);border-radius:8px;border:2px solid transparent;background-clip:padding-box}
+.plan-info::-webkit-scrollbar-thumb,.plan-in::-webkit-scrollbar-thumb{background:rgba(255,248,236,.22);border-radius:8px;border:2px solid transparent;background-clip:padding-box}
+.plan-fig::-webkit-scrollbar-track,.plan-info::-webkit-scrollbar-track,.plan-in::-webkit-scrollbar-track,.quiz-in::-webkit-scrollbar-track{background:transparent}
+
+/* «Ваша подборка»: the quiz result stays one tap away for the rest of the visit */
+.quiz-fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:95;display:flex;align-items:center;gap:10px;min-height:52px;padding:6px 18px 6px 6px;border:0;border-radius:999px;background:var(--gold);color:var(--ink);font:inherit;font-weight:600;font-size:14.5px;cursor:pointer;box-shadow:0 14px 34px -12px rgba(0,0,0,.7);animation:dlg .5s var(--ease)}
+.quiz-fab[hidden]{display:none}
+.quiz-fab:hover{background:var(--gold-hi)}
+.quiz-fab .thumbs{display:flex}
+.quiz-fab .thumbs i{width:40px;height:40px;border-radius:50%;background:#3a353b center/cover;box-shadow:0 0 0 2px var(--gold)}
+.quiz-fab .thumbs i+i{margin-left:-14px}
+.quiz-fab small{display:block;font-size:12px;font-weight:500;opacity:.75;line-height:1.2}
+.quiz-fab span{line-height:1.2;text-align:left}
+@media (max-width:860px){.quiz-fab{bottom:calc(84px + env(safe-area-inset-bottom));right:12px}}
 
 /* ---------- Catalog in WhatsApp (form card on the home, projects and invest pages) ---------- */
 .c-catalog{display:grid;grid-template-columns:1.1fr 1fr;gap:clamp(20px,3vw,48px);align-items:center;margin-top:var(--gap);padding:clamp(22px,3vw,44px)}

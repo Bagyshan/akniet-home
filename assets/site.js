@@ -271,32 +271,43 @@
     return PROJECTS.map(p => [score(p), p]).sort((x, y) => y[0] - x[0]).slice(0, 3).map(x => x[1]);
   }
   let quiz = null;
+  // the finished quiz is kept for this tab (sessionStorage): «Ваша подборка» brings it back on any page without answering again
+  const QUIZ_KEY = 'akniet-quiz';
+  const quizSaved = () => {
+    try { const v = JSON.parse(sessionStorage.getItem(QUIZ_KEY)); return v && Array.isArray(v.answers) && v.answers.length === T.quiz?.q.length ? v : null; }
+    catch { return null; }
+  };
+  const quizSave = v => { try { sessionStorage.setItem(QUIZ_KEY, JSON.stringify(v)); } catch {} };
   const ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg>';
   function quizBuild() {
     const Q = T.quiz, total = Q.q.length, el = document.createElement('dialog');
     el.className = 'quiz'; el.setAttribute('aria-labelledby', 'quiz-q');
-    el.innerHTML = `<div class="quiz-in"><div class="quiz-top"><span class="eyebrow" id="quiz-step"></span><button type="button" class="quiz-x" aria-label="${esc(Q.close)}">×</button></div><div class="quiz-bar"><i></i></div><div class="quiz-body"></div></div>`;
+    el.innerHTML = `<div class="quiz-in" data-lenis-prevent><div class="quiz-top"><div class="quiz-head"><span class="eyebrow" id="quiz-step"></span><button type="button" class="quiz-x" aria-label="${esc(Q.close)}">×</button></div><div class="quiz-bar"><i></i></div></div><div class="quiz-body"></div></div>`;
     document.body.append(el);
     const body = el.querySelector('.quiz-body'), bar = el.querySelector('.quiz-bar i'), stepEl = el.querySelector('#quiz-step');
     let answers = [], i = 0;
     const focusTitle = () => body.querySelector('h3').focus({ preventScroll: true });
     const back = () => i ? `<button type="button" class="quiz-back">← ${esc(Q.back)}</button>` : '';
+    const top = () => el.querySelector('.quiz-in').scrollTo(0, 0);
     function show() {
       if (i >= total) return result();
       const q = Q.q[i];
       stepEl.textContent = fill(Q.step, { n: i + 1, total });
       bar.style.transform = `scaleX(${i / total})`;
+      top();
       body.innerHTML = `<h3 id="quiz-q" tabindex="-1">${esc(q.t)}</h3><div class="quiz-opts">${q.o.map((o, j) =>
         `<button type="button" class="quiz-opt" data-i="${j}" aria-pressed="${answers[i] === j}"><b>${esc(o)}</b>${q.h ? `<small>${esc(q.h[j])}</small>` : ''}</button>`).join('')}</div>${back()}`;
       focusTitle();
     }
-    function result() {
-      goal('quiz_result', { purpose: QUIZ_RU[0][1][answers[0]], budget: QUIZ_RU[3][1][answers[3]] });
-      stepEl.textContent = Q.doneStep; bar.style.transform = 'scaleX(1)';
+    // fresh: the quiz was just answered (not reopened from «Ваша подборка»)
+    function result(fresh = true) {
+      if (fresh) { goal('quiz_result', { purpose: QUIZ_RU[0][1][answers[0]], budget: QUIZ_RU[3][1][answers[3]] }); quizSave({ answers, sent: false }); }
+      const sent = !!quizSaved()?.sent;
+      stepEl.textContent = Q.doneStep; bar.style.transform = 'scaleX(1)'; top();
       const picks = quizPick(answers), root = document.documentElement.lang === 'ky' ? '/ky/' : '/';
       body.innerHTML = `<h3 id="quiz-q" tabindex="-1">${esc(picks.length ? Q.result : Q.resultNone)}</h3>
         <div class="quiz-picks">${picks.map(p => `<a class="quiz-pick" href="${root}projects/#${encodeURIComponent(p.slug)}">${p.image ? `<img src="${esc(p.image)}" alt="" loading="lazy">` : '<span class="quiz-noimg" aria-hidden="true"></span>'}<span><small>${esc(word(styleName(p)))} · ${p.area} ${T.m2} · ${esc(fill(Q.beds, { n: p.beds }))}</small><b>«${esc(p.name)}»</b><em>${esc(priceFrom(projectPrice(p)))}</em></span></a>`).join('')}</div>
-        <p class="quiz-note">${esc(Q.resultText)}</p>
+        ${sent ? `<p class="quiz-done quiz-note" role="status"><span aria-hidden="true">✓</span><span><b>${esc(Q.sentChip)}.</b> ${esc(Q.sentText)}</span></p>` : `<p class="quiz-note">${esc(Q.resultText)}</p>
         <form class="form quiz-form" novalidate>
           <div class="fld" id="qz-f-name"><input id="qz-name" name="name" placeholder=" " autocomplete="name"><label for="qz-name">${esc(Q.name)}</label><span class="err">${esc(Q.errName)}</span></div>
           <div class="fld" id="qz-f-phone"><input id="qz-phone" name="phone" type="tel" inputmode="tel" placeholder=" " autocomplete="tel"><label for="qz-phone">${esc(Q.phone)}</label><span class="err">${esc(Q.errPhone)}</span></div>
@@ -305,7 +316,9 @@
           <p class="form-err" role="alert" hidden>${esc(Q.fail)}</p>
           <button class="btn ink" type="submit">${esc(Q.send)} ${ARROW}</button>
           <p class="form-note">${esc(Q.consent)}</p>
-        </form>${back()}`;
+        </form>`}${back()} <button type="button" class="quiz-back quiz-again">↻ ${esc(Q.again)}</button>`;
+      focusTitle();
+      if (sent) return;
       const f = body.querySelector('form'), nameIn = f.elements.name, phoneIn = f.elements.phone;
       phoneField(phoneIn, $id('qz-f-phone'));
       nameIn.addEventListener('input', () => nameIn.value.trim().length > 1 && $id('qz-f-name').classList.remove('invalid'));
@@ -319,6 +332,7 @@
           project: 'Квиз: ' + (picks.map(p => `«${p.name}»`).join(', ') || '—'), msg: QUIZ_RU.map(([k, o], j) => `${k}: ${o[answers[j]]}`).join('\n'), lang: document.documentElement.lang };
         const done = () => {
           goal('lead_quiz', { via });
+          quizSave({ answers, sent: true });
           stepEl.textContent = Q.doneStep;
           body.innerHTML = `<div class="quiz-sent"><span class="chip ink">${esc(Q.sentChip)}</span><h3 id="quiz-q" tabindex="-1">${esc(Q.sentTitle)}</h3><p>${esc(Q.sentText)}</p><button type="button" class="btn ghost-ink quiz-close">${esc(Q.close)}</button></div>`;
           focusTitle();
@@ -330,24 +344,37 @@
           .catch(() => { err.hidden = false; })
           .finally(() => { btn.disabled = false; });
       });
-      focusTitle();
     }
-    const close = () => { if (el.open) { el.close(); unlock(); } };
-    el.addEventListener('close', unlock);
+    const close = () => { if (el.open) { el.close(); unlock(); updateFab(); } };
+    el.addEventListener('close', () => { unlock(); updateFab(); });
     el.addEventListener('click', e => {
       if (e.target === el || e.target.closest('.quiz-x, .quiz-close, .quiz-pick')) return close();
       const o = e.target.closest('.quiz-opt'); if (o) { answers[i] = +o.dataset.i; i++; if (i === 1) goal('quiz_start'); return show(); }
+      if (e.target.closest('.quiz-again')) { answers = []; i = 0; return show(); }
       if (e.target.closest('.quiz-back')) { i = Math.min(i, total) - 1; show(); }
     });
-    return { el, reset: () => { answers = []; i = 0; show(); } };
+    // a saved result opens straight away; otherwise the first question
+    return { el, reset: () => { const saved = quizSaved(); if (saved) { answers = saved.answers.slice(); i = total; result(false); } else { answers = []; i = 0; show(); } } };
   }
   function quizOpen() {
     if (!T.quiz) return;
     quiz ||= quizBuild();
     goal('quiz_open');
     quiz.reset(); quiz.el.showModal(); quiz.el.append(cursorEl); lenis?.stop(); document.documentElement.style.overflow = 'hidden';
+    updateFab();
   }
   document.addEventListener('click', e => { if (e.target.closest('[data-quiz]')) { e.preventDefault(); quizOpen(); } });
+  // «Ваша подборка»: a floating button with the picked houses, on every page while the tab is open
+  const fab = T.quiz ? document.createElement('button') : null;
+  if (fab) { fab.type = 'button'; fab.className = 'quiz-fab'; fab.hidden = true; fab.addEventListener('click', quizOpen); document.body.append(fab); }
+  function updateFab() {
+    if (!fab) return;
+    const saved = quizSaved(), picks = saved ? quizPick(saved.answers) : [];
+    fab.hidden = !saved || !!quiz?.el.open;
+    if (!saved) return;
+    fab.innerHTML = `<span class="thumbs" aria-hidden="true">${picks.map(p => `<i${p.image ? ` style="background-image:url('${esc(p.image)}')"` : ''}></i>`).join('')}</span>`
+      + `<span>${esc(T.quiz.saved)}<small>${picks.length} ${esc(plural(picks.length, T.quiz.projectsUnit))}</small></span>`;
+  }
 
   /* ---- «Получить каталог в WhatsApp»: name + number → a lead; the manager gets the catalog link (/catalog/) in it ---- */
   document.querySelectorAll('.cat-form').forEach(f => {
@@ -478,6 +505,7 @@
   const embedded = $id('cms');
   if (embedded) applyContent(JSON.parse(embedded.textContent));
   else if (location.protocol !== 'file:') fetch('/api/content?lang=' + document.documentElement.lang).then(r => r.ok ? r.json() : null).then(c => c && applyContent(c)).catch(() => {});
+  updateFab();
   if (location.hash === '#quiz') { history.replaceState(null, '', location.pathname + location.search); quizOpen(); }
 
   /* ---- FAQ: 4 questions, the rest behind «Показать ещё» ---- */
