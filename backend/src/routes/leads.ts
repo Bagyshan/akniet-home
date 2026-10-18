@@ -24,18 +24,19 @@ leads.post('/', async (req, res) => {
 
   const type = HOUSE_TYPES.includes(b.type) ? b.type : null;
   const via = CONTACT_VIA.includes(b.via) ? b.via : null;
-  const area = Number.parseInt(b.area, 10);
+  const area = Number.parseInt(b.area, 10), terrace = Number.parseInt(b.terrace, 10);
   const lead = {
     name, phone, house_type: type, contact_via: via, lang: b.lang === 'ky' ? 'ky' : 'ru',
     project: str(b.project, 200) || null,
     area: area > 0 && area < 2000 ? area : null,
+    terrace: terrace > 0 && terrace < 1000 ? terrace : null,
     message: str(b.msg, 2000) || null,
   };
 
   const { rows } = await pool.query<{ id: number }>(
-    `INSERT INTO leads (name, phone, house_type, contact_via, project, area, message, lang)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
-    [lead.name, lead.phone, lead.house_type, lead.contact_via, lead.project, lead.area, lead.message, lead.lang],
+    `INSERT INTO leads (name, phone, house_type, contact_via, project, area, terrace, message, lang)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+    [lead.name, lead.phone, lead.house_type, lead.contact_via, lead.project, lead.area, lead.terrace, lead.message, lead.lang],
   );
   const id = Number(rows[0].id);
   res.status(201).json({ ok: true, id });

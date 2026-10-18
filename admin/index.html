@@ -154,11 +154,13 @@ dialog.wide{width:min(1120px,calc(100% - 24px))}
 .floor-prev svg,.floor-prev img{display:block;width:100%;height:auto;max-height:420px;object-fit:contain}
 .floor-prev .warn{margin-top:8px;font-size:12.5px;color:#a33a24}
 .rooms{display:grid;gap:6px}
-.room{display:grid;grid-template-columns:1.3fr 1.3fr repeat(4,54px) 58px 36px;gap:6px;align-items:center}
+.room{display:grid;grid-template-columns:1.3fr 1.3fr repeat(4,54px) 56px 58px 36px;gap:6px;align-items:center}
 .room.head{font-size:11px;font-weight:600;letter-spacing:.06em;color:rgba(255,248,236,.45)}
 .room input{width:100%;min-width:0;min-height:38px;padding:6px 8px;border-radius:10px;border:1.5px solid transparent;background:rgba(24,22,25,.55);outline:none;font-size:13.5px}
 .room input:focus{border-color:var(--gold)}
 .ce-photo .thumb:not([style*=url]){display:grid;place-items:center;background:rgba(24,22,25,.55)}
+.room .tr{display:flex;gap:4px;align-items:center;font-size:11.5px;color:var(--dim);cursor:pointer}
+.room .tr input{width:18px;height:18px;min-height:0;accent-color:var(--gold)}
 .room .ar{font-size:12.5px;color:var(--dim);text-align:right}
 .room button{width:36px;height:36px;border-radius:10px;border:0;background:rgba(255,248,236,.08);cursor:pointer}
 .ce-err{padding:10px 14px;border-radius:12px;background:rgba(224,120,94,.15);box-shadow:inset 0 0 0 1px rgba(224,120,94,.5);color:#f3b3a2;font-size:13.5px}
@@ -170,9 +172,9 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
   .ce-grid{grid-template-columns:1fr 1fr}
   .floor{grid-template-columns:1fr}
   .floor-prev{position:static}
-  .room{grid-template-columns:repeat(4,1fr) 56px 36px}
-  .room>input:nth-child(1),.room>input:nth-child(2){grid-column:span 3}
-  .room>input:nth-child(2){grid-column:span 3}
+  .room{grid-template-columns:repeat(4,1fr) 64px 56px 36px}
+  .room>input:nth-child(1){grid-column:1/4}
+  .room>input:nth-child(2){grid-column:4/-1}
   .room.head{display:none}
 }
 @media (max-width:600px){
@@ -360,7 +362,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
     const row = el('article', { className: 'lead' },
       el('div', { className: 'd' }, '№' + l.id, el('br'), fmtDate(l.created_at)),
       el('div', {}, el('b', { textContent: l.name }, ...(l.lang === 'ky' ? [el('span', { className: 'lang-tag', textContent: 'КЫР', title: 'Заявка с кыргызской версии сайта' })] : [])), el('a', { href: 'tel:' + l.phone.replace(/[^\d+]/g, ''), textContent: l.phone })),
-      el('div', {}, el('b', { textContent: l.house_type || '—' }), el('span', { className: 'd', textContent: (l.contact_via || '') + (l.project ? ' · ' + l.project : '') + (l.area ? ', ' + l.area + ' м²' : '') })),
+      el('div', {}, el('b', { textContent: l.house_type || '—' }), el('span', { className: 'd', textContent: (l.contact_via || '') + (l.project ? ' · ' + l.project : '') + (l.area ? ', ' + l.area + ' м²' : '') + (l.terrace ? ' + терраса ' + l.terrace + ' м²' : '') })),
       el('div', { className: 'm', textContent: l.message || '' }),
       el('div', { className: 'st' }, sel, el('div', { className: 'tg', textContent: l.telegram_sent ? 'отправлено в Telegram' : 'в Telegram не отправлено' })));
     row.dataset.status = l.status;
@@ -626,7 +628,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
     } catch { toast('Не удалось загрузить список', true); }
   }
   const ROW = {
-    projects: d => ({ img: d.image, title: `«${d.name}»`, meta: `${STYLE[d.style]} · ${area(d.area)} м² · спален: ${d.beds} · санузлов: ${d.baths} · этажей в схеме: ${d.plan.length}`, tags: [d.on_home && ['gold', 'на главной'], !d.name_ky || !d.text_ky ? ['warn', 'нет перевода'] : null] }),
+    projects: d => ({ img: d.image, title: `«${d.name}»`, meta: `${STYLE[d.style]} · ${area(d.area)} м²${d.terrace ? ` + терраса ${area(d.terrace)} м²` : ''} · спален: ${d.beds} · санузлов: ${d.baths} · этажей в схеме: ${d.plan.length}`, tags: [d.on_home && ['gold', 'на главной'], !d.name_ky || !d.text_ky ? ['warn', 'нет перевода'] : null] }),
     cases: d => ({ img: d.image, title: d.title, meta: `${d.region} · ${d.area} · ${d.term}` + (d.project ? ` · проект: ${CAT.projects.find(p => p.id === d.project)?.data.name || '—'}` : ''), tags: [!d.title_ky || !d.story_ky ? ['warn', 'нет перевода'] : null] }),
     faq: d => ({ title: d.q, meta: d.a.length > 140 ? d.a.slice(0, 140) + '…' : d.a, tags: [!d.q_ky || !d.a_ky ? ['warn', 'нет перевода'] : null] }),
   };
@@ -696,7 +698,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
   }
 
   const BLANK = {
-    projects: () => ({ slug: '', style: 'barn', name: '', name_ky: '', area: null, beds: 1, baths: 1, floors: '1', floors_ky: '', text: '', text_ky: '', price: null, image: null, on_home: false,
+    projects: () => ({ slug: '', style: 'barn', name: '', name_ky: '', area: null, terrace: 0, beds: 1, baths: 1, floors: '1', floors_ky: '', text: '', text_ky: '', price: null, image: null, on_home: false,
       plan: [{ name: '1 этаж', name_ky: '1-кабат', w: 10, h: 8, void: null, image: null, rooms: [{ x: 0, y: 0, w: 6, h: 8, name: 'Кухня-гостиная', name_ky: 'Ашкана-конок бөлмө' }] }] }),
     cases: () => ({ image: null, region: '', region_ky: '', title: '', title_ky: '', area: '', term: '', term_ky: '', season: '', season_ky: '', story: '', story_ky: '', project: null }),
     faq: () => ({ q: '', q_ky: '', a: '', a_ky: '' }),
@@ -719,7 +721,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
     return [el('div', { className: 'ce-grid' },
       pair('Вопрос', 'q', { max: 200 }),
       pair('Ответ', 'a', { max: 1500, area: true })),
-      el('p', { className: 'muted', innerHTML: 'В ответе можно вставить значения из вкладки «Основное» — сайт подставит их сам: <code>{price}</code> — цена за м² («$440»), <code>{months}</code> — средний срок («2 месяца»), <code>{months_min}</code> — минимальный срок после «от» («от 1,5 месяца»; по-кыргызски перед «баштап»), <code>{warranty}</code> — гарантия («5 лет»).' })];
+      el('p', { className: 'muted', innerHTML: 'В ответе можно вставить значения из вкладки «Основное» — сайт подставит их сам: <code>{price}</code> — цена за м² («$440»), <code>{terrace_price}</code> — цена террасы за м² (пока она не задана, такой вопрос на сайте скрыт), <code>{months}</code> — средний срок («2 месяца»), <code>{months_min}</code> — минимальный срок после «от» («от 1,5 месяца»; по-кыргызски перед «баштап»), <code>{warranty}</code> — гарантия («5 лет»).' })];
   }
 
   function caseForm() {
@@ -765,13 +767,14 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
         fld('Площадь, м²', numInp('area', { ph: '86' })),
         fld('Спальни', numInp('beds')),
         fld('Санузлы', numInp('baths')),
+        fld('Терраса, м²', numInp('terrace', { ph: '0 — без террасы' })),
         fld('Цена под ключ, $', numInp('price', { ph: 'пусто — площадь × цена за м²' })),
         pair('Этажи (как в карточке)', 'floors', { max: 30, ph: '1 + антресоль' }),
         pair('Описание', 'text', { max: 400, area: true }),
         el('label', { className: 'check s4' }, home, 'Показывать на главной (короткая карточка в «Готовых проектах»)')),
       el('div', { className: 'ce-sec' },
         el('h2', {}, 'Планировка', addFloor),
-        el('p', { className: 'muted', textContent: 'Размеры в метрах. X и Y — где начинается комната от левого верхнего угла дома, ширина — по горизонтали, длина — по вертикали. Схема справа обновляется сразу и выглядит так же, как на сайте. Вместо схемы можно загрузить картинку этажа — тогда на сайте будет она, а комнаты останутся списком под фото проекта.' }),
+        el('p', { className: 'muted', textContent: 'Размеры в метрах. Отметка «терр.» превращает комнату в террасу: она рисуется настилом и может выходить за контур дома (например, Y больше длины дома — терраса перед входом). Площадь террасы для цены — поле «Терраса, м²» выше. X и Y — где начинается комната от левого верхнего угла дома, ширина — по горизонтали, длина — по вертикали. Схема справа обновляется сразу и выглядит так же, как на сайте. Вместо схемы можно загрузить картинку этажа — тогда на сайте будет она, а комнаты останутся списком под фото проекта.' }),
         floorsBox),
     ];
   }
@@ -779,7 +782,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
   function floorEditor(f, i, rerender) {
     const prev = el('div', { className: 'floor-prev' });
     const draw = () => {
-      const warn = f.rooms.filter(r => r.x + r.w > f.w + 0.01 || r.y + r.h > f.h + 0.01).map(r => r.name || 'без названия');
+      const warn = f.rooms.filter(r => !r.terrace && (r.x + r.w > f.w + 0.01 || r.y + r.h > f.h + 0.01)).map(r => r.name || 'без названия');
       prev.innerHTML = window.AknietPlan.html(f, { m: 'м', m2: 'м²', secondLight: 'Второй свет', label: f.name });
       if (warn.length) prev.append(el('div', { className: 'warn', textContent: 'Выходит за размер дома: ' + warn.join(', ') }));
     };
@@ -791,7 +794,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
     fillVoid();
     const rooms = el('div', { className: 'rooms' });
     const renderRooms = () => rooms.replaceChildren(
-      el('div', { className: 'room head' }, ...['Комната (рус)', 'Комната (кыр)', 'X', 'Y', 'Ширина', 'Длина', 'Площадь', ''].map(t => el('span', { textContent: t }))),
+      el('div', { className: 'room head' }, ...['Комната (рус)', 'Комната (кыр)', 'X', 'Y', 'Ширина', 'Длина', 'Терраса', 'Площадь', ''].map(t => el('span', { textContent: t }))),
       ...f.rooms.map((r, j) => {
         const ar = el('span', { className: 'ar', textContent: area(r.w * r.h) + ' м²' });
         const upd = () => { ar.textContent = area((r.w || 0) * (r.h || 0)) + ' м²'; draw(); };
@@ -799,7 +802,9 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
         const n = inp('name', { obj: r, max: 30, ph: 'Спальня', onChange: draw }), nk = inp('name_ky', { obj: r, max: 30, ky: true, ph: 'кыргызча' });
         n.setAttribute('aria-label', 'Комната'); nk.setAttribute('aria-label', 'Комната — кыргызча');
         const ns = ['x', 'y', 'w', 'h'].map(k => { const e = numInp(k, { obj: r, onChange: upd, ph: { x: 'X', y: 'Y', w: 'шир.', h: 'дл.' }[k] }); e.setAttribute('aria-label', { x: 'X', y: 'Y', w: 'Ширина', h: 'Длина' }[k]); return e; });
-        return el('div', { className: 'room' }, n, nk, ...ns, ar, rm);
+        const tr = el('input', { type: 'checkbox', checked: !!r.terrace, title: 'Терраса: рисуется настилом и может выходить за контур дома' });
+        tr.setAttribute('aria-label', 'Это терраса'); tr.addEventListener('change', () => { if (tr.checked) r.terrace = true; else delete r.terrace; draw(); });
+        return el('div', { className: 'room' }, n, nk, ...ns, el('label', { className: 'tr', title: 'Терраса' }, tr, el('span', { textContent: 'терр.' })), ar, rm);
       }));
     renderRooms();
     const addRoom = el('button', { type: 'button', className: 'btn sm', textContent: '+ Комната' });

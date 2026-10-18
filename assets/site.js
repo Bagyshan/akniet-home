@@ -98,41 +98,50 @@
 
     /* ---- prefill the form from projects / calculator ---- */
     const pick = $id('pick'), pickText = $id('pick-text');
-    const fProject = $id('f-project'), fArea = $id('f-area');
+    const fProject = $id('f-project'), fArea = $id('f-area'), fTerrace = $id('f-terrace');
     prefill = d => {
       const r = d.type && form.querySelector(`input[name="type"][value="${d.type}"]`); if (r) r.checked = true;
-      fProject.value = d.project || ''; fArea.value = d.area || '';
-      const t = [d.project, d.area && d.area + ' ' + T.m2, d.price].filter(Boolean).join(' · ');
+      fProject.value = d.project || ''; fArea.value = d.area || ''; fTerrace.value = d.terrace || '';
+      const t = [d.project, d.area && d.area + ' ' + T.m2 + (d.terrace ? fill(T.plusTerrace, { n: d.terrace }) : ''), d.price].filter(Boolean).join(' · ');
       pickText.textContent = t; pick.hidden = !t;
       form.classList.remove('sent');
       if (fine) setTimeout(() => nameIn.focus({ preventScroll: true }), lenis ? 1400 : 600);
     };
-    $id('pick-x').addEventListener('click', () => { fProject.value = fArea.value = ''; pick.hidden = true; });
+    $id('pick-x').addEventListener('click', () => { fProject.value = fArea.value = fTerrace.value = ''; pick.hidden = true; });
     document.addEventListener('click', e => { const a = e.target.closest('[data-lead]'); if (a) prefill(JSON.parse(a.dataset.lead)); });
   }
 
   const money = n => '$' + n.toLocaleString('ru-RU');
-  let PRICE_M2 = 440;
+  // the terrace has its own price per m²; 0 — not set in the admin panel, the terrace is not offered
+  let PRICE_M2 = 440, TERRACE_M2 = 0;
 
   /* ---- price calculator ---- */
-  const area = $id('area'), presets = document.querySelectorAll('.presets button');
+  const area = $id('area'), terrace = $id('terrace'), presets = document.querySelectorAll('.presets button');
+  const slider = (el, out, text) => {
+    out.value = el.value + ' ' + T.m2;
+    el.style.setProperty('--p', (el.value - el.min) / (el.max - el.min) * 100 + '%');
+    el.setAttribute('aria-valuetext', text);
+  };
   function calc() {
     if (!area) return;
     const checked = document.querySelector('input[name="cstyle"]:checked'), style = checked.value, styleLabel = document.querySelector(`label[for="${checked.id}"]`).textContent;
-    const a = +area.value, sum = money(a * PRICE_M2);
-    $id('area-out').value = a + ' ' + T.m2;
-    area.style.setProperty('--p', (a - area.min) / (area.max - area.min) * 100 + '%');
-    area.setAttribute('aria-valuetext', fill(T.areaText, { n: a }));
+    const a = +area.value, t = TERRACE_M2 && terrace ? +terrace.value : 0;
+    const house = a * PRICE_M2, deck = t * TERRACE_M2, sum = money(house + deck);
+    slider(area, $id('area-out'), fill(T.areaText, { n: a }));
+    if (terrace) slider(terrace, $id('terrace-out'), t ? fill(T.areaText, { n: t }) : T.terraceNone);
     $id('calc-sum').textContent = sum;
     $id('calc-style').textContent = styleLabel;
     $id('calc-area').textContent = a;
-    presets.forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.area === a)));
-    $id('calc-go').dataset.lead = JSON.stringify({ type: style, project: fill(T.calcProject, { style: styleLabel }), area: a, price: priceFrom(sum) });
+    const split = $id('calc-split');
+    if (split) { split.hidden = !t; split.textContent = t ? fill(T.calcSplit, { house: money(house), n: t, terrace: money(deck) }) : ''; }
+    presets.forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.area === a && (!TERRACE_M2 || +(b.dataset.terrace || 0) === t))));
+    $id('calc-go').dataset.lead = JSON.stringify({ type: style, project: fill(T.calcProject, { style: styleLabel }), area: a, ...(t ? { terrace: t } : {}), price: priceFrom(sum) });
   }
   if (area) {
     area.addEventListener('input', calc);
+    terrace?.addEventListener('input', calc);
     document.querySelectorAll('input[name="cstyle"]').forEach(r => r.addEventListener('change', calc));
-    presets.forEach(b => b.addEventListener('click', () => { area.value = b.dataset.area; calc(); }));
+    presets.forEach(b => b.addEventListener('click', () => { area.value = b.dataset.area; if (terrace && b.dataset.terrace) terrace.value = b.dataset.terrace; calc(); }));
     calc();
   }
 
@@ -153,10 +162,10 @@
   /* ---- projects: floor plans ---- */
   // The projects come from the admin panel (#cms → projects, the server puts them there); this copy of the stock
   // projects is for a static page without the server. Drawing: assets/plan.js
-  let PROJECTS = [{"id":1,"slug":"tau","style":"af","name":"Тау","area":43,"beds":1,"baths":1,"price":null,"plan":[{"name":"1 этаж","w":6,"h":5.5,"void":null,"image":null,"rooms":[{"x":0,"y":0,"w":6,"h":3.5,"name":"Кухня-гостиная"},{"x":0,"y":3.5,"w":2.4,"h":2,"name":"Санузел"},{"x":2.4,"y":3.5,"w":3.6,"h":2,"name":"Прихожая"}]},{"name":"Антресоль","w":6,"h":5.5,"void":[0,0,6,3.8],"image":null,"rooms":[{"x":0,"y":3.8,"w":6,"h":1.7,"name":"Спальня"}]}]},{"id":2,"slug":"karagay","style":"af","name":"Карагай","area":68,"beds":2,"baths":1,"price":null,"plan":[{"name":"1 этаж","w":7,"h":7,"void":null,"image":null,"rooms":[{"x":0,"y":0,"w":7,"h":4,"name":"Кухня-гостиная"},{"x":0,"y":4,"w":3.5,"h":3,"name":"Спальня"},{"x":3.5,"y":4,"w":2,"h":3,"name":"Санузел"},{"x":5.5,"y":4,"w":1.5,"h":3,"name":"Вход"}]},{"name":"2 этаж","w":7,"h":7,"void":[0,0,7,4.3],"image":null,"rooms":[{"x":0,"y":4.3,"w":7,"h":2.7,"name":"Спальня 2"}]}]},{"id":3,"slug":"jailoo","style":"barn","name":"Жайлау","area":86,"beds":2,"baths":1,"price":null,"plan":[{"name":"1 этаж","w":12,"h":7.2,"void":null,"image":null,"rooms":[{"x":0,"y":0,"w":6,"h":7.2,"name":"Кухня-гостиная"},{"x":6,"y":0,"w":3.4,"h":4,"name":"Спальня"},{"x":9.4,"y":0,"w":2.6,"h":4,"name":"Спальня 2"},{"x":6,"y":4,"w":2.2,"h":3.2,"name":"Холл"},{"x":8.2,"y":4,"w":2,"h":3.2,"name":"Санузел"},{"x":10.2,"y":4,"w":1.8,"h":3.2,"name":"Постирочная"}]}]},{"id":4,"slug":"alatoo","style":"barn","name":"Ала-Тоо","area":120,"beds":3,"baths":2,"price":null,"plan":[{"name":"1 этаж","w":10,"h":7,"void":null,"image":null,"rooms":[{"x":0,"y":0,"w":6,"h":7,"name":"Кухня-гостиная"},{"x":6,"y":0,"w":4,"h":3.6,"name":"Спальня"},{"x":6,"y":3.6,"w":2,"h":3.4,"name":"Санузел"},{"x":8,"y":3.6,"w":2,"h":3.4,"name":"Прихожая"}]},{"name":"2 этаж","w":10,"h":7,"void":[0,5,10,2],"image":null,"rooms":[{"x":0,"y":0,"w":3.6,"h":3.4,"name":"Спальня 2"},{"x":3.6,"y":0,"w":2.8,"h":5,"name":"Холл"},{"x":6.4,"y":0,"w":3.6,"h":3.4,"name":"Спальня 3"},{"x":0,"y":3.4,"w":3.6,"h":1.6,"name":"Санузел 2"},{"x":6.4,"y":3.4,"w":3.6,"h":1.6,"name":"Гардероб"}]}]}];
+  let PROJECTS = [{"id":1,"slug":"tau","style":"af","name":"Тау","area":43,"beds":1,"baths":1,"price":null,"plan":[{"name":"1 этаж","w":6,"h":5.5,"void":null,"image":null,"rooms":[{"x":0,"y":0,"w":6,"h":3.5,"name":"Кухня-гостиная"},{"x":0,"y":3.5,"w":2.4,"h":2,"name":"Санузел"},{"x":2.4,"y":3.5,"w":3.6,"h":2,"name":"Прихожая"},{"x":0,"y":5.5,"w":6,"h":2,"name":"Терраса","terrace":true}]},{"name":"Антресоль","w":6,"h":5.5,"void":[0,0,6,3.8],"image":null,"rooms":[{"x":0,"y":3.8,"w":6,"h":1.7,"name":"Спальня"}]}],"terrace":12},{"id":2,"slug":"karagay","style":"af","name":"Карагай","area":68,"beds":2,"baths":1,"price":null,"plan":[{"name":"1 этаж","w":7,"h":7,"void":null,"image":null,"rooms":[{"x":0,"y":0,"w":7,"h":4,"name":"Кухня-гостиная"},{"x":0,"y":4,"w":3.5,"h":3,"name":"Спальня"},{"x":3.5,"y":4,"w":2,"h":3,"name":"Санузел"},{"x":5.5,"y":4,"w":1.5,"h":3,"name":"Вход"},{"x":0,"y":7,"w":7,"h":2.5,"name":"Терраса","terrace":true}]},{"name":"2 этаж","w":7,"h":7,"void":[0,0,7,4.3],"image":null,"rooms":[{"x":0,"y":4.3,"w":7,"h":2.7,"name":"Спальня 2"}]}],"terrace":17.5},{"id":3,"slug":"jailoo","style":"barn","name":"Жайлау","area":86,"beds":2,"baths":1,"price":null,"plan":[{"name":"1 этаж","w":12,"h":7.2,"void":null,"image":null,"rooms":[{"x":0,"y":0,"w":6,"h":7.2,"name":"Кухня-гостиная"},{"x":6,"y":0,"w":3.4,"h":4,"name":"Спальня"},{"x":9.4,"y":0,"w":2.6,"h":4,"name":"Спальня 2"},{"x":6,"y":4,"w":2.2,"h":3.2,"name":"Холл"},{"x":8.2,"y":4,"w":2,"h":3.2,"name":"Санузел"},{"x":10.2,"y":4,"w":1.8,"h":3.2,"name":"Постирочная"},{"x":0,"y":7.2,"w":6,"h":2.5,"name":"Терраса","terrace":true}]}],"terrace":15},{"id":4,"slug":"alatoo","style":"barn","name":"Ала-Тоо","area":120,"beds":3,"baths":2,"price":null,"plan":[{"name":"1 этаж","w":10,"h":7,"void":null,"image":null,"rooms":[{"x":0,"y":0,"w":6,"h":7,"name":"Кухня-гостиная"},{"x":6,"y":0,"w":4,"h":3.6,"name":"Спальня"},{"x":6,"y":3.6,"w":2,"h":3.4,"name":"Санузел"},{"x":8,"y":3.6,"w":2,"h":3.4,"name":"Прихожая"},{"x":0,"y":7,"w":6,"h":3,"name":"Терраса","terrace":true}]},{"name":"2 этаж","w":10,"h":7,"void":[0,5,10,2],"image":null,"rooms":[{"x":0,"y":0,"w":3.6,"h":3.4,"name":"Спальня 2"},{"x":3.6,"y":0,"w":2.8,"h":5,"name":"Холл"},{"x":6.4,"y":0,"w":3.6,"h":3.4,"name":"Спальня 3"},{"x":0,"y":3.4,"w":3.6,"h":1.6,"name":"Санузел 2"},{"x":6.4,"y":3.4,"w":3.6,"h":1.6,"name":"Гардероб"}]}],"terrace":18}];
   const projectBy = slug => PROJECTS.find(p => p.slug === slug);
   const styleName = p => p.style === 'af' ? 'A-frame' : 'Барнхаус'; // the form's radio values
-  const projectPrice = p => money(p.price || p.area * PRICE_M2);
+  const projectPrice = p => money(p.price || p.area * PRICE_M2 + (p.terrace || 0) * TERRACE_M2);
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const m2 = v => (Math.round(v * 10) / 10).toLocaleString('ru-RU');
   const planHTML = f => window.AknietPlan.html({ ...f, rooms: f.rooms.map(r => ({ ...r, name: word(r.name) })) },
@@ -173,10 +182,10 @@
     const price = projectPrice(p);
     plan.querySelector('.plan-style').textContent = word(styleName(p));
     plan.querySelector('#plan-title').textContent = `«${p.name}» · ${p.area} ${T.m2}`;
-    plan.querySelector('.plan-specs').innerHTML = [[T.specs[0], p.area + ' ' + T.m2], [T.specs[1], p.beds], [T.specs[2], p.baths]].map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('');
+    plan.querySelector('.plan-specs').innerHTML = [[T.specs[0], p.area + ' ' + T.m2], [T.specs[1], p.beds], [T.specs[2], p.baths], ...(p.terrace ? [[T.specs[3], m2(p.terrace) + ' ' + T.m2]] : [])].map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('');
     plan.querySelector('.plan-rooms').innerHTML = p.plan.map(f => (p.plan.length > 1 ? `<li class="fl">${esc(word(f.name))}</li>` : '') + f.rooms.map(r => `<li><span>${esc(word(r.name))}</span><span>${m2(r.w * r.h)} ${T.m2}</span></li>`).join('')).join('');
     plan.querySelector('.plan-price b').textContent = priceFrom(price);
-    plan.querySelector('.plan-go').dataset.lead = JSON.stringify({ type: styleName(p), project: `«${p.name}»`, area: p.area, price: priceFrom(price) });
+    plan.querySelector('.plan-go').dataset.lead = JSON.stringify({ type: styleName(p), project: `«${p.name}»`, area: p.area, ...(p.terrace ? { terrace: Math.round(p.terrace) } : {}), price: priceFrom(price) });
     floorsEl.innerHTML = p.plan.length > 1 ? p.plan.map(f => `<button type="button">${esc(word(f.name))}</button>`).join('') : '';
     floorsEl.querySelectorAll('button').forEach((b, i) => b.addEventListener('click', () => showFloor(p, i)));
     showFloor(p, 0);
@@ -194,7 +203,7 @@
 
   /* ---- content from the admin panel (GET /api/content); the HTML keeps the defaults ---- */
   // data-price="43" — a project of 43 m², its price follows the price per m² from the admin
-  const syncProjectPrices = () => document.querySelectorAll('[data-price]').forEach(el => { el.textContent = priceFrom(money(+el.dataset.price * PRICE_M2)); });
+  const syncProjectPrices = () => document.querySelectorAll('[data-price]').forEach(el => { el.textContent = priceFrom(money(+el.dataset.price * PRICE_M2 + +(el.dataset.terrace || 0) * TERRACE_M2)); });
   // data-unit="one,few,many[,fraction]": 1 год · 3 года · 5 лет; a fraction takes the 4th form or "few" (1,5 месяца).
   // After «от» the case changes, so those spans list genitive forms: от 1 месяца · от 2 месяцев
   const plural = (n, forms) => { const [one, few, many, frac = few] = forms.split(','); if (!Number.isInteger(n)) return frac; const a = n % 100, b = n % 10; return a > 10 && a < 20 ? many : b === 1 ? one : b > 1 && b < 5 ? few : many; };
@@ -223,7 +232,10 @@
       el.classList.remove('ph'); el.removeAttribute('title');
     });
     document.querySelectorAll('[data-cms-unit]').forEach(el => { const v = c[el.dataset.cmsUnit]; if (v !== null && v !== undefined && v !== '') el.textContent = plural(+v, el.dataset.unit); });
-    if (+c.price_m2 > 0) { PRICE_M2 = +c.price_m2; calc(); syncProjectPrices(); }
+    if (+c.price_m2 > 0) PRICE_M2 = +c.price_m2;
+    TERRACE_M2 = +c.price_terrace_m2 > 0 ? +c.price_terrace_m2 : 0;
+    document.querySelectorAll('[data-needs="price_terrace_m2"]').forEach(e => { e.hidden = !TERRACE_M2; });
+    calc(); syncProjectPrices();
 
     const lang = document.documentElement.lang;
     const addr = (lang === 'ky' && c.address_ky) || c.address;

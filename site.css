@@ -368,7 +368,7 @@ dialog.plan::backdrop{background:rgba(20,18,21,.74);backdrop-filter:blur(6px);-w
 .plan-info{padding:clamp(24px,2.6vw,36px);display:flex;flex-direction:column;gap:18px}
 .plan-info .chip{align-self:flex-start}
 .plan-info h3{font-size:clamp(28px,2.6vw,40px)}
-.plan-specs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0}
+.plan-specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(64px,1fr));gap:8px;margin:0}
 .plan-specs div{background:rgba(255,248,236,.06);border-radius:14px;padding:10px 12px}
 .plan-specs dt{font-size:12px;color:var(--dim)}
 .plan-specs dd{margin:0;font-family:var(--f-head);font-size:18px}
@@ -431,6 +431,12 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 .calc-sum{font-family:var(--f-head);font-weight:300;font-size:clamp(20px,1.8vw,28px)}
 .calc-sum b{display:block;font-weight:400;font-size:clamp(48px,5.2vw,86px);letter-spacing:-.04em;line-height:1;white-space:nowrap}
 .calc-meta{margin-top:12px;font-size:15px;opacity:.8}
+.calc-hint{font-size:13px;color:var(--dim)}
+.calc-split{margin-top:6px;font-size:14px;font-weight:600;opacity:.85}
+/* terrace blocks wait for the terrace price from the admin panel */
+[data-needs][hidden]{display:none!important}
+.tk-terrace{margin-top:4px!important;font-weight:600}
+.proj-notes{display:grid;gap:2px}
 .calc-gift{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:16px;background:rgba(49,45,50,.1);font-weight:600;font-size:14px}
 .calc-gift svg{width:20px;height:20px;flex:none}
 .c-calc-out .btn{min-height:56px}
@@ -566,7 +572,7 @@ section[id],article[id],[id="gift"]{scroll-margin-top:96px}
 .pd .area{font-family:var(--f-head);font-size:clamp(24px,2.2vw,34px);color:var(--gold);white-space:nowrap}
 .pd .area small{font-size:.6em}
 .pd-text{color:rgba(255,248,236,.8);max-width:52ch}
-.pd-specs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0}
+.pd-specs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0}
 .pd-specs div{background:rgba(255,248,236,.06);border-radius:14px;padding:10px 12px}
 .pd-specs dt{font-size:12px;color:var(--dim)}
 .pd-specs dd{margin:0;font-family:var(--f-head);font-size:17px}
@@ -674,6 +680,7 @@ section[id],article[id],[id="gift"]{scroll-margin-top:96px}
   .page-links .chip{flex:1;justify-content:center;white-space:nowrap}
   .pd-img{aspect-ratio:4/3}
   .pd-rooms{columns:1}
+  .pd-specs{grid-template-columns:1fr 1fr}
   .pd-specs dd{font-size:15px}
   .pd-foot{flex-direction:column;align-items:stretch}
   .pd-btns{display:grid;grid-template-columns:1fr 1fr}
