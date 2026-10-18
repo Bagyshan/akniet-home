@@ -210,6 +210,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
     <button role="tab" aria-selected="false" aria-controls="p-projects">Проекты</button>
     <button role="tab" aria-selected="false" aria-controls="p-cases">Кейсы</button>
     <button role="tab" aria-selected="false" aria-controls="p-faq">Вопросы</button>
+    <button role="tab" aria-selected="false" aria-controls="p-extras">Постройки</button>
     <button role="tab" aria-selected="false" aria-controls="p-materials">Материалы</button>
     <button role="tab" aria-selected="false" aria-controls="p-gallery">Галерея</button>
     <button role="tab" aria-selected="false" aria-controls="p-map">Карта</button>
@@ -251,6 +252,11 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
   <section id="p-faq" role="tabpanel" class="card" hidden>
     <div class="bar"><div><h1>Вопросы</h1><p class="muted">«Частые вопросы» на главной: сначала видно 4 вопроса, остальные — по кнопке «Показать ещё вопросы».</p></div><button class="btn gold" type="button" data-add="faq">+ Добавить вопрос</button></div>
     <div class="cat-list" id="l-faq"></div>
+  </section>
+
+  <section id="p-extras" role="tabpanel" class="card" hidden>
+    <div class="bar"><div><h1>Постройки</h1><p class="muted">Страница «Постройки» (/extras/) и раздел «Не только дома» на главной: бани, модульные дома, беседки, площадки. У каждого направления — обложка, описание, пункты «что делаем» и примеры работ. Цены здесь нет: на сайте — «после консультации».</p></div><button class="btn gold" type="button" data-add="extras">+ Добавить направление</button></div>
+    <div class="cat-list" id="l-extras"></div>
   </section>
 
   <section id="p-materials" role="tabpanel" class="card" hidden>
@@ -612,7 +618,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
   });
 
   /* ---- projects, cases, FAQ: lists (add / delete / reorder) and the editor ---- */
-  const CAT = { projects: [], cases: [], faq: [] };
+  const CAT = { projects: [], cases: [], faq: [], extras: [] };
   const STYLE = { af: 'A-frame', barn: 'Барнхаус' };
   const num = v => { const n = Number(String(v).trim().replace(',', '.')); return String(v).trim() === '' || !Number.isFinite(n) ? null : n; };
   const area = v => (Math.round(v * 10) / 10).toLocaleString('ru-RU');
@@ -630,6 +636,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
   const ROW = {
     projects: d => ({ img: d.image, title: `«${d.name}»`, meta: `${STYLE[d.style]} · ${area(d.area)} м²${d.terrace ? ` + ${d.terrace_type === 'closed' ? 'закрытая' : 'открытая'} терраса ${area(d.terrace)} м²` : ''} · спален: ${d.beds} · санузлов: ${d.baths} · этажей в схеме: ${d.plan.length}`, tags: [d.on_home && ['gold', 'на главной'], !d.name_ky || !d.text_ky ? ['warn', 'нет перевода'] : null] }),
     cases: d => ({ img: d.image, title: d.title, meta: `${d.region} · ${d.area} · ${d.term}` + (d.project ? ` · проект: ${CAT.projects.find(p => p.id === d.project)?.data.name || '—'}` : ''), tags: [!d.title_ky || !d.story_ky ? ['warn', 'нет перевода'] : null] }),
+    extras: d => ({ img: d.image, title: d.name, meta: `${d.lead} · примеров работ: ${d.works.length}`, tags: [!d.name_ky || !d.text_ky ? ['warn', 'нет перевода'] : null] }),
     faq: d => ({ title: d.q, meta: d.a.length > 140 ? d.a.slice(0, 140) + '…' : d.a, tags: [!d.q_ky || !d.a_ky ? ['warn', 'нет перевода'] : null] }),
   };
   function renderCat(kind) {
@@ -702,19 +709,52 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
       plan: [{ name: '1 этаж', name_ky: '1-кабат', w: 10, h: 8, void: null, image: null, rooms: [{ x: 0, y: 0, w: 6, h: 8, name: 'Кухня-гостиная', name_ky: 'Ашкана-конок бөлмө' }] }] }),
     cases: () => ({ image: null, region: '', region_ky: '', title: '', title_ky: '', area: '', term: '', term_ky: '', season: '', season_ky: '', story: '', story_ky: '', project: null }),
     faq: () => ({ q: '', q_ky: '', a: '', a_ky: '' }),
+    extras: () => ({ slug: '', name: '', name_ky: '', lead: '', lead_ky: '', text: '', text_ky: '', points: '', points_ky: '', image: null, works: [] }),
   };
-  const TITLES = { projects: ['Новый проект', 'Проект'], cases: ['Новый кейс', 'Кейс'], faq: ['Новый вопрос', 'Вопрос'] };
+  const TITLES = { projects: ['Новый проект', 'Проект'], cases: ['Новый кейс', 'Кейс'], faq: ['Новый вопрос', 'Вопрос'], extras: ['Новое направление', 'Направление'] };
 
   function openCat(kind, item) {
     ceKind = kind; ceItem = item; draft = structuredClone(item ? item.data : BLANK[kind]());
     const head = el('div', { className: 'ce-head' }, el('h1', { id: 'ce-title', textContent: item ? `${TITLES[kind][1]}: ${ROW[kind](item.data).title}` : TITLES[kind][0] }));
     const x = el('button', { type: 'button', className: 'ce-close', textContent: '×', 'aria-label': 'Закрыть' }); x.addEventListener('click', () => ce.close()); head.append(x);
     const err = el('div', { className: 'ce-err', id: 'ce-err', hidden: true });
-    const body = { projects: projectForm, cases: caseForm, faq: faqForm }[kind]();
+    const body = { projects: projectForm, cases: caseForm, faq: faqForm, extras: extraForm }[kind]();
     const del = el('button', { type: 'button', className: 'btn sm danger', textContent: 'Удалить', hidden: !item }); del.addEventListener('click', deleteCat);
     const cancel = el('button', { type: 'button', className: 'btn sm', textContent: 'Отмена' }); cancel.addEventListener('click', () => ce.close());
     ceForm.replaceChildren(head, ...body, err, el('div', { className: 'ce-foot' }, del, el('div', {}, cancel, el('button', { type: 'submit', className: 'btn sm gold', textContent: 'Сохранить' }))));
     ce.showModal(); ce.scrollTop = 0;
+  }
+
+  function extraForm() {
+    const slug = inp('slug', { max: 40, ph: 'например bani' });
+    let slugTouched = !!draft.slug;
+    slug.addEventListener('input', () => { slugTouched = true; });
+    const worksBox = el('div', { className: 'cat-list' });
+    const renderWorks = () => worksBox.replaceChildren(...draft.works.map((w, i) => {
+      const rm = el('button', { type: 'button', className: 'btn sm danger', textContent: 'Удалить пример' }); rm.addEventListener('click', () => { draft.works.splice(i, 1); renderWorks(); });
+      const mv = (dir, t) => { const b = el('button', { type: 'button', className: 'btn sm', textContent: t, disabled: i + dir < 0 || i + dir >= draft.works.length }); b.addEventListener('click', () => { [draft.works[i], draft.works[i + dir]] = [draft.works[i + dir], draft.works[i]]; renderWorks(); }); return b; };
+      return el('div', { className: 'floor', style: 'grid-template-columns:1fr' }, el('div', { className: 'ce-grid' },
+        photoField(`Пример ${i + 1}: фото`, w, 'image', 'gallery'),
+        el('div', { className: 'fld s4' }, el('label', { textContent: 'Подпись' }), el('div', { className: 'pair' }, el('div', {}, el('span', { textContent: 'РУС' }), inp('title', { obj: w, max: 60, ph: 'Баня 6×4 у реки' })), el('div', {}, el('span', { textContent: 'КЫР' }), inp('title_ky', { obj: w, max: 60, ky: true, ph: 'пусто — как по-русски' })))),
+        el('div', { className: 'fld s4' }, el('label', { textContent: 'Детали (необязательно)' }), el('div', { className: 'pair' }, el('div', {}, el('span', { textContent: 'РУС' }), inp('note', { obj: w, max: 60, ph: 'Иссык-Куль, 2025' })), el('div', {}, el('span', { textContent: 'КЫР' }), inp('note_ky', { obj: w, max: 60, ky: true })))),
+        el('div', { className: 's4', style: 'display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap' }, el('div', { style: 'display:flex;gap:6px' }, mv(-1, '↑'), mv(1, '↓')), rm)));
+    }));
+    renderWorks();
+    const addWork = el('button', { type: 'button', className: 'btn sm', textContent: '+ Пример работы' });
+    addWork.addEventListener('click', () => { if (draft.works.length >= 12) return toast('Не больше 12 примеров', true); draft.works.push({ image: null, title: '', title_ky: '', note: '', note_ky: '' }); renderWorks(); });
+    const name = inp('name', { max: 60, onChange: v => { if (!slugTouched) { draft.slug = slugify(v); slug.value = draft.slug; } } });
+    return [
+      el('div', { className: 'ce-grid' },
+        photoField('Обложка (карточка на главной и большое фото на странице)', draft, 'image', 'gallery'),
+        el('div', { className: 'fld s2' }, el('label', { textContent: 'Название' }),
+          el('div', { className: 'pair' }, el('div', {}, el('span', { textContent: 'РУС' }), name), el('div', {}, el('span', { textContent: 'КЫР' }), inp('name_ky', { max: 60, ky: true, ph: 'пусто — как по-русски' })))),
+        fld('Адрес на странице: /extras/#…', slug, 's2'),
+        pair('Коротко — для карточки на главной', 'lead', { max: 160 }),
+        pair('Описание', 'text', { max: 800, area: true }),
+        pair('Что делаем — каждый пункт с новой строки', 'points', { max: 800, area: true })),
+      el('div', { className: 'ce-sec' }, el('h2', {}, 'Примеры работ', addWork),
+        el('p', { className: 'muted', textContent: 'Фото с подписью под описанием направления. Можно не добавлять — тогда блока примеров не будет.' }), worksBox),
+    ];
   }
 
   function faqForm() {

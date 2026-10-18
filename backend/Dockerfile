@@ -7,6 +7,7 @@ COPY index-stone.html ./
 COPY technology/ technology/
 COPY map/ map/
 COPY projects/ projects/
+COPY extras/ extras/
 COPY i18n/ i18n/
 COPY scripts/build-ky.mjs scripts/
 RUN node scripts/build-ky.mjs
@@ -30,6 +31,7 @@ COPY index-stone.html ./site/index.html
 COPY technology/ ./site/technology/
 COPY map/ ./site/map/
 COPY projects/ ./site/projects/
+COPY extras/ ./site/extras/
 COPY --from=ky /src/ky/ ./site/ky/
 # uploads volume mounts here; the directory owner carries over to a new named volume
 RUN mkdir -p /data/uploads && chown node:node /data/uploads

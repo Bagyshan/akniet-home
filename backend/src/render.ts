@@ -12,7 +12,7 @@ import { listPointsFor } from './points.js';
 import { readSlotsFor, type Lang } from './slots.js';
 
 // '' is the home page; the others live in their own folder: /map/ → map/index.html
-export const PAGES = ['', 'technology', 'map', 'projects'] as const;
+export const PAGES = ['', 'technology', 'map', 'projects', 'extras'] as const;
 export type Page = (typeof PAGES)[number];
 export const isPage = (v: unknown): v is Page => PAGES.includes(v as Page);
 const pagePath = (page: Page, lang: Lang) => (lang === 'ky' ? '/ky/' : '/') + (page ? page + '/' : '');
@@ -37,6 +37,7 @@ type Slot = Record<string, string> | null;
 type Content = Record<string, any> & {
   materials: Slot[]; gallery: Slot[]; points: { name: string; houses: number; area: number; lat: number; lon: number }[];
   projects: PageProject[]; cases: PageCase[]; faq: { q: string; a: string }[];
+  extras: { slug: string; name: string; lead: string; text: string; image: string | null; points: string[]; works: { image: string | null; title: string; note: string }[] }[];
 };
 
 /* ---- the same helpers as the page script ---- */
@@ -328,6 +329,27 @@ function renderCatalog(document: any, lang: Lang, c: Content, T: any, price: num
     const dd = card.querySelectorAll('.case-facts dd');
     [k.area, k.term, k.season].forEach((v, i) => dd[i] && (dd[i].textContent = v));
     setText(card, '.body > p', k.story);
+  });
+
+  // extras: cards on the home page, sections and their links on /extras/
+  const homeExtras = $('[data-list="home-extras"]');
+  if (homeExtras && !c.extras.length) homeExtras.closest('section')?.remove();
+  else fillList(homeExtras, c.extras, (card, x) => {
+    card.setAttribute('href', 'extras/#' + x.slug);
+    setImage(card, 'img', x.image, x.name);
+    setText(card, 'h3', x.name); setText(card, 'p', x.lead);
+  });
+  fillList($('[data-list="extras-links"]'), c.extras, (a, x) => { a.setAttribute('href', '#' + x.slug); a.textContent = x.name; });
+  fillList($('[data-list="extras"]'), c.extras, (sec, x) => {
+    sec.setAttribute('id', x.slug);
+    setImage(sec, '.ex-cover img', x.image, x.name);
+    setText(sec, 'h2', x.name); setText(sec, '.ex-text', x.text);
+    const ul = sec.querySelector('.ex-points');
+    if (x.points.length) ul.innerHTML = x.points.map(p => `<li>${esc(p)}</li>`).join(''); else ul.remove();
+    sec.querySelector('[data-lead]')?.setAttribute('data-lead', JSON.stringify({ type: 'Нужен совет', project: x.name }));
+    const works = sec.querySelector('.ex-works');
+    if (!x.works.length) works.remove();
+    else fillList(works, x.works, (w, it) => { setImage(w, 'img', it.image, it.title); setText(w, 'b', it.title); setText(w, 'span', it.note); });
   });
 
   // FAQ

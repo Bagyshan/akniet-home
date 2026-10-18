@@ -1,9 +1,10 @@
 import { pool } from './db.js';
 import type { Lang } from './slots.js';
 
-// Projects (/projects/ and the short cards on the home page), cases (built houses) and FAQ, edited in the admin panel.
+// Projects (/projects/ and the short cards on the home page), cases (built houses), FAQ and extras (saunas, gazebos… on /extras/),
+// edited in the admin panel.
 // Every text has a Kyrgyz twin "<field>_ky"; the page gets one text in its language (Russian while there is no translation).
-export const KINDS = ['projects', 'cases', 'faq'] as const;
+export const KINDS = ['projects', 'cases', 'faq', 'extras'] as const;
 export type Kind = (typeof KINDS)[number];
 export const isKind = (k: unknown): k is Kind => KINDS.includes(k as Kind);
 
@@ -23,6 +24,12 @@ export type Case = {
 };
 // {price} {terrace_open_price} {terrace_closed_price} {months} {months_min} {warranty} in an answer become the values from the admin «Основное» tab
 export type Faq = { q: string; q_ky: string | null; a: string; a_ky: string | null };
+// An extra kind of building: card on the home page (name, lead), section on /extras/ (text, points — one per line, works)
+export type Work = { image: string | null; title: string; title_ky: string | null; note: string; note_ky: string | null };
+export type Extra = {
+  slug: string; name: string; name_ky: string | null; lead: string; lead_ky: string | null; text: string; text_ky: string | null;
+  points: string; points_ky: string | null; image: string | null; works: Work[];
+};
 type Item<T> = { id: number; position: number; data: T };
 
 // Photos uploaded through the admin panel, plus the stock demo photos the site started with
@@ -130,18 +137,40 @@ export function cleanFaq(b: Record<string, unknown>): [Faq, string[]] {
 }
 export const FAQ_TOKENS = ['{price}', '{terrace_open_price}', '{terrace_closed_price}', '{months}', '{months_min}', '{warranty}'];
 
-export const clean = (kind: Kind, b: Record<string, unknown>): [Project | Case | Faq, string[]] =>
-  kind === 'projects' ? cleanProject(b) : kind === 'cases' ? cleanCase(b) : cleanFaq(b);
+export function cleanExtra(b: Record<string, unknown>): [Extra, string[]] {
+  const c = new Check(b);
+  const slug = c.text('slug', 'Адрес на странице', 40);
+  if (slug && !SLUG_RE.test(slug)) c.errors.push('Адрес на странице: латинские буквы, цифры и дефис, например bani');
+  const x: Extra = {
+    slug, name: c.text('name', 'Название', 60), name_ky: c.ky('name_ky', 'Название', 60),
+    lead: c.text('lead', 'Коротко (для главной)', 160), lead_ky: c.ky('lead_ky', 'Коротко (для главной)', 160),
+    text: c.text('text', 'Описание', 800), text_ky: c.ky('text_ky', 'Описание', 800),
+    points: c.text('points', 'Что делаем', 800, false), points_ky: c.ky('points_ky', 'Что делаем', 800),
+    image: c.image('image', 'Обложка'), works: [],
+  };
+  const works = Array.isArray(b.works) ? b.works : [];
+  if (works.length > 12) c.errors.push('Примеры работ: не больше 12');
+  works.slice(0, 12).forEach((w, i) => {
+    const wc = new Check(w && typeof w === 'object' ? w : {}), at = `Пример ${i + 1}`;
+    x.works.push({ image: wc.image('image', `${at}: фото`), title: wc.text('title', `${at}: подпись`, 60), title_ky: wc.ky('title_ky', `${at}: подпись`, 60), note: wc.text('note', `${at}: детали`, 60, false), note_ky: wc.ky('note_ky', `${at}: детали`, 60) });
+    if (!x.works[i].image) wc.errors.push(`${at}: загрузите фото`);
+    c.errors.push(...wc.errors);
+  });
+  return [x, c.errors];
+}
+
+export const clean = (kind: Kind, b: Record<string, unknown>): [Project | Case | Faq | Extra, string[]] =>
+  kind === 'projects' ? cleanProject(b) : kind === 'cases' ? cleanCase(b) : kind === 'extras' ? cleanExtra(b) : cleanFaq(b);
 
 /* ---- storage ---- */
-export async function listItems<T = Project | Case | Faq>(kind: Kind): Promise<Item<T>[]> {
+export async function listItems<T = Project | Case | Faq | Extra>(kind: Kind): Promise<Item<T>[]> {
   return (await pool.query<Item<T>>(`SELECT id, position, data FROM ${kind} ORDER BY position, id`)).rows;
 }
 
-export async function saveItem(kind: Kind, data: Project | Case | Faq, user: string, id?: number) {
-  if (kind === 'projects') {
-    const { rows } = await pool.query(`SELECT id FROM projects WHERE data->>'slug' = $1 AND id <> $2`, [(data as Project).slug, id ?? 0]);
-    if (rows.length) return { error: 'Адрес на странице уже занят другим проектом' };
+export async function saveItem(kind: Kind, data: Project | Case | Faq | Extra, user: string, id?: number) {
+  if (kind === 'projects' || kind === 'extras') {
+    const { rows } = await pool.query(`SELECT id FROM ${kind} WHERE data->>'slug' = $1 AND id <> $2`, [(data as Project | Extra).slug, id ?? 0]);
+    if (rows.length) return { error: 'Адрес на странице уже занят' };
   }
   const { rows } = id
     ? await pool.query<{ id: number }>(`UPDATE ${kind} SET data = $1, updated_at = now(), updated_by = $2 WHERE id = $3 RETURNING id`, [data, user, id])
@@ -173,7 +202,7 @@ export type PageProject = Omit<Project, `${string}_ky` | 'plan'> & { id: number;
 export type PageCase = Omit<Case, `${string}_ky` | 'project'> & { project: { slug: string; name: string; style: Project['style'] } | null };
 
 export async function readCatalogFor(lang: Lang) {
-  const [projects, cases, faq] = await Promise.all([listItems<Project>('projects'), listItems<Case>('cases'), listItems<Faq>('faq')]);
+  const [projects, cases, faq, extras] = await Promise.all([listItems<Project>('projects'), listItems<Case>('cases'), listItems<Faq>('faq'), listItems<Extra>('extras')]);
   const ps: PageProject[] = projects.map(({ id, data: d }) => ({
     id, slug: d.slug, style: d.style, name: pick(d, 'name', lang), area: d.area, terrace: d.terrace || 0, terrace_type: d.terrace_type === 'closed' ? 'closed' : 'open', beds: d.beds, baths: d.baths,
     floors: pick(d, 'floors', lang), text: pick(d, 'text', lang), price: d.price, image: d.image, on_home: d.on_home,
@@ -187,5 +216,12 @@ export async function readCatalogFor(lang: Lang) {
       season: pick(d, 'season', lang), story: pick(d, 'story', lang), project: p ? { slug: p.slug, name: p.name, style: p.style } : null,
     };
   });
-  return { projects: ps, cases: cs, faq: faq.map(({ data: d }) => ({ q: pick(d, 'q', lang) as string, a: pick(d, 'a', lang) as string })) };
+  return {
+    projects: ps, cases: cs, faq: faq.map(({ data: d }) => ({ q: pick(d, 'q', lang) as string, a: pick(d, 'a', lang) as string })),
+    extras: extras.map(({ data: d }) => ({
+      slug: d.slug, name: pick(d, 'name', lang) as string, lead: pick(d, 'lead', lang) as string, text: pick(d, 'text', lang) as string, image: d.image,
+      points: (pick(d, 'points', lang) || '').split('\n').map((s: string) => s.trim()).filter(Boolean) as string[],
+      works: d.works.map(w => ({ image: w.image, title: pick(w, 'title', lang) as string, note: pick(w, 'note', lang) as string })),
+    })),
+  };
 }

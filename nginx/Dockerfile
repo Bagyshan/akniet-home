@@ -7,6 +7,7 @@ COPY index-stone.html ./
 COPY technology/ technology/
 COPY map/ map/
 COPY projects/ projects/
+COPY extras/ extras/
 COPY i18n/ i18n/
 COPY scripts/build-ky.mjs scripts/
 RUN node scripts/build-ky.mjs
@@ -23,6 +24,7 @@ COPY index-stone.html /usr/share/nginx/html/index.html
 COPY technology/ /usr/share/nginx/html/technology/
 COPY map/ /usr/share/nginx/html/map/
 COPY projects/ /usr/share/nginx/html/projects/
+COPY extras/ /usr/share/nginx/html/extras/
 COPY --from=ky /src/ky/ /usr/share/nginx/html/ky/
 COPY site.css /usr/share/nginx/html/
 COPY assets/site.js assets/logo3d.js assets/plan.js /usr/share/nginx/html/assets/

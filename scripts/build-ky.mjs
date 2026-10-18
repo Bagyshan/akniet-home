@@ -18,7 +18,7 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const arg = new Set(process.argv.slice(2));
 // [Russian source, address of the page] — the Kyrgyz page lives at /ky/<address>
-const PAGES = [['index-stone.html', ''], ['technology/index.html', 'technology/'], ['map/index.html', 'map/'], ['projects/index.html', 'projects/']];
+const PAGES = [['index-stone.html', ''], ['technology/index.html', 'technology/'], ['map/index.html', 'map/'], ['projects/index.html', 'projects/'], ['extras/index.html', 'extras/']];
 const dict = JSON.parse(readFileSync(path.join(root, 'i18n/ky.json'), 'utf8'));
 
 const norm = s => s.replace(/\s+/g, ' ').trim();
