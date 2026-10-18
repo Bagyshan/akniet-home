@@ -34,9 +34,9 @@
     <a href="projects/">Долбоорлор</a>
     <a href="technology/">Технологиялар</a>
     <a href="extras/">Курулуштар</a>
+    <a href="invest/">Ижарага</a>
     <a href="map/">Объекттер картасы</a>
     <a href="#price">Баалар</a>
-    <a href="#faq">Суроолор</a>
   </nav>
   <div style="display:flex;gap:8px;align-items:center">
     <div class="lang" role="group" aria-label="Сайттын тили"><a href="../"  hreflang="ru" lang="ru" data-lang-link="ru">РУС</a><a href="./"  hreflang="ky" lang="ky" data-lang-link="ky" aria-current="true">КЫР</a></div>
@@ -49,6 +49,7 @@
   <a href="projects/">Долбоорлор жана кейстер <span>→</span></a>
   <a href="technology/">Технологиялар <span>→</span></a>
   <a href="extras/">Мончо, беседка, аянтчалар <span>→</span></a>
+  <a href="invest/">Ижара үчүн үй <span>→</span></a>
   <a href="map/">Объекттер картасы <span>→</span></a>
   <a href="#price">Баалар жана эсептөө <span>→</span></a>
   <a href="#faq">Суроолор <span>→</span></a>
@@ -164,6 +165,16 @@
     <div class="proj-more rv">
       <span class="proj-notes"><span class="proj-note">Баа болжолдуу: 1 м² үчүн $<span data-cms="price_m2">440</span> баада эсептелген</span><span class="proj-note" data-needs="terrace_open">Ачык терраса: 1 м² үчүн $<span data-cms="price_terrace_open_m2">300</span></span><span class="proj-note" data-needs="terrace_closed">Жабык терраса: 1 м² үчүн $<span data-cms="price_terrace_closed_m2">350</span></span></span>
       <span class="proj-btns"><button type="button" class="btn ghost" data-quiz>Долбоор тандоо</button><a href="projects/" class="btn ghost">Бардык долбоорлор жана кейстер <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></a></span>
+    </div>
+    <div class="card gold c-catalog rv">
+      <div class="cat-copy"><span class="eyebrow">Долбоорлор каталогу</span><h3>Пландары жана баалары менен бардык долбоорлор — WhatsApp'ка</h3><p>Номериңизди калтырыңыз — каталогду иш күнү ичинде жөнөтөбүз. Үй-бүлөгө көрсөтүп, шашпай салыштырууга ыңгайлуу.</p></div>
+      <form class="cat-form" novalidate>
+        <div class="fld"><input name="name" placeholder=" " autocomplete="name" aria-label="Атыңыз"><label>Атыңыз</label><span class="err">Атыңызды жазыңыз</span></div>
+        <div class="fld"><input name="phone" type="tel" inputmode="tel" placeholder=" " autocomplete="tel" aria-label="WhatsApp номери"><label>WhatsApp номери</label><span class="err">Номерди толук жазыңыз, мисалы +996 500 20 84 87</span></div>
+        <button class="btn ink" type="submit">Каталогду алуу <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <p class="form-err" role="alert" hidden>Жөнөтүлгөн жок. Бизге WhatsApp'ка жазыңыз: <a data-contact="whatsapp" href="https://wa.me/996500208487" target="_blank" rel="noopener">+996 500 20 84 87</a></p>
+        <p class="cat-sent" role="status" hidden><b>Рахмат!</b> Каталогду иш күнү ичинде WhatsApp'ка жөнөтөбүз.</p>
+      </form>
     </div>
   </div>
 </section>
@@ -343,19 +354,22 @@
   </div>
 </section>
 
-<!-- ============ GALLERY ============ -->
-<section class="gallery" aria-label="Галерея">
-  <div class="wrap"><div class="sec-title"><h2 class="rv"><span>Биздин үйлөр</span> кандай көрүнөт</h2><p class="rv">Курулуштардын көбүрөөк сүрөт жана видеолору — биздин <a data-contact="instagram" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener" style="text-decoration:underline">Instagram</a> баракчабызда.</p></div></div>
-  <div class="rail" id="rail-a">
-    <figure class="shot" data-slot="1" style="margin:0" data-cursor="view"><img src="https://images.pexels.com/photos/9209878/pexels-photo-9209878.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Карагай токоюндагы A-frame" loading="lazy"><span class="chip">A-frame «Карагай»</span></figure>
-    <figure class="shot tall" data-slot="2" style="margin:0" data-cursor="view"><img src="https://images.pexels.com/photos/19737838/pexels-photo-19737838.jpeg?auto=compress&cs=tinysrgb&w=600" alt="A-frame интерьери" loading="lazy"><span class="chip">Кырдын астындагы терезе</span></figure>
-    <div class="shot tex" style="--c:#3e3a40;--w:url(../assets/stone/stacked-slate.webp);--sz:cover"><b><span style="color:var(--gold)">Очок</span><br>жанындагы таш</b></div>
-    <figure class="shot" data-slot="3" style="margin:0" data-cursor="view"><img src="https://images.pexels.com/photos/4626268/pexels-photo-4626268.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Күүгүмдөгү барнхаус" loading="lazy"><span class="chip">«Жайлоо» барнхаусу</span></figure>
-    <figure class="shot tall" data-slot="4" style="margin:0" data-cursor="view"><img src="https://images.pexels.com/photos/19737839/pexels-photo-19737839.jpeg?auto=compress&cs=tinysrgb&w=600" alt="A-frameдеги уктоочу бөлмө" loading="lazy"><span class="chip">Көрүнүшү бар уктоочу бөлмө</span></figure>
-    <div class="shot tex" style="--c:#c9a27a;--w:url(../assets/wood/parquet.webp);--sz:cover;color:#2a1a10;text-shadow:0 1px 12px rgba(255,236,205,.7)"><b>Табигый<br>жыгач</b></div>
-    <figure class="shot" data-slot="5" style="margin:0" data-cursor="view"><img src="https://images.pexels.com/photos/8112922/pexels-photo-8112922.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Меши бар интерьер" loading="lazy"><span class="chip">Меш жанындагы кеч</span></figure>
-    <div class="shot tex" style="--c:#d5a039;--w:none;background:linear-gradient(150deg,#e2b04d,#b8862a);color:var(--ink)"><b>Ар бир үй —<br>Instagram'да</b></div>
-    <figure class="shot" data-slot="6" style="margin:0" data-cursor="view"><img src="https://images.pexels.com/photos/19737830/pexels-photo-19737830.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Тоолордун фонундагы A-frame" loading="lazy"><span class="chip">A-frame «Тау»</span></figure>
+<!-- ============ INVEST (short; details on /invest/) ============ -->
+<section id="invest">
+  <div class="wrap bento" style="margin-top:clamp(40px,5vw,80px)">
+    <div class="card walnut c-invest rv">
+      <div><span class="eyebrow">Инвесторлорго</span><h2><span>Күнүмдүк ижара</span> үчүн үй</h2><p>Конок үйлөрүн, глэмпингдерди жана эс алуу базаларын курабыз. Үй канча суткалык ижарада өзүн актай турганын эсептеп, долбоор тандаңыз.</p></div>
+      <div class="btns"><a href="#price" class="btn gold" data-rent>Өзүн актоону эсептөө <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></a><a href="invest/" class="btn ghost">Инвесторлор үчүн толугураак</a></div>
+    </div>
+    <div class="card gold c-invest-pts rv">
+      <span class="eyebrow">Ижара үчүн эмне маанилүү</span>
+      <ul>
+        <li><b>Салым алдын ала белгилүү</b><span>Баа келишимде бекитилет</span></li>
+        <li><b>Орточо <span data-cms="build_months_avg" data-unit="айда,айда,айда">2 айда</span> ишке киргизүү</b><span>Жыл бою курабыз — сезонго үлгүрөсүз</span></li>
+        <li><b>Этап боюнча төлөм</b><span>Бардык сумманы бир эле учурда берүүнүн кереги жок</span></li>
+        <li><b>Бир жер тилкесинде бир нече үй</b><span>Эс алуу базасы же глэмпинг үчүн</span></li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -430,7 +444,7 @@
     <div class="card graphite">
       <div class="foot-top">
         <p style="font-family:var(--f-head);font-weight:300;font-size:clamp(22px,2.2vw,32px);line-height:1.25;max-width:20ch"><span style="color:var(--gold)">Ачкычка чейин</span> барнхаус жана A&#8209;frame үйлөр</p>
-        <div><h3>Навигация</h3><ul><li><a href="projects/">Долбоорлор жана кейстер</a></li><li><a href="technology/">Технологиялар</a></li><li><a href="extras/">Курулуштар</a></li><li><a href="map/">Объекттер картасы</a></li><li><a href="#price">Баалар</a></li><li><a href="#faq">Суроолор</a></li></ul></div>
+        <div><h3>Навигация</h3><ul><li><a href="projects/">Долбоорлор жана кейстер</a></li><li><a href="technology/">Технологиялар</a></li><li><a href="extras/">Курулуштар</a></li><li><a href="invest/">Ижарага</a></li><li><a href="map/">Объекттер картасы</a></li><li><a href="#price">Баалар</a></li><li><a href="#faq">Суроолор</a></li></ul></div>
         <div><h3>Соцтармактар</h3><ul><li><a data-contact="instagram" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener">Instagram</a></li><li><a data-contact="tiktok" href="https://www.tiktok.com/@akniet_home" target="_blank" rel="noopener">TikTok</a></li><li><a data-contact="threads" href="https://www.threads.net/@akniet.home" target="_blank" rel="noopener">Threads</a></li></ul></div>
         <div><h3>Байланыш</h3><ul><li><a data-contact="phone" href="tel:+996500208487">+996 500 20 84 87</a></li><li><a data-contact="whatsapp" href="https://wa.me/996500208487" target="_blank" rel="noopener">WhatsApp</a> · <a data-contact="telegram" href="https://t.me/+996500208487" target="_blank" rel="noopener">Telegram</a></li><li><a data-contact="email" href="mailto:akniethome305@gmail.com">akniethome305@gmail.com</a></li></ul></div>
         <div><h3>Кеңсе</h3><address class="office"><span data-cms="address">Бишкек ш., Осмонкул көч., 113</span><span data-cms="hours">Дш–Иш, 10:00–20:00</span><a data-contact="route" href="https://2gis.kg/bishkek/directions/points/%7C74.624823%2C42.883309" target="_blank" rel="noopener" class="route">2ГИСте маршрут куруу ↗</a></address></div>
@@ -697,6 +711,11 @@ window.aknietTex = (() => {
   "sentChip": "Өтүнмө кабыл алынды",
   "sentTitle": "Рахмат! Тандоо менеджерде",
   "sentText": "Иш күнү ичинде байланышып, пландарды жөнөтөбүз жана так сметаны эсептейбиз."
+ },
+ "invest": {
+  "nights": "түн,түн,түн",
+  "years": "жыл,жыл,жыл",
+  "days": "сутка,сутка,сутка"
  }
 }</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>

@@ -6,13 +6,15 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { parseHTML } from 'linkedom';
 import { config } from './config.js';
-import { readCatalogFor, type PageCase, type PageProject } from './catalog.js';
+import { readCatalogFor, type PageCase, type PageProject, type PageRental } from './catalog.js';
 import { readContent } from './content.js';
 import { listPointsFor } from './points.js';
 import { readSlotsFor, type Lang } from './slots.js';
 
 // '' is the home page; the others live in their own folder: /map/ → map/index.html
-export const PAGES = ['', 'technology', 'map', 'projects', 'extras'] as const;
+export const PAGES = ['', 'technology', 'map', 'projects', 'extras', 'invest', 'catalog'] as const;
+// the catalog is a document for sending to clients (print / PDF): it repeats /projects/, so search engines skip it
+const NOINDEX: readonly Page[] = ['catalog'];
 export type Page = (typeof PAGES)[number];
 export const isPage = (v: unknown): v is Page => PAGES.includes(v as Page);
 const pagePath = (page: Page, lang: Lang) => (lang === 'ky' ? '/ky/' : '/') + (page ? page + '/' : '');
@@ -36,7 +38,7 @@ export async function renderPage(lang: Lang, page: Page = ''): Promise<string> {
 type Slot = Record<string, string> | null;
 type Content = Record<string, any> & {
   materials: Slot[]; gallery: Slot[]; points: { name: string; houses: number; area: number; lat: number; lon: number }[];
-  projects: PageProject[]; cases: PageCase[]; faq: { q: string; a: string }[];
+  projects: PageProject[]; cases: PageCase[]; rentals: PageRental[]; faq: { q: string; a: string }[];
   extras: { slug: string; name: string; lead: string; text: string; image: string | null; points: string[]; works: { image: string | null; title: string; note: string }[] }[];
 };
 
@@ -89,11 +91,11 @@ function build(template: string, lang: Lang, page: Page, c: Content): string {
   const deck = (m2: number, type?: string) => m2 * (type === 'closed' ? terracePrice.closed : terracePrice.open);
 
   /* ---- projects, cases, FAQ from the admin panel: the first card in each list is the template ---- */
-  renderCatalog(document, lang, c, T, price, terracePrice);
+  renderCatalog(document, lang, page, c, T, price, terracePrice);
   // blocks about the terrace stay hidden until a terrace price is set in the admin panel; the same for each kind
   // and for the company figures (years on the market, houses built) while they are empty
   const needs: Record<string, boolean> = { terrace: !!(terracePrice.open || terracePrice.closed), terrace_open: !!terracePrice.open, terrace_closed: !!terracePrice.closed,
-    houses_built: +c.houses_built > 0, years_on_market: +c.years_on_market > 0 };
+    houses_built: +c.houses_built > 0, years_on_market: +c.years_on_market > 0, rentals: c.rentals.length > 0 };
   for (const e of $$('[data-needs]')) needs[e.dataset.needs] ? e.removeAttribute('hidden') : e.setAttribute('hidden', '');
 
   /* ---- content ---- */
@@ -169,7 +171,7 @@ function build(template: string, lang: Lang, page: Page, c: Content): string {
   link({ rel: 'alternate', hreflang: 'ru', href: site + pagePath(page, 'ru') });
   link({ rel: 'alternate', hreflang: 'ky', href: site + pagePath(page, 'ky') });
   link({ rel: 'alternate', hreflang: 'x-default', href: site + pagePath(page, 'ru') });
-  meta({ name: 'robots', content: 'index, follow, max-image-preview:large' });
+  meta({ name: 'robots', content: NOINDEX.includes(page) ? 'noindex, follow' : 'index, follow, max-image-preview:large' });
   meta({ property: 'og:type', content: 'website' });
   meta({ property: 'og:site_name', content: T.seo.siteName });
   meta({ property: 'og:title', content: title });
@@ -257,7 +259,7 @@ const FAQ_UNITS: Record<Lang, Record<string, [string, string]>> = {
 const esc = (s: string) => s.replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch]!);
 const area = (v: number) => (Math.round(v * 10) / 10).toLocaleString('ru-RU');
 
-function renderCatalog(document: any, lang: Lang, c: Content, T: any, price: number, terracePrice: { open: number; closed: number }) {
+function renderCatalog(document: any, lang: Lang, page: Page, c: Content, T: any, price: number, terracePrice: { open: number; closed: number }) {
   const $ = (s: string): any => document.querySelector(s);
   const styleName = (p: { style: string }) => (p.style === 'af' ? 'A-frame' : 'Барнхаус'); // the form's radio values
   const styleLabel = (p: { style: string }) => T.words[styleName(p)] || styleName(p);
@@ -286,16 +288,64 @@ function renderCatalog(document: any, lang: Lang, c: Content, T: any, price: num
     list.replaceChildren(...cards);
   };
 
-  // home page: short cards of the projects marked «на главной»
-  const home = $('[data-list="home-projects"]');
-  const onHome = c.projects.filter(p => p.on_home);
-  if (home && !onHome.length) home.closest('section')?.remove();
-  else fillList(home, onHome, (card, p) => {
-    card.setAttribute('href', 'projects/#' + p.slug);
+  // short cards: on the home page the projects marked «на главной», on /invest/ all of them
+  const up = page ? '../' : '';
+  const shortCard = (card: any, p: PageProject) => {
+    card.setAttribute('href', up + 'projects/#' + p.slug);
     setImage(card, 'img', p.image, `${styleLabel(p)} «${p.name}»`);
     setText(card, '.pimg .chip', styleLabel(p));
     setText(card, 'h3', `«${p.name}»`);
     setArea(card, p.area); setPrice(card, p);
+  };
+  const home = $('[data-list="home-projects"]');
+  const onHome = c.projects.filter(p => p.on_home);
+  if (home && !onHome.length) home.closest('section')?.remove();
+  else fillList(home, onHome, shortCard);
+  const rent = $('[data-list="rent-projects"]');
+  if (rent && !c.projects.length) rent.closest('section')?.remove();
+  else fillList(rent, c.projects, shortCard);
+
+  // catalog for clients (/catalog/): a page per project; the plans are drawn by the page script from #cms
+  const specs = (p: PageProject) => [`${p.area} ${T.m2}`, p.beds, p.baths, p.floors, p.terrace ? `${area(p.terrace)} ${T.m2}, ${T.terraceKind[p.terrace_type]}` : T.noTerrace];
+  const roomsHTML = (p: PageProject) => p.plan.map(f => (p.plan.length > 1 ? `<li class="fl">${esc(f.name)}</li>` : '')
+    + f.rooms.map(r => `<li><span>${esc(r.name)}</span><span>${area(r.w * r.h)} ${T.m2}</span></li>`).join('')).join('');
+  fillList($('[data-list="catalog"]'), c.projects, (card, p) => {
+    card.setAttribute('id', p.slug);
+    setImage(card, '.doc-img', p.image, `${styleLabel(p)} «${p.name}»`);
+    setText(card, '.chip', styleLabel(p));
+    setText(card, 'h2', `«${p.name}»`);
+    setPrice(card, p);
+    const dd = card.querySelectorAll('.doc-specs dd');
+    specs(p).forEach((v, i) => dd[i] && (dd[i].textContent = String(v)));
+    setText(card, '.doc-text', p.text);
+    const rooms = card.querySelector('.doc-rooms'); if (rooms) rooms.innerHTML = roomsHTML(p);
+    card.querySelector('[data-plans]')?.setAttribute('data-plans', p.slug);
+  });
+
+  // daily-rent examples (/invest/): the figures the admin gave, income and payback counted here
+  fillList($('[data-list="rentals"]'), c.rentals, (card, r) => {
+    setImage(card, '.pimg img', r.image, r.title);
+    setText(card, '.pimg .chip', r.place);
+    const eyebrow = card.querySelector('.eyebrow');
+    if (r.project) eyebrow.textContent = `${styleLabel(r.project)} «${r.project.name}»`; else eyebrow.remove();
+    setText(card, 'h3', r.title);
+    const I = T.invest, income = r.nights ? r.price_night * r.nights : 0;
+    const years = r.invest && income ? Math.round(r.invest / income * 10) / 10 : 0;
+    const nightsBack = r.invest ? Math.ceil(r.invest / r.price_night) : 0;
+    const facts: Record<string, string | null> = {
+      area: r.area ? `${area(r.area)} ${T.m2}` : null,
+      price: money(r.price_night),
+      nights: r.nights ? `${r.nights} ${plural(r.nights, I.nights)}` : null,
+      income: income ? money(income) : null,
+      invest: r.invest ? money(r.invest) : null,
+      payback: years ? `≈ ${numRu(years)} ${plural(years, I.years)}` : nightsBack ? `${nightsBack.toLocaleString('ru-RU')} ${plural(nightsBack, I.days)}` : null,
+    };
+    for (const [k, v] of Object.entries(facts)) {
+      const box = card.querySelector(`[data-f="${k}"]`); if (!box) continue;
+      if (v === null) box.remove(); else box.querySelector('dd').textContent = v;
+    }
+    const story = card.querySelector('.body > p');
+    if (r.story) story.textContent = r.story; else story.remove();
   });
 
   // projects page: detailed cards
@@ -404,7 +454,7 @@ export function sitemapXml(lastmod: Date) {
   };
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-${PAGES.flatMap(page => [url(page, 'ru'), url(page, 'ky')]).join('\n')}
+${PAGES.filter(page => !NOINDEX.includes(page)).flatMap(page => [url(page, 'ru'), url(page, 'ky')]).join('\n')}
 </urlset>
 `;
 }

@@ -8,6 +8,8 @@ COPY technology/ technology/
 COPY map/ map/
 COPY projects/ projects/
 COPY extras/ extras/
+COPY invest/ invest/
+COPY catalog/ catalog/
 COPY i18n/ i18n/
 COPY scripts/build-ky.mjs scripts/
 RUN node scripts/build-ky.mjs
@@ -25,6 +27,8 @@ COPY technology/ /usr/share/nginx/html/technology/
 COPY map/ /usr/share/nginx/html/map/
 COPY projects/ /usr/share/nginx/html/projects/
 COPY extras/ /usr/share/nginx/html/extras/
+COPY invest/ /usr/share/nginx/html/invest/
+COPY catalog/ /usr/share/nginx/html/catalog/
 COPY --from=ky /src/ky/ /usr/share/nginx/html/ky/
 COPY site.css /usr/share/nginx/html/
 COPY assets/site.js assets/logo3d.js assets/plan.js /usr/share/nginx/html/assets/

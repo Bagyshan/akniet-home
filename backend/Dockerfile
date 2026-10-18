@@ -8,6 +8,8 @@ COPY technology/ technology/
 COPY map/ map/
 COPY projects/ projects/
 COPY extras/ extras/
+COPY invest/ invest/
+COPY catalog/ catalog/
 COPY i18n/ i18n/
 COPY scripts/build-ky.mjs scripts/
 RUN node scripts/build-ky.mjs
@@ -32,6 +34,8 @@ COPY technology/ ./site/technology/
 COPY map/ ./site/map/
 COPY projects/ ./site/projects/
 COPY extras/ ./site/extras/
+COPY invest/ ./site/invest/
+COPY catalog/ ./site/catalog/
 COPY --from=ky /src/ky/ ./site/ky/
 # uploads volume mounts here; the directory owner carries over to a new named volume
 RUN mkdir -p /data/uploads && chown node:node /data/uploads

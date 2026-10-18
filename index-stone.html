@@ -33,9 +33,9 @@
     <a href="projects/">Проекты</a>
     <a href="technology/">Технологии</a>
     <a href="extras/">Постройки</a>
+    <a href="invest/">Под аренду</a>
     <a href="map/">Карта объектов</a>
     <a href="#price">Цены</a>
-    <a href="#faq">Вопросы</a>
   </nav>
   <div style="display:flex;gap:8px;align-items:center">
     <div class="lang" role="group" aria-label="Язык сайта"><a href="./" data-lang-link="ru" hreflang="ru" lang="ru" aria-current="true">РУС</a><a href="ky/" data-lang-link="ky" hreflang="ky" lang="ky">КЫР</a></div>
@@ -48,6 +48,7 @@
   <a href="projects/">Проекты и кейсы <span>→</span></a>
   <a href="technology/">Технологии <span>→</span></a>
   <a href="extras/">Бани, беседки, площадки <span>→</span></a>
+  <a href="invest/">Дом под аренду <span>→</span></a>
   <a href="map/">Карта объектов <span>→</span></a>
   <a href="#price">Цены и расчёт <span>→</span></a>
   <a href="#faq">Вопросы <span>→</span></a>
@@ -163,6 +164,16 @@
     <div class="proj-more rv">
       <span class="proj-notes"><span class="proj-note">Цена — ориентировочная, по ставке $<span data-cms="price_m2">440</span> за м²</span><span class="proj-note" data-needs="terrace_open">Открытая терраса — $<span data-cms="price_terrace_open_m2">300</span> за м²</span><span class="proj-note" data-needs="terrace_closed">Закрытая терраса — $<span data-cms="price_terrace_closed_m2">350</span> за м²</span></span>
       <span class="proj-btns"><button type="button" class="btn ghost" data-quiz>Подобрать проект</button><a href="projects/" class="btn ghost">Все проекты и кейсы <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></a></span>
+    </div>
+    <div class="card gold c-catalog rv">
+      <div class="cat-copy"><span class="eyebrow">Каталог проектов</span><h3>Все проекты с планировками и ценами — в WhatsApp</h3><p>Оставьте номер — пришлём каталог в течение рабочего дня. Удобно показать семье и сравнить спокойно.</p></div>
+      <form class="cat-form" novalidate>
+        <div class="fld"><input name="name" placeholder=" " autocomplete="name" aria-label="Ваше имя"><label>Ваше имя</label><span class="err">Укажите имя</span></div>
+        <div class="fld"><input name="phone" type="tel" inputmode="tel" placeholder=" " autocomplete="tel" aria-label="Номер WhatsApp"><label>Номер WhatsApp</label><span class="err">Введите номер полностью, например +996 500 20 84 87</span></div>
+        <button class="btn ink" type="submit">Получить каталог <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <p class="form-err" role="alert" hidden>Не получилось отправить. Напишите нам в WhatsApp: <a data-contact="whatsapp" href="https://wa.me/996500208487" target="_blank" rel="noopener">+996 500 20 84 87</a></p>
+        <p class="cat-sent" role="status" hidden><b>Спасибо!</b> Пришлём каталог в WhatsApp в течение рабочего дня.</p>
+      </form>
     </div>
   </div>
 </section>
@@ -342,19 +353,22 @@
   </div>
 </section>
 
-<!-- ============ GALLERY ============ -->
-<section class="gallery" aria-label="Галерея">
-  <div class="wrap"><div class="sec-title"><h2 class="rv">Как выглядят <span>наши дома</span></h2><p class="rv">Больше фото и видео со строек — в нашем <a data-contact="instagram" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener" style="text-decoration:underline">Instagram</a>.</p></div></div>
-  <div class="rail" id="rail-a">
-    <figure class="shot" data-slot="1" style="margin:0" data-cursor="view"><img src="https://images.pexels.com/photos/9209878/pexels-photo-9209878.jpeg?auto=compress&cs=tinysrgb&w=800" alt="A-frame в сосновом лесу" loading="lazy"><span class="chip">A-frame «Карагай»</span></figure>
-    <figure class="shot tall" data-slot="2" style="margin:0" data-cursor="view"><img src="https://images.pexels.com/photos/19737838/pexels-photo-19737838.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Интерьер A-frame" loading="lazy"><span class="chip">Окно под коньком</span></figure>
-    <div class="shot tex" style="--c:#3e3a40;--w:url(assets/stone/stacked-slate.webp);--sz:cover"><b>Камень<br>у <span style="color:var(--gold)">очага</span></b></div>
-    <figure class="shot" data-slot="3" style="margin:0" data-cursor="view"><img src="https://images.pexels.com/photos/4626268/pexels-photo-4626268.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Барнхаус в сумерках" loading="lazy"><span class="chip">Барнхаус «Жайлау»</span></figure>
-    <figure class="shot tall" data-slot="4" style="margin:0" data-cursor="view"><img src="https://images.pexels.com/photos/19737839/pexels-photo-19737839.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Спальня в A-frame" loading="lazy"><span class="chip">Спальня с видом</span></figure>
-    <div class="shot tex" style="--c:#c9a27a;--w:url(assets/wood/parquet.webp);--sz:cover;color:#2a1a10;text-shadow:0 1px 12px rgba(255,236,205,.7)"><b>Натуральное<br>дерево</b></div>
-    <figure class="shot" data-slot="5" style="margin:0" data-cursor="view"><img src="https://images.pexels.com/photos/8112922/pexels-photo-8112922.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Интерьер с печью" loading="lazy"><span class="chip">Вечер у печи</span></figure>
-    <div class="shot tex" style="--c:#d5a039;--w:none;background:linear-gradient(150deg,#e2b04d,#b8862a);color:var(--ink)"><b>Каждый дом —<br>в Instagram</b></div>
-    <figure class="shot" data-slot="6" style="margin:0" data-cursor="view"><img src="https://images.pexels.com/photos/19737830/pexels-photo-19737830.jpeg?auto=compress&cs=tinysrgb&w=800" alt="A-frame на фоне гор" loading="lazy"><span class="chip">A-frame «Тау»</span></figure>
+<!-- ============ INVEST (short; details on /invest/) ============ -->
+<section id="invest">
+  <div class="wrap bento" style="margin-top:clamp(40px,5vw,80px)">
+    <div class="card walnut c-invest rv">
+      <div><span class="eyebrow">Инвесторам</span><h2>Дом под посуточную <span>аренду</span></h2><p>Строим гостевые дома, глэмпинги и базы отдыха. Посчитайте, за сколько суток аренды окупится дом, и выберите проект.</p></div>
+      <div class="btns"><a href="#price" class="btn gold" data-rent>Рассчитать окупаемость <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></a><a href="invest/" class="btn ghost">Подробнее для инвесторов</a></div>
+    </div>
+    <div class="card gold c-invest-pts rv">
+      <span class="eyebrow">Что важно для аренды</span>
+      <ul>
+        <li><b>Вложения известны заранее</b><span>Цена фиксируется в договоре</span></li>
+        <li><b>Запуск в среднем за <span data-cms="build_months_avg" data-unit="месяц,месяца,месяцев">2 месяца</span></b><span>Строим круглый год — успеете к сезону</span></li>
+        <li><b>Оплата по этапам</b><span>Не нужно отдавать всю сумму сразу</span></li>
+        <li><b>Несколько домов на участке</b><span>Для базы отдыха или глэмпинга</span></li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -429,7 +443,7 @@
     <div class="card graphite">
       <div class="foot-top">
         <p style="font-family:var(--f-head);font-weight:300;font-size:clamp(22px,2.2vw,32px);line-height:1.25;max-width:20ch">Барнхаусы и A&#8209;frame дома <span style="color:var(--gold)">под ключ</span></p>
-        <div><h3>Навигация</h3><ul><li><a href="projects/">Проекты и кейсы</a></li><li><a href="technology/">Технологии</a></li><li><a href="extras/">Постройки</a></li><li><a href="map/">Карта объектов</a></li><li><a href="#price">Цены</a></li><li><a href="#faq">Вопросы</a></li></ul></div>
+        <div><h3>Навигация</h3><ul><li><a href="projects/">Проекты и кейсы</a></li><li><a href="technology/">Технологии</a></li><li><a href="extras/">Постройки</a></li><li><a href="invest/">Под аренду</a></li><li><a href="map/">Карта объектов</a></li><li><a href="#price">Цены</a></li><li><a href="#faq">Вопросы</a></li></ul></div>
         <div><h3>Соцсети</h3><ul><li><a data-contact="instagram" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener">Instagram</a></li><li><a data-contact="tiktok" href="https://www.tiktok.com/@akniet_home" target="_blank" rel="noopener">TikTok</a></li><li><a data-contact="threads" href="https://www.threads.net/@akniet.home" target="_blank" rel="noopener">Threads</a></li></ul></div>
         <div><h3>Контакты</h3><ul><li><a data-contact="phone" href="tel:+996500208487">+996 500 20 84 87</a></li><li><a data-contact="whatsapp" href="https://wa.me/996500208487" target="_blank" rel="noopener">WhatsApp</a> · <a data-contact="telegram" href="https://t.me/+996500208487" target="_blank" rel="noopener">Telegram</a></li><li><a data-contact="email" href="mailto:akniethome305@gmail.com">akniethome305@gmail.com</a></li></ul></div>
         <div><h3>Офис</h3><address class="office"><span data-cms="address">г. Бишкек, ул. Осмонкула, 113</span><span data-cms="hours">Пн–Сб, 10:00–20:00</span><a data-contact="route" href="https://2gis.kg/bishkek/directions/points/%7C74.624823%2C42.883309" target="_blank" rel="noopener" class="route">Построить маршрут в 2ГИС ↗</a></address></div>

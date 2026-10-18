@@ -69,13 +69,11 @@ h2{font:400 18px/1.2 var(--f-head);margin:0}
 
 /* slots */
 .slots{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
-.slots.gallery{grid-template-columns:repeat(3,1fr)}
 .slot{display:grid;gap:10px;padding:10px;border-radius:18px;background:rgba(24,22,25,.45);box-shadow:inset 0 0 0 1px var(--line)}
 .slot.custom{box-shadow:inset 0 0 0 1.5px var(--gold)}
 .slot-head{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px}
 .slot-head b{font-family:var(--f-head);font-weight:500}
 .prev{position:relative;aspect-ratio:4/5;border-radius:14px;overflow:hidden;background:#555 center/cover}
-.slots.gallery .prev{aspect-ratio:4/3}
 .prev .kind{position:absolute;top:8px;left:8px;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:5px 9px;border-radius:999px;background:rgba(33,30,34,.65)}
 .prev .lab{position:absolute;left:8px;right:8px;bottom:8px;display:grid;padding:9px 11px;border-radius:12px;background:rgba(255,248,236,.93);color:var(--ink)}
 .prev .lab b{font-family:var(--f-head);font-weight:500;font-size:13px;line-height:1.2;overflow-wrap:anywhere}
@@ -190,7 +188,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
   .lead .m,.lead .st{grid-column:1/-1}
   .fields{grid-template-columns:1fr}
   header{border-radius:var(--r)}
-  .slots,.slots.gallery{grid-template-columns:repeat(2,1fr)}
+  .slots{grid-template-columns:repeat(2,1fr)}
   .ed{grid-template-columns:1fr}
   .ed .prev{max-width:240px}
 }
@@ -211,8 +209,8 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
     <button role="tab" aria-selected="false" aria-controls="p-cases">Кейсы</button>
     <button role="tab" aria-selected="false" aria-controls="p-faq">Вопросы</button>
     <button role="tab" aria-selected="false" aria-controls="p-extras">Постройки</button>
+    <button role="tab" aria-selected="false" aria-controls="p-rentals">Аренда</button>
     <button role="tab" aria-selected="false" aria-controls="p-materials">Материалы</button>
-    <button role="tab" aria-selected="false" aria-controls="p-gallery">Галерея</button>
     <button role="tab" aria-selected="false" aria-controls="p-map">Карта</button>
   </div>
 
@@ -240,13 +238,18 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
   </section>
 
   <section id="p-projects" role="tabpanel" class="card" hidden>
-    <div class="bar"><div><h1>Проекты</h1><p class="muted">Страница «Проекты и кейсы» (/projects/) и короткие карточки на главной — для проектов с галочкой «На главной». Порядок — как в списке, меняется стрелками. Площади из проектов становятся кнопками калькулятора «Как в проектах».</p></div><button class="btn gold" type="button" data-add="projects">+ Добавить проект</button></div>
+    <div class="bar"><div><h1>Проекты</h1><p class="muted">Страница «Проекты и кейсы» (/projects/) и короткие карточки на главной — для проектов с галочкой «На главной». Порядок — как в списке, меняется стрелками. Площади из проектов становятся кнопками калькулятора «Как в проектах». Каталог для клиентов (его ссылка приходит в заявках «Каталог проектов в WhatsApp») собирается из этих же проектов: <a href="/catalog/" target="_blank" rel="noopener">открыть каталог</a>, на кыргызском — <a href="/ky/catalog/" target="_blank" rel="noopener">/ky/catalog/</a>.</p></div><button class="btn gold" type="button" data-add="projects">+ Добавить проект</button></div>
     <div class="cat-list" id="l-projects"></div>
   </section>
 
   <section id="p-cases" role="tabpanel" class="card" hidden>
     <div class="bar"><div><h1>Кейсы</h1><p class="muted">Блок «Кейсы — построенные дома» на странице «Проекты и кейсы». Если удалить все кейсы, блок исчезнет со страницы.</p></div><button class="btn gold" type="button" data-add="cases">+ Добавить кейс</button></div>
     <div class="cat-list" id="l-cases"></div>
+  </section>
+
+  <section id="p-rentals" role="tabpanel" class="card" hidden>
+    <div class="bar"><div><h1>Аренда</h1><p class="muted">Блок «Сколько зарабатывают наши дома» на странице «Под аренду» (/invest/): реальные дома клиентов, которые сдаются посуточно. Пока записей нет — блок скрыт. Выручку за год (цена × ночей) и окупаемость (вложения ÷ выручка) сайт считает сам.</p></div><button class="btn gold" type="button" data-add="rentals">+ Добавить пример</button></div>
+    <div class="cat-list" id="l-rentals"></div>
   </section>
 
   <section id="p-faq" role="tabpanel" class="card" hidden>
@@ -264,10 +267,6 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
     <div class="slots" id="s-materials"></div>
   </section>
 
-  <section id="p-gallery" role="tabpanel" class="card" hidden>
-    <div class="bar"><div><h1>Галерея</h1><p class="muted">Раздел «Как выглядят наши дома» на главной — 6 фото с подписями на русском и кыргызском. Вид и анимация раздела не меняются, меняется только содержимое ячейки.</p></div></div>
-    <div class="slots gallery" id="s-gallery"></div>
-  </section>
 
   <section id="p-map" role="tabpanel" class="card" hidden>
     <div class="bar"><div><h1>Карта</h1><p class="muted">Страница «Карта объектов» (/map/): карта и список мест под ней. Нажмите на карту, чтобы поставить точку населённого пункта. Нажмите на точку, чтобы изменить её; пока точка выбрана, нажатие на карту переносит её. Приближение — «+» / «−», колесо с Ctrl или два пальца.</p></div></div>
@@ -436,7 +435,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
     finally { btn.disabled = false; }
   }));
 
-  /* ---- numbered slots: stock cards are read from the live home page ---- */
+  /* ---- numbered slots: stock cards are read from the live page ---- */
   const SECTIONS = {
     materials: {
       kind: 'material', title: 'Карточка материала', page: 'technology/',
@@ -448,18 +447,9 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
         subtitle: t.querySelector('.lab span').textContent.trim(),
       })),
     },
-    gallery: {
-      kind: 'gallery', title: 'Фото галереи', page: '',
-      fields: [['caption', 'Подпись на фото', 60]],
-      stock: doc => [...doc.querySelectorAll('.shot[data-slot]')].map(f => ({
-        image: f.querySelector('img').getAttribute('src'),
-        caption: f.querySelector('.chip').textContent.trim(),
-        hint: f.classList.contains('tall') ? 'Ячейка вертикальная (3:4) — лучше вертикальное фото' : 'Ячейка горизонтальная (4:3) — лучше горизонтальное фото',
-      })),
-    },
   };
-  const docs = {}; // page → { ru, ky }: the live pages, source of the stock cards (materials — /technology/, gallery — the home page)
-  const state = { materials: null, gallery: null }; // { stock: [], stockKy: [], custom: [] }
+  const docs = {}; // page → { ru, ky }: the live pages, source of the stock cards (materials — /technology/)
+  const state = { materials: null }; // { stock: [], stockKy: [], custom: [] }
   const abs = src => src && new URL(src, location.origin + '/').href;
   // What a page in `lang` shows: custom text of that language → custom Russian → stock of that language
   function merged(sec, i, lang = 'ru', custom = state[sec].custom[i] || {}) {
@@ -504,7 +494,6 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
     } catch { toast('Не удалось загрузить карточки', true); }
   }
   loaders['p-materials'] = () => loadSlots('materials');
-  loaders['p-gallery'] = () => loadSlots('gallery');
 
   /* ---- slot editor ---- */
   const ed = $('#ed'); let cur = null; // { sec, i, image, lang }
@@ -618,7 +607,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
   });
 
   /* ---- projects, cases, FAQ: lists (add / delete / reorder) and the editor ---- */
-  const CAT = { projects: [], cases: [], faq: [], extras: [] };
+  const CAT = { projects: [], cases: [], faq: [], extras: [], rentals: [] };
   const STYLE = { af: 'A-frame', barn: 'Барнхаус' };
   const num = v => { const n = Number(String(v).trim().replace(',', '.')); return String(v).trim() === '' || !Number.isFinite(n) ? null : n; };
   const area = v => (Math.round(v * 10) / 10).toLocaleString('ru-RU');
@@ -629,7 +618,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
   async function loadCat(kind) {
     try {
       CAT[kind] = await api('/api/admin/catalog/' + kind);
-      if (kind === 'cases' && !CAT.projects.length) CAT.projects = await api('/api/admin/catalog/projects');
+      if ((kind === 'cases' || kind === 'rentals') && !CAT.projects.length) CAT.projects = await api('/api/admin/catalog/projects');
       renderCat(kind);
     } catch { toast('Не удалось загрузить список', true); }
   }
@@ -637,6 +626,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
     projects: d => ({ img: d.image, title: `«${d.name}»`, meta: `${STYLE[d.style]} · ${area(d.area)} м²${d.terrace ? ` + ${d.terrace_type === 'closed' ? 'закрытая' : 'открытая'} терраса ${area(d.terrace)} м²` : ''} · спален: ${d.beds} · санузлов: ${d.baths} · этажей в схеме: ${d.plan.length}`, tags: [d.on_home && ['gold', 'на главной'], !d.name_ky || !d.text_ky ? ['warn', 'нет перевода'] : null] }),
     cases: d => ({ img: d.image, title: d.title, meta: `${d.region} · ${d.area} · ${d.term}` + (d.project ? ` · проект: ${CAT.projects.find(p => p.id === d.project)?.data.name || '—'}` : ''), tags: [!d.title_ky || !d.story_ky ? ['warn', 'нет перевода'] : null] }),
     extras: d => ({ img: d.image, title: d.name, meta: `${d.lead} · примеров работ: ${d.works.length}`, tags: [!d.name_ky || !d.text_ky ? ['warn', 'нет перевода'] : null] }),
+    rentals: d => ({ img: d.image, title: d.title, meta: [d.place, `$${d.price_night} за сутки`, d.nights && `${d.nights} ночей в год`, d.invest && `вложения $${d.invest.toLocaleString('ru-RU')}`, rentCalc(d)].filter(Boolean).join(' · '), tags: [!d.title_ky ? ['warn', 'нет перевода'] : null] }),
     faq: d => ({ title: d.q, meta: d.a.length > 140 ? d.a.slice(0, 140) + '…' : d.a, tags: [!d.q_ky || !d.a_ky ? ['warn', 'нет перевода'] : null] }),
   };
   function renderCat(kind) {
@@ -709,16 +699,17 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
       plan: [{ name: '1 этаж', name_ky: '1-кабат', w: 10, h: 8, void: null, image: null, rooms: [{ x: 0, y: 0, w: 6, h: 8, name: 'Кухня-гостиная', name_ky: 'Ашкана-конок бөлмө' }] }] }),
     cases: () => ({ image: null, region: '', region_ky: '', title: '', title_ky: '', area: '', term: '', term_ky: '', season: '', season_ky: '', story: '', story_ky: '', project: null }),
     faq: () => ({ q: '', q_ky: '', a: '', a_ky: '' }),
+    rentals: () => ({ image: null, title: '', title_ky: '', place: '', place_ky: '', area: null, project: null, price_night: null, nights: null, invest: null, story: '', story_ky: '' }),
     extras: () => ({ slug: '', name: '', name_ky: '', lead: '', lead_ky: '', text: '', text_ky: '', points: '', points_ky: '', image: null, works: [] }),
   };
-  const TITLES = { projects: ['Новый проект', 'Проект'], cases: ['Новый кейс', 'Кейс'], faq: ['Новый вопрос', 'Вопрос'], extras: ['Новое направление', 'Направление'] };
+  const TITLES = { projects: ['Новый проект', 'Проект'], cases: ['Новый кейс', 'Кейс'], faq: ['Новый вопрос', 'Вопрос'], extras: ['Новое направление', 'Направление'], rentals: ['Новый пример аренды', 'Пример аренды'] };
 
   function openCat(kind, item) {
     ceKind = kind; ceItem = item; draft = structuredClone(item ? item.data : BLANK[kind]());
     const head = el('div', { className: 'ce-head' }, el('h1', { id: 'ce-title', textContent: item ? `${TITLES[kind][1]}: ${ROW[kind](item.data).title}` : TITLES[kind][0] }));
     const x = el('button', { type: 'button', className: 'ce-close', textContent: '×', 'aria-label': 'Закрыть' }); x.addEventListener('click', () => ce.close()); head.append(x);
     const err = el('div', { className: 'ce-err', id: 'ce-err', hidden: true });
-    const body = { projects: projectForm, cases: caseForm, faq: faqForm, extras: extraForm }[kind]();
+    const body = { projects: projectForm, cases: caseForm, faq: faqForm, extras: extraForm, rentals: rentalForm }[kind]();
     const del = el('button', { type: 'button', className: 'btn sm danger', textContent: 'Удалить', hidden: !item }); del.addEventListener('click', deleteCat);
     const cancel = el('button', { type: 'button', className: 'btn sm', textContent: 'Отмена' }); cancel.addEventListener('click', () => ce.close());
     ceForm.replaceChildren(head, ...body, err, el('div', { className: 'ce-foot' }, del, el('div', {}, cancel, el('button', { type: 'submit', className: 'btn sm gold', textContent: 'Сохранить' }))));
@@ -762,6 +753,35 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
       pair('Вопрос', 'q', { max: 200 }),
       pair('Ответ', 'a', { max: 1500, area: true })),
       el('p', { className: 'muted', innerHTML: 'В ответе можно вставить значения из вкладки «Основное» — сайт подставит их сам: <code>{price}</code> — цена за м² («$440»), <code>{terrace_open_price}</code> и <code>{terrace_closed_price}</code> — цена открытой и закрытой террасы за м² (пока цена не задана, такой вопрос на сайте скрыт), <code>{months}</code> — средний срок («2 месяца»), <code>{months_min}</code> — минимальный срок после «от» («от 1,5 месяца»; по-кыргызски перед «баштап»), <code>{warranty}</code> — гарантия («5 лет»).' })];
+  }
+
+  // the same count as on the page: income = price × nights, payback = investment ÷ income (or ÷ price, in nights)
+  function rentCalc(d) {
+    const income = d.price_night && d.nights ? d.price_night * d.nights : 0;
+    const out = [];
+    if (income) out.push(`выручка $${income.toLocaleString('ru-RU')} в год`);
+    if (d.invest && income) out.push(`окупаемость ≈ ${(Math.round(d.invest / income * 10) / 10).toLocaleString('ru-RU')} г.`);
+    else if (d.invest && d.price_night) out.push(`окупаемость ${Math.ceil(d.invest / d.price_night).toLocaleString('ru-RU')} суток аренды`);
+    return out.join(' · ');
+  }
+  function rentalForm() {
+    const sel = el('select', {});
+    sel.append(el('option', { value: '', textContent: '— без ссылки на проект —' }), ...CAT.projects.map(p => el('option', { value: p.id, textContent: `${STYLE[p.data.style]} «${p.data.name}»`, selected: p.id === draft.project })));
+    sel.addEventListener('change', () => { draft.project = sel.value ? Number(sel.value) : null; });
+    const sum = el('p', { className: 'muted s4' });
+    const upd = () => { sum.textContent = rentCalc(draft) ? 'На сайте: ' + rentCalc(draft) : 'Заполните цену за сутки, ночей в год и вложения — здесь появится расчёт, как на сайте.'; };
+    upd();
+    return [el('div', { className: 'ce-grid' },
+      photoField('Фото (лучше горизонтальное)', draft, 'image', 'gallery'),
+      pair('Заголовок', 'title', { max: 80, ph: 'Гостевой дом у озера' }),
+      pair('Место (бейдж на фото)', 'place', { max: 50, ph: 'Иссык-Куль, Чолпон-Ата' }),
+      fld('По какому проекту', sel, 's2'),
+      fld('Площадь, м² (пусто — из проекта)', numInp('area'), 's2'),
+      fld('Цена за сутки, $', numInp('price_night', { onChange: upd }), 's2'),
+      fld('Сдаётся ночей в год (необязательно)', numInp('nights', { onChange: upd }), 's2'),
+      fld('Вложения, $ (дом под ключ + мебель; необязательно)', numInp('invest', { onChange: upd }), 's4'),
+      sum,
+      pair('История (необязательно)', 'story', { max: 600, area: true }))];
   }
 
   function caseForm() {

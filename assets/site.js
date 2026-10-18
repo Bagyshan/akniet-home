@@ -349,6 +349,31 @@
   }
   document.addEventListener('click', e => { if (e.target.closest('[data-quiz]')) { e.preventDefault(); quizOpen(); } });
 
+  /* ---- «Получить каталог в WhatsApp»: name + number → a lead; the manager gets the catalog link (/catalog/) in it ---- */
+  document.querySelectorAll('.cat-form').forEach(f => {
+    const nameIn = f.elements.name, phoneIn = f.elements.phone, [nameBox, phoneBox] = f.querySelectorAll('.fld');
+    phoneField(phoneIn, phoneBox);
+    nameIn.addEventListener('input', () => nameIn.value.trim().length > 1 && nameBox.classList.remove('invalid'));
+    f.addEventListener('submit', e => {
+      e.preventDefault();
+      const okN = nameIn.value.trim().length > 1, okP = phoneValid(phoneIn.value);
+      nameBox.classList.toggle('invalid', !okN); phoneBox.classList.toggle('invalid', !okP);
+      if (!okN || !okP) return f.querySelector('.invalid input').focus();
+      const lang = document.documentElement.lang, btn = f.querySelector('button[type="submit"]'), err = f.querySelector('.form-err');
+      const lead = { name: nameIn.value, phone: phoneIn.value, via: 'WhatsApp', type: 'Нужен совет', project: 'Каталог проектов в WhatsApp',
+        msg: 'Отправить каталог: ' + location.origin + (lang === 'ky' ? '/ky/catalog/' : '/catalog/'), lang };
+      const done = () => { goal('lead_catalog'); f.classList.add('done'); f.querySelector('.cat-sent').hidden = false; };
+      if (location.protocol === 'file:') return done();
+      btn.disabled = true; err.hidden = true;
+      fetch('/api/leads', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) })
+        .then(r => { if (!r.ok) throw new Error(r.status); done(); })
+        .catch(() => { err.hidden = false; })
+        .finally(() => { btn.disabled = false; });
+    });
+  });
+  // «Рассчитать окупаемость» (data-rent) opens the calculator with the daily-rent part on
+  document.addEventListener('click', e => { if (e.target.closest('[data-rent]') && rentOn && !rentOn.checked) { rentOn.checked = true; rentOn.dispatchEvent(new Event('change')); } });
+
   /* ---- content from the admin panel (GET /api/content); the HTML keeps the defaults ---- */
   // data-price="43" — a project of 43 m², its price follows the price per m² from the admin
   const syncProjectPrices = () => document.querySelectorAll('[data-price]').forEach(el => { el.textContent = priceFrom(money(+el.dataset.price * PRICE_M2 + deckPrice(+(el.dataset.terrace || 0), el.dataset.terraceType))); });
@@ -382,7 +407,7 @@
     if (+c.price_m2 > 0) PRICE_M2 = +c.price_m2;
     TERRACE.open = +c.price_terrace_open_m2 > 0 ? +c.price_terrace_open_m2 : 0;
     TERRACE.closed = +c.price_terrace_closed_m2 > 0 ? +c.price_terrace_closed_m2 : 0;
-    const needs = { terrace: !!(TERRACE.open || TERRACE.closed), terrace_open: !!TERRACE.open, terrace_closed: !!TERRACE.closed, houses_built: +c.houses_built > 0, years_on_market: +c.years_on_market > 0 };
+    const needs = { terrace: !!(TERRACE.open || TERRACE.closed), terrace_open: !!TERRACE.open, terrace_closed: !!TERRACE.closed, houses_built: +c.houses_built > 0, years_on_market: +c.years_on_market > 0, rentals: !!c.rentals?.length };
     document.querySelectorAll('[data-needs]').forEach(e => { e.hidden = !needs[e.dataset.needs]; });
     // a kind without a price can not be picked
     [['ct1', 'open', 'ct2'], ['ct2', 'closed', 'ct1']].forEach(([id, kind, other]) => { const r = $id(id); if (!r) return; r.disabled = !TERRACE[kind]; if (r.disabled && r.checked) $id(other).checked = true; });
