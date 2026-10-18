@@ -9,6 +9,7 @@
   // UI strings of the current language (#i18n); fill('от {sum}', { sum }) → «от $18 920»
   const T = JSON.parse($id('i18n').textContent);
   const fill = (tpl, vars) => tpl.replace(/\{(\w+)\}/g, (_, k) => vars[k]);
+  const plural = (n, forms) => { const [one, few, many, frac = few] = forms.split(','); if (!Number.isInteger(n)) return frac; const a = n % 100, b = n % 10; return a > 10 && a < 20 ? many : b === 1 ? one : b > 1 && b < 5 ? few : many; };
   const word = s => T.words[s] || s;
   const priceFrom = sum => fill(T.priceFrom, { sum });
 
@@ -119,6 +120,20 @@
 
   /* ---- price calculator ---- */
   const area = $id('area'), terrace = $id('terrace'), presets = document.querySelectorAll('.presets button');
+  // daily rent: how many nights at the client's price cover the house, a rough count without running costs
+  const rentOn = $id('rent-on'), rent = $id('rent');
+  function payback(total) {
+    const on = rentOn.checked, rate = Math.round(+rent.value);
+    $id('rent-box').hidden = $id('calc-pay').hidden = !on;
+    if (!on || !(rate > 0)) { $id('pay-nights').textContent = on ? '—' : ''; $id('pay-unit').textContent = ''; $id('pay-time').textContent = $id('rent-live').textContent = on ? T.payEmpty : ''; return ''; }
+    const n = Math.ceil(total / rate), months = n / 30.4, years = Math.round(n / 365 * 10) / 10;
+    const t = months < 12 ? Math.max(1, Math.round(months)) + ' ' + plural(Math.max(1, Math.round(months)), T.payMonths) : years.toLocaleString('ru-RU') + ' ' + plural(years, T.payYears);
+    $id('pay-nights').textContent = n.toLocaleString('ru-RU');
+    $id('pay-unit').textContent = plural(n, T.payDays);
+    $id('pay-time').textContent = fill(T.payTime, { t });
+    $id('rent-live').textContent = '= ' + n.toLocaleString('ru-RU') + ' ' + plural(n, T.payDays) + ' · ' + fill(T.payTime, { t });
+    return fill(T.calcRent, { rent: rate.toLocaleString('ru-RU'), n: n.toLocaleString('ru-RU'), days: plural(n, T.payDays) });
+  }
   const slider = (el, out, text) => {
     out.value = el.value + ' ' + T.m2;
     el.style.setProperty('--p', (el.value - el.min) / (el.max - el.min) * 100 + '%');
@@ -129,7 +144,7 @@
     const checked = document.querySelector('input[name="cstyle"]:checked'), style = checked.value, styleLabel = document.querySelector(`label[for="${checked.id}"]`).textContent;
     const kind = document.querySelector('input[name="cterrace"]:checked')?.value || 'open';
     const a = +area.value, t = terrace && TERRACE[kind] ? +terrace.value : 0;
-    const house = a * PRICE_M2, deck = deckPrice(t, kind), sum = money(house + deck);
+    const house = a * PRICE_M2, deck = deckPrice(t, kind), sum = money(house + deck), rentNote = rentOn ? payback(house + deck) : '';
     slider(area, $id('area-out'), fill(T.areaText, { n: a }));
     if (terrace) slider(terrace, $id('terrace-out'), t ? fill(T.areaText, { n: t }) : T.terraceNone);
     $id('calc-sum').textContent = sum;
@@ -138,13 +153,14 @@
     const split = $id('calc-split');
     if (split) { split.hidden = !t; split.textContent = t ? fill(T.calcSplit, { house: money(house), kind: T.terraceKind[kind], n: t, terrace: money(deck) }) : ''; }
     presets.forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.area === a && (!terrace || (+(b.dataset.terrace || 0) === t && (!t || b.dataset.terraceType === kind))))));
-    $id('calc-go').dataset.lead = JSON.stringify({ type: style, project: fill(T.calcProject, { style: styleLabel }), area: a, ...(t ? { terrace: t, terrace_type: kind } : {}), price: priceFrom(sum) });
+    $id('calc-go').dataset.lead = JSON.stringify({ type: style, project: fill(T.calcProject, { style: styleLabel }) + (rentNote ? ' · ' + rentNote : ''), area: a, ...(t ? { terrace: t, terrace_type: kind } : {}), price: priceFrom(sum) });
   }
   if (area) {
     area.addEventListener('input', calc);
     terrace?.addEventListener('input', calc);
     document.querySelectorAll('input[name="cterrace"]').forEach(r => r.addEventListener('change', calc));
     document.querySelectorAll('input[name="cstyle"]').forEach(r => r.addEventListener('change', calc));
+    if (rentOn) { $id('rent-row').hidden = false; rentOn.addEventListener('change', calc); rent.addEventListener('input', calc); }
     presets.forEach(b => b.addEventListener('click', () => { area.value = b.dataset.area; if (terrace && b.dataset.terrace) { terrace.value = b.dataset.terrace; const r = $id(b.dataset.terraceType === 'closed' ? 'ct2' : 'ct1'); if (r && !r.disabled) r.checked = true; } calc(); }));
     calc();
   }
@@ -210,7 +226,6 @@
   const syncProjectPrices = () => document.querySelectorAll('[data-price]').forEach(el => { el.textContent = priceFrom(money(+el.dataset.price * PRICE_M2 + deckPrice(+(el.dataset.terrace || 0), el.dataset.terraceType))); });
   // data-unit="one,few,many[,fraction]": 1 год · 3 года · 5 лет; a fraction takes the 4th form or "few" (1,5 месяца).
   // After «от» the case changes, so those spans list genitive forms: от 1 месяца · от 2 месяцев
-  const plural = (n, forms) => { const [one, few, many, frac = few] = forms.split(','); if (!Number.isInteger(n)) return frac; const a = n % 100, b = n % 10; return a > 10 && a < 20 ? many : b === 1 ? one : b > 1 && b < 5 ? few : many; };
   const numRu = n => String(n).replace('.', ',');
   const digits = v => String(v).replace(/\D/g, '');
   // contact values as shown in the HTML; their text is swapped inside every [data-contact] link

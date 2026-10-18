@@ -206,6 +206,15 @@
           <input type="range" id="terrace" min="0" max="60" step="1" value="0" aria-describedby="terrace-hint">
           <p class="calc-hint" id="terrace-hint">Фундамент, каркас, настил, ограждение со ступенями и крыша, у закрытой — ещё стены и остекление. 0 — без террасы</p>
         </div>
+        <div class="calc-row calc-rent" id="rent-row" hidden>
+          <label class="switch"><input type="checkbox" id="rent-on" aria-controls="rent-box"><span class="sw" aria-hidden="true"></span><span>Строю под посуточную аренду</span></label>
+          <div class="rent-box" id="rent-box" hidden>
+            <label class="cap" for="rent">Цена за сутки</label>
+            <div class="rent-in"><span aria-hidden="true">$</span><input type="number" id="rent" inputmode="numeric" min="1" max="100000" step="1" value="80" aria-describedby="rent-hint"></div>
+            <p class="rent-live" id="rent-live" aria-hidden="true"></p>
+            <p class="calc-hint" id="rent-hint">Посчитаем, сколько суток аренды вернут стоимость дома. Грубый расчёт: без уборки, коммунальных платежей и комиссий площадок</p>
+          </div>
+        </div>
         <ul class="calc-inc">
           <li>Проект и фундамент</li><li>Несущий металлический каркас</li><li>Утепление базальтом</li><li>Кровля, фасад, окна, двери</li><li>Отделка, сантехника, электрика</li><li>Оснащение санузла</li>
         </ul>
@@ -213,6 +222,7 @@
       <div class="card gold c-calc-out rv" aria-live="polite">
         <span class="eyebrow" style="opacity:.8">Ориентировочно, под ключ</span>
         <div><div class="calc-sum">от <b id="calc-sum">$37 840</b></div><p class="calc-meta"><span id="calc-style">Барнхаус</span> · <span id="calc-area">86</span> м² · в среднем <span data-cms="build_months_avg" data-unit="месяц,месяца,месяцев">2 месяца</span></p><p class="calc-split" id="calc-split" hidden></p></div>
+        <div class="calc-pay" id="calc-pay" hidden><span class="calc-pay-k">Окупаемость аренды</span><p class="calc-pay-n"><b id="pay-nights">0</b> <span id="pay-unit">суток</span></p><p class="calc-pay-t" id="pay-time"></p></div>
         <div class="calc-gift"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v8h14v-8M12 8v12M12 8S10.5 3.5 8 4.2 8.5 8 12 8Zm0 0s1.5-4.5 4-3.8S15.5 8 12 8Z"/></svg><span>+ эскизный проект и тёплый пол в подарок</span></div>
         <a href="#contact" class="btn ink" id="calc-go">Получить точную смету <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></a>
         <p class="calc-note">Точная цена зависит от проекта, участка и отделки — посчитаем бесплатно.</p>
@@ -522,6 +532,12 @@ window.aknietTex = (() => {
  "m": "м",
  "areaText": "{n} квадратных метров",
  "calcProject": "{style} (калькулятор)",
+ "calcRent": "под аренду ${rent}/сутки, окупится за {n} {days}",
+ "payDays": "сутки,суток,суток",
+ "payMonths": "месяц,месяца,месяцев",
+ "payYears": "год,года,лет",
+ "payTime": "≈ {t}, если сдавать каждый день",
+ "payEmpty": "Введите цену за сутки",
  "scheme": "Схема: {floor}",
  "secondLight": "Второй свет",
  "specs": [
