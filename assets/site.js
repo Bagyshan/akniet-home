@@ -75,10 +75,24 @@
     addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; }, { passive: true });
     const loop = () => { rx += (mx - rx) * 0.22; ry += (my - ry) * 0.22; ring.style.transform = `translate(${rx}px,${ry}px)`; requestAnimationFrame(loop); };
     loop();
-    document.addEventListener('mouseover', e => {
-      const v = e.target.closest('[data-cursor="view"]'), h = e.target.closest('a,button,label,input,textarea,summary,.tile');
-      c.classList.toggle('view', !!v); c.classList.toggle('hover', !v && !!h);
-    });
+    // over light surfaces (cream and gold cards, gold buttons) the gold dot turns dark. The design always sets
+    // dark text on light surfaces, so the text colour under the pointer tells which one it is — this also covers
+    // gradients and photos with a light veil, where the background itself says little
+    const lin = v => (v /= 255) <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+    const isLight = el => {
+      const m = getComputedStyle(el).color.match(/[\d.]+/g); if (!m) return false;
+      const [r, g, b] = m.map(Number);
+      return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b) < 0.18;
+    };
+    const mark = el => {
+      if (!el || c.contains(el)) return;
+      const v = el.closest('[data-cursor="view"]'), h = el.closest('a,button,label,input,textarea,summary,.tile');
+      c.classList.toggle('view', !!v); c.classList.toggle('hover', !v && !!h); c.classList.toggle('light', isLight(el));
+    };
+    document.addEventListener('mouseover', e => mark(e.target));
+    // scrolling moves the page under a still pointer without a mouseover
+    let checking = false;
+    addEventListener('scroll', () => { if (checking) return; checking = true; requestAnimationFrame(() => { checking = false; mark(document.elementFromPoint(mx, my)); }); }, { passive: true });
   }
 
   /* ---- form ---- */
@@ -165,6 +179,7 @@
     el.style.setProperty('--p', (el.value - el.min) / (el.max - el.min) * 100 + '%');
     el.setAttribute('aria-valuetext', text);
   };
+  let syncFloat = () => {};
   function calc() {
     if (!area) return;
     const checked = document.querySelector('input[name="cstyle"]:checked'), style = checked.value, styleLabel = document.querySelector(`label[for="${checked.id}"]`).textContent;
@@ -180,6 +195,7 @@
     if (split) { split.hidden = !t; split.textContent = t ? fill(T.calcSplit, { house: money(house), kind: T.terraceKind[kind], n: t, terrace: money(deck) }) : ''; }
     presets.forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.area === a && (!terrace || (+(b.dataset.terrace || 0) === t && (!t || b.dataset.terraceType === kind))))));
     $id('calc-go').dataset.lead = JSON.stringify({ type: style, project: fill(T.calcProject, { style: styleLabel }) + (rentNote ? ' · ' + rentNote : ''), area: a, ...(t ? { terrace: t, terrace_type: kind } : {}), price: priceFrom(sum) });
+    syncFloat();
   }
   if (area) {
     area.addEventListener('input', calc);
@@ -192,6 +208,61 @@
     $id('calc-go').addEventListener('click', () => goal('calc_estimate'));
     presets.forEach(b => b.addEventListener('click', () => { area.value = b.dataset.area; if (terrace && b.dataset.terrace) { terrace.value = b.dataset.terrace; const r = $id(b.dataset.terraceType === 'closed' ? 'ct2' : 'ct1'); if (r && !r.disabled) r.checked = true; } calc(); }));
     calc();
+  }
+
+  /* ---- calculator, phones and tablets: the price card sits below the inputs, so a cloud with the live price
+     floats over the calculator. It trails the scroll a little and, as the price card comes up, flies into the
+     price and dissolves there. Everything follows the scroll position, so scrolling back up plays it in reverse ---- */
+  const calcBox = document.querySelector('.c-calc'), outB = $id('calc-sum');
+  if (calcBox && outB) {
+    const outSum = outB.closest('.calc-sum'), stack = matchMedia('(max-width:1100px)');
+    const wrap = document.createElement('div');
+    wrap.className = 'calc-float'; wrap.setAttribute('aria-hidden', 'true');
+    wrap.innerHTML = '<div class="cf"><i class="cf-bg"></i><span class="cf-meta"></span><span class="cf-row"><span class="cf-from"></span><b class="cf-sum"></b></span><span class="cf-pay"></span></div>';
+    document.body.append(wrap);
+    const cf = wrap.firstChild, bg = cf.querySelector('.cf-bg'), sumEl = cf.querySelector('.cf-sum'), fade = cf.querySelectorAll('.cf-meta,.cf-from,.cf-pay');
+    syncFloat = () => {
+      cf.querySelector('.cf-meta').textContent = $id('calc-style').textContent + ' · ' + $id('calc-area').textContent + ' ' + T.m2;
+      cf.querySelector('.cf-from').textContent = outSum.firstChild.textContent.trim();
+      sumEl.textContent = outB.textContent;
+      const pay = $id('calc-pay'), nights = $id('pay-nights').textContent;
+      cf.querySelector('.cf-pay').textContent = pay && !pay.hidden && nights ? pay.querySelector('.calc-pay-k').textContent + ': ' + nights + ' ' + $id('pay-unit').textContent : '';
+    };
+    syncFloat();
+    const clamp = v => Math.min(1, Math.max(0, v)), smooth = (a, b, v) => { const t = clamp((v - a) / (b - a)); return t * t * (3 - 2 * t); };
+    let lastY = scrollY, lag = 0, queued = false, shown = false;
+    const show = on => { if (on === shown) return; shown = on; wrap.classList.toggle('on', on); document.body.classList.toggle('calc-float-on', on); };
+    function frame() {
+      queued = false;
+      if (!stack.matches) { show(false); outSum.style.opacity = ''; return; }
+      const H = innerHeight, cr = calcBox.getBoundingClientRect(), tr = outB.getBoundingClientRect(), wr = wrap.getBoundingClientRect();
+      // a: the cloud appears while the calculator rises into view; m: once the card's price has risen to the cloud,
+      // the cloud rides up with it, grows to its size and dissolves into it
+      const a = smooth(H * 0.92, H * 0.62, cr.top);
+      const restL = wr.left + cf.offsetLeft, restT = wr.top + cf.offsetTop, bx = sumEl.offsetLeft, by = sumEl.offsetTop;
+      const reach = H * 0.2, m = clamp((restT + by - tr.top) / reach), e = reduce ? 0 : 1 - (1 - m) ** 3;
+      const vel = scrollY - lastY; lastY = scrollY;
+      lag = reduce ? 0 : lag + (Math.max(-26, Math.min(26, vel * 0.9)) - lag) * 0.14;
+      const drift = reduce ? 0 : (clamp((H - cr.top) / (H + cr.height)) - 0.5) * -18;
+      const sc = 1 + (tr.height / sumEl.offsetHeight - 1) * e;
+      const tx = e * (tr.left - restL - bx * sc), ty = e * (tr.top - restT - by * sc) + (1 - e) * (lag + drift) + (1 - a) * 28;
+      cf.style.setProperty('--e', e);
+      cf.style.transform = `translate3d(${tx}px,${ty}px,0) scale(${sc})`;
+      cf.style.opacity = a * (1 - smooth(0.84, 1, m));
+      bg.style.opacity = 1 - smooth(0, 0.7, m);
+      fade.forEach(el => { el.style.opacity = 1 - smooth(0, 0.45, m); });
+      const on = a > 0.01 && m < 0.999;
+      outSum.style.opacity = on && !reduce ? smooth(0.72, 1, m) : '';
+      show(on);
+      if (Math.abs(lag) > 0.05) request();
+    }
+    const request = () => { if (!queued) { queued = true; requestAnimationFrame(frame); } };
+    addEventListener('scroll', request, { passive: true });
+    addEventListener('resize', request);
+    stack.addEventListener('change', request);
+    calcBox.closest('section')?.addEventListener('input', request);
+    wrap.addEventListener('click', () => { const card = outB.closest('.c-calc-out'); lenis ? lenis.scrollTo(card, { offset: -90 }) : card.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' }); });
+    request();
   }
 
   /* ---- projects: filter ---- */
@@ -277,6 +348,7 @@
     try { const v = JSON.parse(sessionStorage.getItem(QUIZ_KEY)); return v && Array.isArray(v.answers) && v.answers.length === T.quiz?.q.length ? v : null; }
     catch { return null; }
   };
+  const FAB_OFF = 'akniet-quiz-fab-off';
   const quizSave = v => { try { sessionStorage.setItem(QUIZ_KEY, JSON.stringify(v)); } catch {} };
   const ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg>';
   function quizBuild() {
@@ -301,7 +373,7 @@
     }
     // fresh: the quiz was just answered (not reopened from «Ваша подборка»)
     function result(fresh = true) {
-      if (fresh) { goal('quiz_result', { purpose: QUIZ_RU[0][1][answers[0]], budget: QUIZ_RU[3][1][answers[3]] }); quizSave({ answers, sent: false }); }
+      if (fresh) { goal('quiz_result', { purpose: QUIZ_RU[0][1][answers[0]], budget: QUIZ_RU[3][1][answers[3]] }); quizSave({ answers, sent: false }); try { sessionStorage.removeItem(FAB_OFF); } catch {} }
       const sent = !!quizSaved()?.sent;
       stepEl.textContent = Q.doneStep; bar.style.transform = 'scaleX(1)'; top();
       const picks = quizPick(answers), root = document.documentElement.lang === 'ky' ? '/ky/' : '/';
@@ -365,15 +437,25 @@
   }
   document.addEventListener('click', e => { if (e.target.closest('[data-quiz]')) { e.preventDefault(); quizOpen(); } });
   // «Ваша подборка»: a floating button with the picked houses, on every page while the tab is open
-  const fab = T.quiz ? document.createElement('button') : null;
-  if (fab) { fab.type = 'button'; fab.className = 'quiz-fab'; fab.hidden = true; fab.addEventListener('click', quizOpen); document.body.append(fab); }
+  // × hides it for the rest of the visit; a newly finished quiz brings it back. The pick itself stays saved
+  const fab = T.quiz ? document.createElement('div') : null;
+  if (fab) {
+    fab.className = 'quiz-fab'; fab.hidden = true; document.body.append(fab);
+    fab.addEventListener('click', e => {
+      if (!e.target.closest('.quiz-fab-x')) return quizOpen();
+      try { sessionStorage.setItem(FAB_OFF, '1'); } catch {}
+      fab.classList.add('out'); setTimeout(updateFab, 300);
+    });
+  }
   function updateFab() {
     if (!fab) return;
     const saved = quizSaved(), picks = saved ? quizPick(saved.answers) : [];
-    fab.hidden = !saved || !!quiz?.el.open;
-    if (!saved) return;
-    fab.innerHTML = `<span class="thumbs" aria-hidden="true">${picks.map(p => `<i${p.image ? ` style="background-image:url('${esc(p.image)}')"` : ''}></i>`).join('')}</span>`
-      + `<span>${esc(T.quiz.saved)}<small>${picks.length} ${esc(plural(picks.length, T.quiz.projectsUnit))}</small></span>`;
+    let off = false; try { off = !!sessionStorage.getItem(FAB_OFF); } catch {}
+    fab.hidden = !saved || off || !!quiz?.el.open; fab.classList.remove('out');
+    if (fab.hidden) return;
+    fab.innerHTML = `<button type="button" class="quiz-fab-go"><span class="thumbs" aria-hidden="true">${picks.map(p => `<i${p.image ? ` style="background-image:url('${esc(p.image)}')"` : ''}></i>`).join('')}</span>`
+      + `<span>${esc(T.quiz.saved)}<small>${picks.length} ${esc(plural(picks.length, T.quiz.projectsUnit))}</small></span></button>`
+      + `<button type="button" class="quiz-fab-x" aria-label="${esc(T.quiz.hide)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>`;
   }
 
   /* ---- «Получить каталог в WhatsApp»: name + number → a lead; the manager gets the catalog link (/catalog/) in it ---- */
