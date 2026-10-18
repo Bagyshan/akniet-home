@@ -29,7 +29,8 @@ app.get('/robots.txt', (_req, res) => res.type('text/plain').send(robotsTxt()));
 app.get('/sitemap.xml', async (_req, res) => {
   const { rows } = await pool.query<{ at: Date | null }>(`SELECT max(at) AS at FROM (
     SELECT max(updated_at) AS at FROM content UNION ALL SELECT max(updated_at) FROM slots UNION ALL SELECT max(updated_at) FROM map_points
-    UNION ALL SELECT max(updated_at) FROM projects UNION ALL SELECT max(updated_at) FROM cases) t`);
+    UNION ALL SELECT max(updated_at) FROM projects UNION ALL SELECT max(updated_at) FROM cases
+    UNION ALL SELECT max(updated_at) FROM faq UNION ALL SELECT max(updated_at) FROM extras) t`);
   res.type('application/xml').send(sitemapXml(rows[0]?.at ?? started));
 });
 

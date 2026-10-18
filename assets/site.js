@@ -11,7 +11,28 @@
   const fill = (tpl, vars) => tpl.replace(/\{(\w+)\}/g, (_, k) => vars[k]);
   const plural = (n, forms) => { const [one, few, many, frac = few] = forms.split(','); if (!Number.isInteger(n)) return frac; const a = n % 100, b = n % 10; return a > 10 && a < 20 ? many : b === 1 ? one : b > 1 && b < 5 ? few : many; };
   const word = s => T.words[s] || s;
+  /* ---- analytics goals: GA4 events and Yandex Metrika goals with the same names (DEPLOY.md → «Цели») ---- */
+  const goalsSent = new Set();
+  const goal = (name, params = {}, once = false) => {
+    if (once) { if (goalsSent.has(name)) return; goalsSent.add(name); }
+    const p = { ...params, page: location.pathname };
+    try { window.gtag?.('event', name, p); } catch {}
+    try { if (window.ym && window.aknietYM) window.ym(window.aknietYM, 'reachGoal', name, p); } catch {}
+  };
+  // phone, WhatsApp, Telegram, mail, route and social links all carry data-contact
+  const CONTACT_GOALS = { phone: 'contact_phone', whatsapp: 'contact_whatsapp', telegram: 'contact_telegram', email: 'contact_email', route: 'contact_route', instagram: 'contact_social', tiktok: 'contact_social', threads: 'contact_social' };
+  document.addEventListener('click', e => { const a = e.target.closest('[data-contact]'); if (a && CONTACT_GOALS[a.dataset.contact]) goal(CONTACT_GOALS[a.dataset.contact], { network: a.dataset.contact }); });
   const priceFrom = sum => fill(T.priceFrom, { sum });
+
+  // WebGL drawn by the processor (no GPU: SwiftShader, llvmpipe) keeps the page busy for seconds — the 3D scenes then stay flat
+  window.aknietSoftGL ??= (() => {
+    try {
+      const gl = document.createElement('canvas').getContext('webgl'); if (!gl) return true;
+      const info = gl.getExtension('WEBGL_debug_renderer_info'), name = String(gl.getParameter(info ? info.UNMASKED_RENDERER_WEBGL : gl.RENDERER));
+      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      return /swiftshader|llvmpipe|softpipe|software|basic render/i.test(name);
+    } catch { return true; }
+  })();
 
   /* ---- smooth scroll ---- */
   let lenis = null;
@@ -63,21 +84,26 @@
   /* ---- form ---- */
   const form = $id('form');
   let prefill = () => {};
+  // +996 500 20 84 87 — Kyrgyz numbers get grouped, foreign ones are left as typed
+  const fmtPhone = v => {
+    let d = v.replace(/\D/g, ''); if (!d) return '';
+    if (d.startsWith('0')) d = '996' + d.slice(1);
+    if (!d.startsWith('996')) return '+' + d.slice(0, 15);
+    d = d.slice(0, 12);
+    return '+' + [d.slice(0, 3), d.slice(3, 6), d.slice(6, 8), d.slice(8, 10), d.slice(10, 12)].filter(Boolean).join(' ');
+  };
+  const phoneValid = v => { const d = v.replace(/\D/g, ''); return d.startsWith('996') ? d.length === 12 : d.length >= 10; };
+  // phone field behaviour shared by the form and the quiz: +996 on focus, grouping while typing
+  const phoneField = (input, box) => {
+    input.addEventListener('focus', () => { if (!input.value) input.value = '+996 '; });
+    input.addEventListener('blur', () => { if (input.value.replace(/\D/g, '') === '996') input.value = ''; });
+    input.addEventListener('input', () => { input.value = fmtPhone(input.value); if (phoneValid(input.value)) box.classList.remove('invalid'); });
+  };
   if (form) {
     const phone = $id('phone'), nameIn = $id('name');
-    // +996 500 20 84 87 — Kyrgyz numbers get grouped, foreign ones are left as typed
-    const fmtPhone = v => {
-      let d = v.replace(/\D/g, ''); if (!d) return '';
-      if (d.startsWith('0')) d = '996' + d.slice(1);
-      if (!d.startsWith('996')) return '+' + d.slice(0, 15);
-      d = d.slice(0, 12);
-      return '+' + [d.slice(0, 3), d.slice(3, 6), d.slice(6, 8), d.slice(8, 10), d.slice(10, 12)].filter(Boolean).join(' ');
-    };
-    const phoneOk = () => { const d = phone.value.replace(/\D/g, ''); return d.startsWith('996') ? d.length === 12 : d.length >= 10; };
+    const phoneOk = () => phoneValid(phone.value);
     const nameOk = () => nameIn.value.trim().length > 1;
-    phone.addEventListener('focus', () => { if (!phone.value) phone.value = '+996 '; });
-    phone.addEventListener('blur', () => { if (phone.value.replace(/\D/g, '') === '996') phone.value = ''; });
-    phone.addEventListener('input', () => { phone.value = fmtPhone(phone.value); if (phoneOk()) $id('f-phone').classList.remove('invalid'); });
+    phoneField(phone, $id('f-phone'));
     nameIn.addEventListener('input', () => nameOk() && $id('f-name').classList.remove('invalid'));
     const SENT = T.sent;
     form.addEventListener('submit', e => {
@@ -88,7 +114,7 @@
       if (!okN || !okP) return form.querySelector('.invalid input').focus();
       // заявка: { project, area, name, phone, type, via, msg, website(honeypot) } → backend → БД + Telegram
       const lead = { ...Object.fromEntries(new FormData(form)), lang: document.documentElement.lang }, btn = form.querySelector('button[type="submit"]'), err = $id('form-err');
-      const done = () => { $id('sent-title').textContent = SENT[lead.via] || SENT['Звонок']; form.classList.add('sent'); };
+      const done = () => { goal('lead_form', { via: lead.via, type: lead.type, from: lead.project ? 'project' : 'form' }); $id('sent-title').textContent = SENT[lead.via] || SENT['Звонок']; form.classList.add('sent'); };
       if (location.protocol === 'file:') return done(); // local preview without a server
       btn.disabled = true; err.hidden = true;
       fetch('/api/leads', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) })
@@ -160,7 +186,10 @@
     terrace?.addEventListener('input', calc);
     document.querySelectorAll('input[name="cterrace"]').forEach(r => r.addEventListener('change', calc));
     document.querySelectorAll('input[name="cstyle"]').forEach(r => r.addEventListener('change', calc));
-    if (rentOn) { $id('rent-row').hidden = false; rentOn.addEventListener('change', calc); rent.addEventListener('input', calc); }
+    if (rentOn) { $id('rent-row').hidden = false; rentOn.addEventListener('change', () => { if (rentOn.checked) goal('calc_rent', {}, true); calc(); }); rent.addEventListener('input', calc); }
+    $id('price').addEventListener('input', () => goal('calc_use', {}, true));
+    $id('price').addEventListener('click', e => { if (e.target.closest('.presets button')) goal('calc_use', {}, true); });
+    $id('calc-go').addEventListener('click', () => goal('calc_estimate'));
     presets.forEach(b => b.addEventListener('click', () => { area.value = b.dataset.area; if (terrace && b.dataset.terrace) { terrace.value = b.dataset.terrace; const r = $id(b.dataset.terraceType === 'closed' ? 'ct2' : 'ct1'); if (r && !r.disabled) r.checked = true; } calc(); }));
     calc();
   }
@@ -209,6 +238,7 @@
     floorsEl.innerHTML = p.plan.length > 1 ? p.plan.map(f => `<button type="button">${esc(word(f.name))}</button>`).join('') : '';
     floorsEl.querySelectorAll('button').forEach((b, i) => b.addEventListener('click', () => showFloor(p, i)));
     showFloor(p, 0);
+    goal('project_plan', { project: p.slug });
     plan.showModal(); plan.append(cursorEl); lenis?.stop(); document.documentElement.style.overflow = 'hidden';
   }
   // 'close' fires async, so unlock scrolling right away — a link inside the dialog scrolls next
@@ -220,6 +250,104 @@
     plan.querySelector('.plan-close').addEventListener('click', closePlan);
     document.addEventListener('click', e => { const b = e.target.closest('[data-plan]'); if (b) openPlan(b.dataset.plan); });
   }
+
+  /* ---- quiz «Подберём дом»: 6 questions → up to 3 projects from the catalog → a lead ---- */
+  // Opens from any [data-quiz] button and from a link ending in #quiz (handy for ads and Instagram).
+  // The answers reach the manager in Russian whatever the page language.
+  const QUIZ_RU = [['Для чего', ['жить круглый год', 'дача, отдых на выходных', 'сдавать посуточно', 'пока выбирает']], ['Сколько человек', ['1–2', '3–4', '5 и больше']],
+    ['Стиль', ['барнхаус', 'A-frame', 'пока не знает']], ['Бюджет', ['до $25 000', '$25 000–40 000', '$40 000–60 000', 'больше $60 000', 'не знает']],
+    ['Участок', ['есть', 'скоро будет', 'нет']], ['Начать стройку', ['в ближайший месяц', 'в течение 3 месяцев', 'позже']]];
+  const QUIZ_BUDGET = [[0, 25000], [25000, 40000], [40000, 60000], [60000, Infinity], null];
+  const projectSum = p => p.price || p.area * PRICE_M2 + deckPrice(p.terrace || 0, p.terrace_type);
+  function quizPick(a) {
+    const beds = [1, 2, 3][a[1]] ?? 2, style = ['barn', 'af', null][a[2]], budget = QUIZ_BUDGET[a[3]];
+    const score = p => {
+      let s = -Math.abs((p.beds || 1) - beds) * 2;
+      if (style && p.style === style) s += 3;
+      if (budget) { const sum = projectSum(p); s += sum <= budget[1] * 1.1 ? (sum >= budget[0] * 0.9 ? 3 : 1) : -4; }
+      if (a[0] === 2 && p.area <= 90) s += 1; // for daily rent a compact house pays back sooner
+      return s;
+    };
+    return PROJECTS.map(p => [score(p), p]).sort((x, y) => y[0] - x[0]).slice(0, 3).map(x => x[1]);
+  }
+  let quiz = null;
+  const ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg>';
+  function quizBuild() {
+    const Q = T.quiz, total = Q.q.length, el = document.createElement('dialog');
+    el.className = 'quiz'; el.setAttribute('aria-labelledby', 'quiz-q');
+    el.innerHTML = `<div class="quiz-in"><div class="quiz-top"><span class="eyebrow" id="quiz-step"></span><button type="button" class="quiz-x" aria-label="${esc(Q.close)}">×</button></div><div class="quiz-bar"><i></i></div><div class="quiz-body"></div></div>`;
+    document.body.append(el);
+    const body = el.querySelector('.quiz-body'), bar = el.querySelector('.quiz-bar i'), stepEl = el.querySelector('#quiz-step');
+    let answers = [], i = 0;
+    const focusTitle = () => body.querySelector('h3').focus({ preventScroll: true });
+    const back = () => i ? `<button type="button" class="quiz-back">← ${esc(Q.back)}</button>` : '';
+    function show() {
+      if (i >= total) return result();
+      const q = Q.q[i];
+      stepEl.textContent = fill(Q.step, { n: i + 1, total });
+      bar.style.transform = `scaleX(${i / total})`;
+      body.innerHTML = `<h3 id="quiz-q" tabindex="-1">${esc(q.t)}</h3><div class="quiz-opts">${q.o.map((o, j) =>
+        `<button type="button" class="quiz-opt" data-i="${j}" aria-pressed="${answers[i] === j}"><b>${esc(o)}</b>${q.h ? `<small>${esc(q.h[j])}</small>` : ''}</button>`).join('')}</div>${back()}`;
+      focusTitle();
+    }
+    function result() {
+      goal('quiz_result', { purpose: QUIZ_RU[0][1][answers[0]], budget: QUIZ_RU[3][1][answers[3]] });
+      stepEl.textContent = Q.doneStep; bar.style.transform = 'scaleX(1)';
+      const picks = quizPick(answers), root = document.documentElement.lang === 'ky' ? '/ky/' : '/';
+      body.innerHTML = `<h3 id="quiz-q" tabindex="-1">${esc(picks.length ? Q.result : Q.resultNone)}</h3>
+        <div class="quiz-picks">${picks.map(p => `<a class="quiz-pick" href="${root}projects/#${encodeURIComponent(p.slug)}">${p.image ? `<img src="${esc(p.image)}" alt="" loading="lazy">` : '<span class="quiz-noimg" aria-hidden="true"></span>'}<span><small>${esc(word(styleName(p)))} · ${p.area} ${T.m2} · ${esc(fill(Q.beds, { n: p.beds }))}</small><b>«${esc(p.name)}»</b><em>${esc(priceFrom(projectPrice(p)))}</em></span></a>`).join('')}</div>
+        <p class="quiz-note">${esc(Q.resultText)}</p>
+        <form class="form quiz-form" novalidate>
+          <div class="fld" id="qz-f-name"><input id="qz-name" name="name" placeholder=" " autocomplete="name"><label for="qz-name">${esc(Q.name)}</label><span class="err">${esc(Q.errName)}</span></div>
+          <div class="fld" id="qz-f-phone"><input id="qz-phone" name="phone" type="tel" inputmode="tel" placeholder=" " autocomplete="tel"><label for="qz-phone">${esc(Q.phone)}</label><span class="err">${esc(Q.errPhone)}</span></div>
+          <span class="cap" id="qz-cap-via">${esc(Q.via)}</span>
+          <div class="seg" role="radiogroup" aria-labelledby="qz-cap-via">${['Звонок', 'WhatsApp', 'Telegram'].map((v, j) => `<input type="radio" name="via" id="qz-v${j}" value="${v}"${j ? '' : ' checked'}><label for="qz-v${j}">${esc(Q.viaO[j])}</label>`).join('')}</div>
+          <p class="form-err" role="alert" hidden>${esc(Q.fail)}</p>
+          <button class="btn ink" type="submit">${esc(Q.send)} ${ARROW}</button>
+          <p class="form-note">${esc(Q.consent)}</p>
+        </form>${back()}`;
+      const f = body.querySelector('form'), nameIn = f.elements.name, phoneIn = f.elements.phone;
+      phoneField(phoneIn, $id('qz-f-phone'));
+      nameIn.addEventListener('input', () => nameIn.value.trim().length > 1 && $id('qz-f-name').classList.remove('invalid'));
+      f.addEventListener('submit', e => {
+        e.preventDefault();
+        const okN = nameIn.value.trim().length > 1, okP = phoneValid(phoneIn.value);
+        $id('qz-f-name').classList.toggle('invalid', !okN); $id('qz-f-phone').classList.toggle('invalid', !okP);
+        if (!okN || !okP) return f.querySelector('.invalid input').focus();
+        const via = f.elements.via.value, btn = f.querySelector('button[type="submit"]'), err = f.querySelector('.form-err');
+        const lead = { name: nameIn.value, phone: phoneIn.value, via, type: ['Барнхаус', 'A-frame', 'Нужен совет'][answers[2]],
+          project: 'Квиз: ' + (picks.map(p => `«${p.name}»`).join(', ') || '—'), msg: QUIZ_RU.map(([k, o], j) => `${k}: ${o[answers[j]]}`).join('\n'), lang: document.documentElement.lang };
+        const done = () => {
+          goal('lead_quiz', { via });
+          stepEl.textContent = Q.doneStep;
+          body.innerHTML = `<div class="quiz-sent"><span class="chip ink">${esc(Q.sentChip)}</span><h3 id="quiz-q" tabindex="-1">${esc(Q.sentTitle)}</h3><p>${esc(Q.sentText)}</p><button type="button" class="btn ghost-ink quiz-close">${esc(Q.close)}</button></div>`;
+          focusTitle();
+        };
+        if (location.protocol === 'file:') return done();
+        btn.disabled = true; err.hidden = true;
+        fetch('/api/leads', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) })
+          .then(r => { if (!r.ok) throw new Error(r.status); done(); })
+          .catch(() => { err.hidden = false; })
+          .finally(() => { btn.disabled = false; });
+      });
+      focusTitle();
+    }
+    const close = () => { if (el.open) { el.close(); unlock(); } };
+    el.addEventListener('close', unlock);
+    el.addEventListener('click', e => {
+      if (e.target === el || e.target.closest('.quiz-x, .quiz-close, .quiz-pick')) return close();
+      const o = e.target.closest('.quiz-opt'); if (o) { answers[i] = +o.dataset.i; i++; if (i === 1) goal('quiz_start'); return show(); }
+      if (e.target.closest('.quiz-back')) { i = Math.min(i, total) - 1; show(); }
+    });
+    return { el, reset: () => { answers = []; i = 0; show(); } };
+  }
+  function quizOpen() {
+    if (!T.quiz) return;
+    quiz ||= quizBuild();
+    goal('quiz_open');
+    quiz.reset(); quiz.el.showModal(); quiz.el.append(cursorEl); lenis?.stop(); document.documentElement.style.overflow = 'hidden';
+  }
+  document.addEventListener('click', e => { if (e.target.closest('[data-quiz]')) { e.preventDefault(); quizOpen(); } });
 
   /* ---- content from the admin panel (GET /api/content); the HTML keeps the defaults ---- */
   // data-price="43" — a project of 43 m², its price follows the price per m² from the admin
@@ -254,7 +382,7 @@
     if (+c.price_m2 > 0) PRICE_M2 = +c.price_m2;
     TERRACE.open = +c.price_terrace_open_m2 > 0 ? +c.price_terrace_open_m2 : 0;
     TERRACE.closed = +c.price_terrace_closed_m2 > 0 ? +c.price_terrace_closed_m2 : 0;
-    const needs = { terrace: !!(TERRACE.open || TERRACE.closed), terrace_open: !!TERRACE.open, terrace_closed: !!TERRACE.closed };
+    const needs = { terrace: !!(TERRACE.open || TERRACE.closed), terrace_open: !!TERRACE.open, terrace_closed: !!TERRACE.closed, houses_built: +c.houses_built > 0, years_on_market: +c.years_on_market > 0 };
     document.querySelectorAll('[data-needs]').forEach(e => { e.hidden = !needs[e.dataset.needs]; });
     // a kind without a price can not be picked
     [['ct1', 'open', 'ct2'], ['ct2', 'closed', 'ct1']].forEach(([id, kind, other]) => { const r = $id(id); if (!r) return; r.disabled = !TERRACE[kind]; if (r.disabled && r.checked) $id(other).checked = true; });
@@ -325,6 +453,7 @@
   const embedded = $id('cms');
   if (embedded) applyContent(JSON.parse(embedded.textContent));
   else if (location.protocol !== 'file:') fetch('/api/content?lang=' + document.documentElement.lang).then(r => r.ok ? r.json() : null).then(c => c && applyContent(c)).catch(() => {});
+  if (location.hash === '#quiz') { history.replaceState(null, '', location.pathname + location.search); quizOpen(); }
 
   /* ---- FAQ: 4 questions, the rest behind «Показать ещё» ---- */
   const faqBox = document.querySelector('.faq'), faqMore = $id('faq-more');

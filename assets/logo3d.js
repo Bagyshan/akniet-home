@@ -92,6 +92,7 @@ async function start() {
 // load only when the footer gets close; on any failure the flat logo stays
 const io = new IntersectionObserver(([en]) => {
   if (!en.isIntersecting) return; io.disconnect();
+  if (window.aknietSoftGL) return;
   start().catch(() => box.classList.remove('ready'));
 }, { rootMargin: '800px 0px' });
 io.observe(box);

@@ -157,6 +157,7 @@ a.card:hover,.card.lift:hover{transform:translateY(-4px);box-shadow:0 24px 50px 
 .c-3d canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .c-3d .fallback{position:absolute;inset:0;background:center/cover;opacity:0}
 .no-webgl .c-3d .fallback{opacity:.55;background-image:url("https://images.pexels.com/photos/4626268/pexels-photo-4626268.jpeg?auto=compress&cs=tinysrgb&w=1600")}
+@media (max-width:860px){.no-webgl .c-3d .fallback{background-image:url("https://images.pexels.com/photos/4626268/pexels-photo-4626268.jpeg?auto=compress&cs=tinysrgb&w=800")}}
 .c-3d .hero-ui{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(20px,2.6vw,40px);pointer-events:none}
 .c-3d .hero-ui a{pointer-events:auto}
 .c-3d h1{font-size:clamp(40px,5vw,84px);max-width:11ch}
@@ -346,6 +347,24 @@ a.card:hover,.card.lift:hover{transform:translateY(-4px);box-shadow:0 24px 50px 
 .proj .price b{font-family:var(--f-head);font-weight:400;font-size:clamp(17px,1.3vw,20px);white-space:nowrap}
 .proj .price .arrow{display:grid;width:40px;height:40px;color:var(--ink)}
 .proj-more{display:flex;justify-content:space-between;align-items:center;gap:12px 20px;flex-wrap:wrap;margin-top:var(--gap);padding:0 6px}
+.proj-btns{display:flex;gap:10px;flex-wrap:wrap}
+button.chip{font-family:inherit;cursor:pointer}
+
+/* ---------- Why us ---------- */
+.why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap)}
+.why{display:flex;flex-direction:column;gap:18px}
+.why h3{font-size:clamp(20px,1.7vw,24px);line-height:1.2}
+.why p{margin-top:8px;font-size:15px;color:rgba(255,248,236,.75)}
+.why-cta{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:calc(var(--gap) * 1.5)}
+.why-cta .btn{min-height:56px}
+@media (max-width:1100px){.why-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:700px){
+  .why-grid{grid-template-columns:1fr;gap:10px}
+  .why{flex-direction:row;align-items:flex-start;gap:14px;padding:18px}
+  .why p{font-size:14px;margin-top:4px}
+  .why-cta{flex-direction:column}
+  .proj-btns{flex-direction:column}
+}
 .c-custom{grid-column:1/-1;display:grid;grid-template-columns:1fr 1.2fr auto;align-items:center;gap:20px 40px;background:radial-gradient(90% 160% at 100% 0%,rgba(213,160,57,.32),transparent 60%),var(--ink);box-shadow:inset 0 0 0 1px rgba(213,160,57,.5)}
 .c-custom h3{font-size:clamp(24px,2.2vw,34px);margin-top:14px}
 .c-custom h3 span{color:var(--gold)}
@@ -487,6 +506,8 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 .c-fact p{color:var(--dim)}
 .c-season{grid-column:7/13;flex-direction:row;align-items:center;justify-content:flex-start;gap:22px;background:var(--ink-soft)}
 .c-season .icon{width:64px;height:64px;flex:none}
+/* «домов построено» is hidden until the number is set in the admin panel: the other cards take its place */
+.c-fact[hidden]~.c-season{grid-column:4/13}
 .c-season .icon svg{width:32px;height:32px}
 .c-season h3{font-size:clamp(20px,1.8vw,28px)}
 .c-season p{margin-top:6px}
@@ -517,7 +538,7 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 .ask-btns{display:grid;gap:8px}
 
 /* ---------- Form additions ---------- */
-.c-form .cap{grid-column:1/-1;margin:4px 0 -6px 4px;color:rgba(49,45,50,.62)}
+.c-form .cap,.quiz .cap{grid-column:1/-1;margin:4px 0 -6px 4px;color:rgba(49,45,50,.62)}
 .pick{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 8px 8px 18px;border-radius:18px;background:rgba(213,160,57,.18);box-shadow:inset 0 0 0 1px rgba(138,97,20,.35);font-size:14px}
 .pick[hidden]{display:none}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
@@ -718,6 +739,7 @@ section[id],article[id],[id="gift"]{scroll-margin-top:96px}
   .kg-box{aspect-ratio:1.8}
   .c-fact{grid-column:span 6}
   .c-season{grid-column:1/-1}
+  .c-fact[hidden]+.c-fact,.c-fact[hidden]~.c-season{grid-column:1/-1}
   .faq,.c-ask{grid-column:1/-1}
   .foot-top{grid-template-columns:repeat(3,1fr)}
   .foot-top>:first-child{grid-column:1/-1}
@@ -811,3 +833,37 @@ section[id],article[id],[id="gift"]{scroll-margin-top:96px}
   .frame-svg .m path{stroke-dashoffset:0!important}.frame-svg .wood,.frame-svg .w,.frame-svg .pile,.frame-svg .callout{opacity:1!important}
   .c-3d h1 .line>span{transform:none!important}
 }
+
+/* ---------- Quiz «Подберём дом» (built by assets/site.js) ---------- */
+dialog.quiz{width:min(640px,calc(100% - 24px));max-width:none;max-height:calc(100dvh - 24px);padding:0;border:0;border-radius:var(--r);background:var(--field);color:var(--ink);box-shadow:0 40px 90px -20px rgba(0,0,0,.85);overflow:hidden}
+dialog.quiz[open]{animation:dlg .5s var(--ease)}
+dialog.quiz::backdrop{background:rgba(20,18,21,.74);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.quiz-in{max-height:calc(100dvh - 24px);overflow:auto;overscroll-behavior:contain;padding:clamp(20px,3vw,36px)}
+.quiz-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.quiz-top .eyebrow{color:var(--gold-ink)}
+.quiz-x{width:44px;height:44px;flex:none;border:0;border-radius:50%;background:rgba(49,45,50,.08);color:var(--ink);font-size:24px;line-height:1;cursor:pointer}
+.quiz-x:hover{background:rgba(49,45,50,.14)}
+.quiz-bar{height:4px;margin:14px 0 26px;border-radius:4px;background:rgba(49,45,50,.1);overflow:hidden}
+.quiz-bar i{display:block;height:100%;background:var(--gold);transform-origin:left;transform:scaleX(0);transition:transform .4s var(--ease)}
+.quiz h3{font-size:clamp(24px,2.6vw,34px);line-height:1.15;outline:none}
+.quiz-opts{display:grid;gap:10px;margin-top:22px}
+.quiz-opt{display:grid;gap:2px;width:100%;min-height:58px;padding:14px 18px;border:1.5px solid rgba(49,45,50,.14);border-radius:18px;background:#fffaf2;color:var(--ink);font:inherit;text-align:left;cursor:pointer;transition:border-color .25s,background-color .25s,transform .25s var(--ease)}
+.quiz-opt b{font-weight:600;font-size:16px}
+.quiz-opt small{font-size:13px;color:rgba(49,45,50,.6)}
+.quiz-opt:hover{border-color:var(--gold-ink)}
+.quiz-opt:active{transform:scale(.99)}
+.quiz-opt[aria-pressed="true"]{border-color:var(--ink);background:#f3e7d2}
+.quiz-back{margin-top:16px;min-height:44px;padding:0 4px;border:0;background:none;color:rgba(49,45,50,.65);font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.quiz-back:hover{color:var(--ink)}
+.quiz-picks{display:grid;gap:10px;margin-top:20px}
+.quiz-pick{display:grid;grid-template-columns:96px 1fr;gap:14px;align-items:center;padding:8px;border-radius:18px;background:#fffaf2;box-shadow:inset 0 0 0 1px rgba(49,45,50,.1);transition:box-shadow .25s}
+.quiz-pick:hover{box-shadow:inset 0 0 0 1.5px var(--gold-ink)}
+.quiz-pick img,.quiz-noimg{width:96px;height:76px;border-radius:12px;object-fit:cover;display:block;background:linear-gradient(140deg,#3a353b,#262327)}
+.quiz-pick>span{display:grid;gap:2px;min-width:0}
+.quiz-pick small{font-size:12.5px;color:rgba(49,45,50,.6)}
+.quiz-pick b{font-family:var(--f-head);font-weight:400;font-size:19px}
+.quiz-pick em{font-style:normal;font-weight:600;color:var(--gold-ink)}
+.quiz-note{margin:16px 0 18px;font-size:14px;color:rgba(49,45,50,.72)}
+.quiz-sent{display:grid;gap:14px;justify-items:start;padding:10px 0}
+.quiz-sent p{color:rgba(49,45,50,.72)}
+@media (max-width:560px){.quiz .form{grid-template-columns:1fr}.quiz .seg{grid-template-columns:repeat(3,1fr)}}

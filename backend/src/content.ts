@@ -12,8 +12,8 @@ export const CONTENT_FIELDS = {
   warranty_years:   { group: 'main', label: 'Гарантия, лет', type: 'number', default: 5 },
   build_months_avg: { group: 'main', label: 'Срок стройки в среднем, месяцев', type: 'number', default: 2 },
   build_months_min: { group: 'main', label: 'Минимальный срок стройки, месяцев', type: 'number', default: 1.5, hint: 'Можно дробное: 1,5' },
-  houses_built:     { group: 'main', label: 'Домов построено', type: 'number', default: null },
-  years_on_market:  { group: 'main', label: 'Сколько лет строим дома', type: 'number', default: null },
+  houses_built:     { group: 'main', label: 'Домов построено', type: 'number', default: null, hint: 'Пусто — карточка «домов построено» на сайте скрыта' },
+  years_on_market:  { group: 'main', label: 'Сколько лет строим дома', type: 'number', default: 6 },
   instagram_k:      { group: 'main', label: 'Подписчиков в Instagram, тыс.', type: 'number', default: 12 },
 
   phone:     { group: 'contacts', label: 'Телефон', type: 'phone', default: '+996 500 20 84 87', hint: 'Как показывать на сайте, например +996 500 20 84 87' },

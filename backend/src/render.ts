@@ -91,7 +91,9 @@ function build(template: string, lang: Lang, page: Page, c: Content): string {
   /* ---- projects, cases, FAQ from the admin panel: the first card in each list is the template ---- */
   renderCatalog(document, lang, c, T, price, terracePrice);
   // blocks about the terrace stay hidden until a terrace price is set in the admin panel; the same for each kind
-  const needs: Record<string, boolean> = { terrace: !!(terracePrice.open || terracePrice.closed), terrace_open: !!terracePrice.open, terrace_closed: !!terracePrice.closed };
+  // and for the company figures (years on the market, houses built) while they are empty
+  const needs: Record<string, boolean> = { terrace: !!(terracePrice.open || terracePrice.closed), terrace_open: !!terracePrice.open, terrace_closed: !!terracePrice.closed,
+    houses_built: +c.houses_built > 0, years_on_market: +c.years_on_market > 0 };
   for (const e of $$('[data-needs]')) needs[e.dataset.needs] ? e.removeAttribute('hidden') : e.setAttribute('hidden', '');
 
   /* ---- content ---- */
@@ -240,7 +242,7 @@ function build(template: string, lang: Lang, page: Page, c: Content): string {
   if (config.seo.metrika) {
     const id = Number(config.seo.metrika);
     const s = document.createElement('script');
-    s.textContent = stash(`(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window,document,"script","https://mc.yandex.ru/metrika/tag.js","ym");ym(${id},"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true});`);
+    s.textContent = stash(`window.aknietYM=${id};(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window,document,"script","https://mc.yandex.ru/metrika/tag.js","ym");ym(${id},"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true});`);
     head.append(s);
   }
   return document.toString().replace(/\/\*@@script(\d+)@@\*\//g, (_, i) => bodies[+i]);

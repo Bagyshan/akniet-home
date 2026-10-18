@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ачкычка чейин барнхаус жана A-frame үйлөр Кыргызстанда — Акниет</title>
-<meta name="description" content="Бүт Кыргызстан боюнча ачкычка чейин барнхаус жана A-frame үйлөр: 1 м² — $440, орточо 2 ай, металл каркас, 5 жыл кепилдик. Эскиз жана жылуу пол — белекке.">
+<meta name="description" content="Бүт Кыргызстан боюнча ачкычка чейин барнхаус жана A-frame үйлөр: 1 м² — $440, келишимде бекитилген баа, этап боюнча төлөм, орточо 2 ай, 5 жыл кепилдик.">
 <meta name="theme-color" content="#211e22">
 <meta name="format-detection" content="telephone=no">
 <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
@@ -19,6 +19,10 @@
 <link rel="preload" href="../assets/fonts/onest-cyrillic-dea2c9.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="../site.css">
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}</script>
+<!-- no GPU → the flat hero photo starts loading right away instead of the 3D scene (same check as in assets/site.js) -->
+<script>try { const gl = document.createElement('canvas').getContext('webgl'), i = gl && gl.getExtension('WEBGL_debug_renderer_info');
+  window.aknietSoftGL = !gl || /swiftshader|llvmpipe|softpipe|software|basic render/i.test(String(gl.getParameter(i ? i.UNMASKED_RENDERER_WEBGL : gl.RENDERER))); gl?.getExtension('WEBGL_lose_context')?.loseContext();
+  if (window.aknietSoftGL) document.documentElement.classList.add('no-webgl'); } catch {}</script>
 </head>
 <body>
 
@@ -64,14 +68,14 @@
       <div class="fallback" aria-hidden="true"></div>
       <canvas id="gl" aria-hidden="true"></canvas>
       <div class="hero-ui">
-        <div class="fade-in" style="display:flex;gap:8px;flex-wrap:wrap"><span class="chip"><i></i>Барнхаус · A-frame · жыл бою курабыз</span><a href="#gift" class="chip gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v8h14v-8M12 8v12M12 8S10.5 3.5 8 4.2 8.5 8 12 8Zm0 0s1.5-4.5 4-3.8S15.5 8 12 8Z"/></svg>Эскиз жана жылуу пол — белекке</a></div>
+        <div class="fade-in" style="display:flex;gap:8px;flex-wrap:wrap"><span class="chip"><i></i>Барнхаус жана A-frame · бүт Кыргызстан боюнча</span><a href="#gift" class="chip gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v8h14v-8M12 8v12M12 8S10.5 3.5 8 4.2 8.5 8 12 8Zm0 0s1.5-4.5 4-3.8S15.5 8 12 8Z"/></svg>Эскиз жана жылуу пол — белекке</a></div>
         <div>
-          <h1><span class="line"><span>Таш, жыгач</span></span><span class="line"><span>жана <em>жылуу</em> жарык</span></span></h1>
+          <h1><span class="line"><span>Ачкычка чейин үй</span></span><span class="line"><span><em><span data-cms="build_months_avg" data-unit="айда,айда,айда">2 айда</span></em></span></span></h1>
           <div class="hero-bottom">
-            <p class="fade-in">Бүт Кыргызстан боюнча барнхаус жана A-frame үйлөрдү ачкычка чейин долбоорлоп, курабыз: 1 м² — $<span data-cms="price_m2">440</span>, орточо <span data-cms="build_months_avg" data-unit="ай,ай,ай">2 ай</span> ичинде, <span data-cms="warranty_years" data-unit="жыл,жыл,жыл">5 жыл</span> расмий кепилдик менен.</p>
+            <p class="fade-in">Металл каркаста барнхаус жана A-frame үйлөрдү курабыз. Келишимде бекитилген баа — 1 м² үчүн $<span data-cms="price_m2">440</span>, этап боюнча төлөм, <span data-cms="warranty_years" data-unit="жыл,жыл,жыл">5 жыл</span> расмий кепилдик.</p>
             <div class="hero-actions fade-in">
               <a href="#price" class="btn gold">Баасын эсептөө <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-              <a href="#projects" class="btn ghost">Долбоорлорду көрүү</a>
+              <button type="button" class="btn ghost" data-quiz>1 мүнөттө үй тандоо</button>
             </div>
           </div>
         </div>
@@ -79,7 +83,7 @@
     </div>
     <a href="#price" class="card gold c-stat rv">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><span class="eyebrow" style="opacity:.8">Ачкычка чейин баасы</span><span class="arrow"><svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
-      <div><div class="big-num">$<span class="count" data-to="440" data-cms="price_m2">440</span><small>/м²</small></div><p style="margin-top:10px;opacity:.85">Баштапкы баа — долбоордон жылуу полго чейин. Үйүңүздү эсептеңиз</p></div>
+      <div><div class="big-num">$<span class="count" data-to="440" data-cms="price_m2">440</span><small>/м²</small></div><p style="margin-top:10px;opacity:.85">Баа келишимде бекитилет жана курулуш учурунда өспөйт</p></div>
     </a>
     <div class="card photo c-photo rv" data-cursor="view">
       <img src="https://images.pexels.com/photos/19737838/pexels-photo-19737838.jpeg?auto=compress&cs=tinysrgb&w=700" alt="Панорамалык терезеси бар A-frame интерьери" loading="lazy">
@@ -90,12 +94,12 @@
       <div><b><span class="count" data-to="12" data-cms="instagram_k">12</span>K+</b><p style="font-size:14px;margin-top:6px;font-weight:500">курулуштарыбызды көрүп турат</p></div>
     </a>
     <div class="card trav c-manifest rv" style="--bg:url(../assets/stone/plaster.webp)">
-      <p>Биз <span>жылуу жыгач</span> менен токтоо ташты, так геометрия менен жарыкты бириктиребиз — ушундай үйгө кайра-кайра кайткың келет.</p>
-      <span class="chip ink" style="align-self:flex-start;font-family:var(--f-text)">Акниеттин философиясы</span>
+      <p><span data-cms="years_on_market" data-unit="жыл,жыл,жыл">6 жыл</span> бою өз бригадабыз менен ачкычка чейин үй курабыз — субподрядчиксиз жана курулуш учурундагы кошумча төлөмдөрсүз.</p>
+      <span class="chip ink" style="align-self:flex-start;font-family:var(--f-text)">Компания жөнүндө</span>
     </div>
     <div class="card slate c-key rv" style="--bg:url(../assets/stone/dark-rock.webp)">
       <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3 4 6v6c0 4.5 3.4 8.2 8 9 4.6-.8 8-4.5 8-9V6l-8-3Z"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg></div>
-      <div><h2 class="key-title">Кепилдик<br><span data-cms="warranty_years" data-unit="жыл,жыл,жыл">5 жыл</span></h2><p style="margin-top:8px;opacity:.8;font-size:15px">Үйгө расмий кепилдик</p></div>
+      <div><h2 class="key-title">Кепилдик<br><span data-cms="warranty_years" data-unit="жыл,жыл,жыл">5 жыл</span></h2><p style="margin-top:8px;opacity:.8;font-size:15px">Келишим боюнча үйгө расмий кепилдик</p></div>
     </div>
     <div class="card graphite c-styles rv" style="--bg:url(../assets/stone/quarry.webp)">
       <span class="eyebrow">Курулуш мөөнөтү</span>
@@ -105,11 +109,27 @@
   </div>
 </section>
 
+<!-- ============ WHY US ============ -->
+<section id="why">
+  <div class="wrap">
+    <div class="sec-title"><h2 class="rv">Биз менен эмне үчүн <span>пайдалуу</span></h2><p class="rv">Бааны, мөөнөттү жана натыйжаны алдын ала билесиз — жана курулуп бүткөн иш үчүн гана төлөйсүз.</p></div>
+    <div class="why-grid">
+      <div class="card soft why rv"><span class="tk-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 12h5M10 16h5"/></svg></span><div><h3>Бекитилген баа</h3><p>Баасын келишимге жазабыз — курулуш учурунда ал өспөйт. Эч кандай «күтүлбөгөн» кошумча төлөм жок.</p></div></div>
+      <div class="card soft why rv"><span class="tk-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 20h4v-5H4zM10 20h4v-9h-4zM16 20h4V5h-4z"/></svg></span><div><h3>Этап боюнча төлөм</h3><p>Даярдыгына жараша бөлүп төлөйсүз: пайдубал, каркас, чатыр, жасалга. Бардык сумманы бир эле учурда берүүнүн кереги жок.</p></div></div>
+      <div class="card soft why rv"><span class="tk-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5M18 14.5c1.8.9 3 2.8 3 5"/></svg></span><div><h3>Өз бригадабыз</h3><p>Биздин усталар курат, субподрядчиксиз. Сапат жана мөөнөт үчүн өзүбүз жооп беребиз.</p></div></div>
+      <div class="card soft why rv"><span class="tk-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span><div><h3>Курулуштан сүрөт отчеттор</h3><p>Объекттен үзгүлтүксүз сүрөт жана видео жөнөтөбүз — башка шаарда болсоңуз да ар бир этапты көрөсүз.</p></div></div>
+      <div class="card soft why rv"><span class="tk-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/></svg></span><div><h3><span data-cms="build_months_avg" data-unit="айда,айда,айда">2 айда</span> даяр үй</h3><p>Металл каркас отурбайт: жасалганы дароо баштайбыз жана жыл бою курабыз.</p></div></div>
+      <div class="card soft why rv"><span class="tk-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 3.4 8.2 8 9 4.6-.8 8-4.5 8-9V6l-8-3Z"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg></span><div><h3>Кепилдик <span data-cms="warranty_years" data-unit="жыл,жыл,жыл">5 жыл</span></h3><p>Расмий, келишим боюнча. Көтөрүүчү металл каркас 40 жылдан ашык кызмат кылат.</p></div></div>
+    </div>
+    <div class="why-cta rv"><button type="button" class="btn gold" data-quiz>1 мүнөттө үй тандоо <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></button><a href="#price" class="btn ghost">Баасын эсептөө</a></div>
+  </div>
+</section>
+
 <!-- ============ PROJECTS (short; the full list with floor plans is on /projects/) ============ -->
 <!-- TODO: демо-кейсы — заменить на реальные типовые проекты (фото, площади, планировки) -->
 <section id="projects">
   <div class="wrap">
-    <div class="sec-title"><h2 class="rv">Даяр <span>долбоорлор</span></h2><p class="rv">Ар бир метри ойлонулган типтүү пландар: чакан A-frameден үй-бүлөлүк барнхауска чейин. Каалаганын өзгөртсө болот — же үйдү нөлдөн долбоорлойбуз.</p></div>
+    <div class="sec-title"><h2 class="rv">Даяр <span>долбоорлор</span></h2><p class="rv">Ачкычка чейинки баасы менен даяр пландар — чакан A-frame'ден үй-бүлөлүк барнхауска чейин. Каалаган долбоорду жер тилкеңизге ылайыктап өзгөртөбүз же үйдү нөлдөн долбоорлойбуз.</p></div>
     <!-- cards: the projects marked «на главной» in the admin panel (the server fills them in) -->
     <div class="proj-grid swipe" data-list="home-projects">
       <a href="projects/#tau" class="card proj rv" data-cursor="view">
@@ -143,7 +163,7 @@
     </div>
     <div class="proj-more rv">
       <span class="proj-notes"><span class="proj-note">Баа болжолдуу: 1 м² үчүн $<span data-cms="price_m2">440</span> баада эсептелген</span><span class="proj-note" data-needs="terrace_open">Ачык терраса: 1 м² үчүн $<span data-cms="price_terrace_open_m2">300</span></span><span class="proj-note" data-needs="terrace_closed">Жабык терраса: 1 м² үчүн $<span data-cms="price_terrace_closed_m2">350</span></span></span>
-      <a href="projects/" class="btn ghost">Бардык долбоорлор жана кейстер <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <span class="proj-btns"><button type="button" class="btn ghost" data-quiz>Долбоор тандоо</button><a href="projects/" class="btn ghost">Бардык долбоорлор жана кейстер <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></a></span>
     </div>
   </div>
 </section>
@@ -151,7 +171,7 @@
 <!-- ============ TURNKEY ============ -->
 <section id="turnkey">
   <div class="wrap">
-    <div class="sec-title"><h2 class="rv"><span>Ачкычка чейин</span><br>үйгө эмнелер кирет</h2><p class="rv">Бир келишим — долбоор жана пайдубалдан жылуу пол менен душка чейин. Көчүп келип, жашай бересиз.</p></div>
+    <div class="sec-title"><h2 class="rv"><span>Ачкычка чейин</span><br>үйгө эмнелер кирет</h2><p class="rv">Бир келишим жана бекитилген баа — долбоор менен пайдубалдан душ кабинасы жана жылуу полго чейин. Өзүнчө подрядчиктерди издөөнүн кереги жок.</p></div>
     <div class="bento tk">
       <div class="card tk-list rv">
         <ol class="tk-items">
@@ -251,7 +271,7 @@
           <i data-mat="1" style="--w:url(../assets/wood/larch.webp)"></i><i data-mat="4" style="--w:url(../assets/wood/oak.webp)"></i><i data-mat="2" style="--w:url(../assets/wood/thermo.webp)"></i>
           <i data-mat="6" style="--w:url(../assets/stone/rubble.webp)"></i><i data-mat="9" style="--w:url(../assets/stone/limestone.webp)"></i><i data-mat="7" style="--w:url(../assets/stone/slate.webp)"></i>
         </div>
-        <div><h3>Колуңуз менен тийгиңиз келген жыгач жана таш</h3><span class="more-link">Бардык материалдар →</span></div>
+        <div><h3>Жасалгада табигый жыгач жана таш</h3><span class="more-link">Бардык материалдар →</span></div>
       </a>
     </div>
   </div>
@@ -291,13 +311,13 @@
 <section id="process">
   <div class="wrap bento" style="margin-top:clamp(40px,5vw,80px)">
     <div class="card slate c-process rv" style="--bg:url(../assets/stone/slate-floor.webp)">
-      <div class="head"><h2>Жаңы үйгө чейин<br><span>беш кадам</span></h2><p style="max-width:36ch;color:var(--dim)">Ар бир этап ачык: объектте эмне болуп жатканын дайыма билесиз.</p></div>
+      <div class="head"><h2><span>Курулуш</span><br>кандай жүрөт</h2><p style="max-width:36ch;color:var(--dim)">Этап боюнча төлөйсүз жана сүрөт отчетторду аласыз — объектте эмне болуп жатканын дайыма билесиз.</p></div>
       <div class="steps" id="steps">
         <div class="track-line"><i id="track-line"></i></div>
-        <div class="step"><span class="dot">1</span><h3>Таанышуу</h3><p>Жер тилке, бюджет жана кантип жашагыңыз келери.</p></div>
+        <div class="step"><span class="dot">1</span><h3>Таанышуу</h3><p>Жер тилкесин, бюджетти жана максаттарды акысыз талкуулайбыз.</p></div>
         <div class="step"><span class="dot">2</span><h3>Долбоор</h3><p>Эскиз белекке, андан кийин архитектуралык долбоор жана смета.</p></div>
-        <div class="step"><span class="dot">3</span><h3>Келишим</h3><p>Мөөнөттү, бааны жана комплектацияны бекитебиз.</p></div>
-        <div class="step"><span class="dot">4</span><h3>Курулуш</h3><p>Пайдубал, каркас, жылуулоо, инженердик тармактар жана жасалга — орточо <span data-cms="build_months_avg" data-unit="ай,ай,ай">2 ай</span>, жылдын каалаган мезгилинде.</p></div>
+        <div class="step"><span class="dot">3</span><h3>Келишим</h3><p>Бааны, мөөнөттү жана комплектацияны бекитебиз — баа мындан ары өзгөрбөйт.</p></div>
+        <div class="step"><span class="dot">4</span><h3>Курулуш</h3><p>Өз бригадабыз, этап боюнча төлөм жана сүрөт отчеттор. Орточо <span data-cms="build_months_avg" data-unit="ай,ай,ай">2 ай</span>, жылдын каалаган мезгилинде.</p></div>
         <div class="step"><span class="dot">5</span><h3>Ачкычтар</h3><p>Көчүп келесиз — <span data-cms="warranty_years" data-unit="жыл,жыл,жыл">5 жыл</span> расмий кепилдик менен.</p></div>
       </div>
     </div>
@@ -314,8 +334,8 @@
         <span class="btn cream">Объекттер картасы <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></span>
       </div>
     </a>
-    <div class="card c-fact rv"><div class="big-num"><span class="ph" data-cms="houses_built" title="Убактылуу маани — админкада алмаштырыңыз">00</span><small>+</small></div><p>үй курулду</p></div>
-    <div class="card c-fact rv"><div class="big-num"><span class="ph" data-cms="years_on_market" title="Убактылуу маани — админкада алмаштырыңыз">00</span></div><p>жылдан бери үй курабыз</p></div>
+    <div class="card c-fact rv" data-needs="houses_built" hidden><div class="big-num"><span data-cms="houses_built">0</span><small>+</small></div><p>үй курулду</p></div>
+    <div class="card c-fact rv"><div class="big-num"><span data-cms="years_on_market">6</span></div><p><span data-cms-unit="years_on_market" data-unit="жыл,жыл,жыл">жыл</span> бою үй курабыз</p></div>
     <div class="card c-fact c-season rv">
       <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg></div>
       <div><h3>Жыл бою курабыз</h3><p>Кышында, жазында, жайында жана күзүндө — мезгилди күтүүнүн кереги жок.</p></div>
@@ -325,7 +345,7 @@
 
 <!-- ============ GALLERY ============ -->
 <section class="gallery" aria-label="Галерея">
-  <div class="wrap"><div class="sec-title"><h2 class="rv">Жылуу <span>кадрлар</span></h2><p class="rv">Үлгү үчүн демо-сүрөттөр — сиздин объекттер менен алмаштырабыз.</p></div></div>
+  <div class="wrap"><div class="sec-title"><h2 class="rv"><span>Биздин үйлөр</span> кандай көрүнөт</h2><p class="rv">Курулуштардын көбүрөөк сүрөт жана видеолору — биздин <a data-contact="instagram" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener" style="text-decoration:underline">Instagram</a> баракчабызда.</p></div></div>
   <div class="rail" id="rail-a">
     <figure class="shot" data-slot="1" style="margin:0" data-cursor="view"><img src="https://images.pexels.com/photos/9209878/pexels-photo-9209878.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Карагай токоюндагы A-frame" loading="lazy"><span class="chip">A-frame «Карагай»</span></figure>
     <figure class="shot tall" data-slot="2" style="margin:0" data-cursor="view"><img src="https://images.pexels.com/photos/19737838/pexels-photo-19737838.jpeg?auto=compress&cs=tinysrgb&w=600" alt="A-frame интерьери" loading="lazy"><span class="chip">Кырдын астындагы терезе</span></figure>
@@ -344,7 +364,7 @@
   <div class="wrap">
     <div class="sec-title"><h2 class="rv">Көп берилүүчү <span>суроолор</span></h2><p class="rv">Курулуштун алдында адатта эмне сурашат — баары ушул жерде. Сурооңузду таппасаңыз, жазыңыз — бир нече мүнөттө жооп беребиз.</p></div>
     <div class="bento">
-      <div class="faq rv" data-list="faq"><details><summary>Ачкычка чейин үй канча турат?<i aria-hidden="true"></i></summary><p class="a">1 м² үчүн — $<span data-cms="price_m2">440</span>. Баага «Ачкычка чейин» бөлүмүндөгүнүн баары кирет: архитектуралык долбоор, пайдубал, көтөрүүчү металл каркас, жылуулоо, чатыр, фасад, терезе жана эшиктер, жасалга, сантехника, электр, ванна бөлмөсүнүн жабдуулары жана жылуу пол. Так сметаны долбооруңузга жана жер тилкеңизге жараша акысыз эсептеп беребиз.</p></details><details><summary>Курулуш канча убакыт алат?<i aria-hidden="true"></i></summary><p class="a">Пайдубалдан ачкычка чейин орточо <span data-cms="build_months_avg" data-unit="ай,ай,ай">2 ай</span>, эң тез курулган үйлөр — <span data-cms="build_months_min" data-unit="айдан,айдан,айдан">1,5 айдан</span> баштап. Так мөөнөттү келишимде бекитебиз.</p></details><details><summary>Кышында курууга болобу?<i aria-hidden="true"></i></summary><p class="a">Ооба, биз жылдын каалаган мезгилинде курабыз. Жазды күтүүнүн кереги жок — долбоор даяр болгондо эле баштаса болот.</p></details><details><summary>Кайсы аймактарда курасыздар?<i aria-hidden="true"></i></summary><p class="a">Бүт Кыргызстан боюнча: Бишкек жана Чүй облусу, Ысык-Көл, Нарын, Талас, Ош, Жалал-Абад жана Баткен.</p></details><details><summary>Даяр долбоорду өзгөртсө же өзүбүздүкүн жасаса болобу?<i aria-hidden="true"></i></summary><p class="a">Ооба. Каалаган типтүү долбоорду өркүндөтсө болот — уктоочу бөлмө, терраса кошуу, терезелерди алмаштыруу. Же үйдү жер тилкеңизге жана жашоо образыңызга ылайык нөлдөн долбоорлойбуз; эскиздик долбоор — белекке.</p></details><details><summary>Кышында суук болбойбу?<i aria-hidden="true"></i></summary><p class="a">Дубал, пол жана чатыр тыгыздыгы 70 болгон эки катмар базальт менен жылуулатылат: кышында жылуу, жайында салкын. Анын үстүнө жылуу пол — аны белекке беребиз.</p></details><details><summary>Кандай пайдубал жасайсыздар?<i aria-hidden="true"></i></summary><p class="a">Бетон казыктар же тасмалуу пайдубал — топурагыңызды баалагандан кийин тандайбыз.</p></details><details><summary>Эмне үчүн каркас жыгачтан эмес, металлдан?<i aria-hidden="true"></i></summary><p class="a">Металл отурбайт, чирибейт жана геометриясы бузулбайт: дубалдар түз бойдон калат, терезе-эшиктер кыйшайбайт, ал эми жасалганы отурушун күтпөй эле дароо баштаса болот. Жыгачты эң жакшы иштеген жерде калтырабыз — жасалгада, фасадда жана террасада.</p></details><details><summary>Кепилдик кандай?<i aria-hidden="true"></i></summary><p class="a">Үйгө расмий кепилдик — <span data-cms="warranty_years" data-unit="жыл,жыл,жыл">5 жыл</span>. Көтөрүүчү каркас дайыма металлдан: үй «жылбайт» жана 40 жылдан ашык кызмат кылат.</p></details><details><summary>Кандай белек жана аны кантип алса болот?<i aria-hidden="true"></i></summary><p class="a">Эскиздик долбоор жана жылуу пол — ачкычка чейин курулушка буйрутма бергендердин баарына, мөөнөт чектөөсүз. Жөн гана арыз калтырыңыз.</p></details><button class="btn ghost faq-more" type="button" id="faq-more" aria-expanded="false" hidden><span>Дагы суроолорду көрсөтүү</span> <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+      <div class="faq rv" data-list="faq"><details><summary>Ачкычка чейин үй канча турат?<i aria-hidden="true"></i></summary><p class="a">1 м² үчүн — $<span data-cms="price_m2">440</span>. Баага «Ачкычка чейин» бөлүмүндөгүнүн баары кирет: архитектуралык долбоор, пайдубал, көтөрүүчү металл каркас, жылуулоо, чатыр, фасад, терезе жана эшиктер, жасалга, сантехника, электр, ванна бөлмөсүнүн жабдуулары жана жылуу пол. Так сметаны долбооруңузга жана жер тилкеңизге жараша акысыз эсептеп беребиз.</p></details><details><summary>Курулуш учурунда баа көтөрүлүшү мүмкүнбү?<i aria-hidden="true"></i></summary><p class="a">Жок. Баасын келишимде бекитебиз жана ал үй тапшырылганга чейин өзгөрбөйт. Эгер өзүңүз бир нерсе кошкуңуз келсе — мисалы, террасаны чоңойтуу, — аны өзүнчө жана алдын ала макулдашабыз.</p></details><details><summary>Төлөм кандай жүргүзүлөт?<i aria-hidden="true"></i></summary><p class="a">Этап боюнча: даярдыгына жараша бөлүп төлөйсүз — пайдубал, каркас, чатыр, жасалга. Бардык сумманы алдын ала берүүнүн кереги жок. Төлөмдөрдүн так графигин келишимге жазабыз.</p></details><details><summary>Курулуш канча убакыт алат?<i aria-hidden="true"></i></summary><p class="a">Пайдубалдан ачкычка чейин орточо <span data-cms="build_months_avg" data-unit="ай,ай,ай">2 ай</span>, эң тез курулган үйлөр — <span data-cms="build_months_min" data-unit="айдан,айдан,айдан">1,5 айдан</span> баштап. Так мөөнөттү келишимде бекитебиз.</p></details><details><summary>Кышында курууга болобу?<i aria-hidden="true"></i></summary><p class="a">Ооба, биз жылдын каалаган мезгилинде курабыз. Жазды күтүүнүн кереги жок — долбоор даяр болгондо эле баштаса болот.</p></details><details><summary>Кайсы аймактарда курасыздар?<i aria-hidden="true"></i></summary><p class="a">Бүт Кыргызстан боюнча: Бишкек жана Чүй облусу, Ысык-Көл, Нарын, Талас, Ош, Жалал-Абад жана Баткен.</p></details><details><summary>Даяр долбоорду өзгөртсө же өзүбүздүкүн жасаса болобу?<i aria-hidden="true"></i></summary><p class="a">Ооба. Каалаган типтүү долбоорду өркүндөтсө болот — уктоочу бөлмө, терраса кошуу, терезелерди алмаштыруу. Же үйдү жер тилкеңизге жана жашоо образыңызга ылайык нөлдөн долбоорлойбуз; эскиздик долбоор — белекке.</p></details><details><summary>Кышында суук болбойбу?<i aria-hidden="true"></i></summary><p class="a">Дубал, пол жана чатыр тыгыздыгы 70 болгон эки катмар базальт менен жылуулатылат: кышында жылуу, жайында салкын. Анын үстүнө жылуу пол — аны белекке беребиз.</p></details><details><summary>Кандай пайдубал жасайсыздар?<i aria-hidden="true"></i></summary><p class="a">Бетон казыктар же тасмалуу пайдубал — топурагыңызды баалагандан кийин тандайбыз.</p></details><details><summary>Эмне үчүн каркас жыгачтан эмес, металлдан?<i aria-hidden="true"></i></summary><p class="a">Металл отурбайт, чирибейт жана геометриясы бузулбайт: дубалдар түз бойдон калат, терезе-эшиктер кыйшайбайт, ал эми жасалганы отурушун күтпөй эле дароо баштаса болот. Жыгачты эң жакшы иштеген жерде калтырабыз — жасалгада, фасадда жана террасада.</p></details><details><summary>Кепилдик кандай?<i aria-hidden="true"></i></summary><p class="a">Үйгө расмий кепилдик — <span data-cms="warranty_years" data-unit="жыл,жыл,жыл">5 жыл</span>. Көтөрүүчү каркас дайыма металлдан: үй «жылбайт» жана 40 жылдан ашык кызмат кылат.</p></details><details><summary>Кандай белек жана аны кантип алса болот?<i aria-hidden="true"></i></summary><p class="a">Эскиздик долбоор жана жылуу пол — ачкычка чейин курулушка буйрутма бергендердин баарына, мөөнөт чектөөсүз. Жөн гана арыз калтырыңыз.</p></details><details><summary>Курулушта эмне болуп жатканын кантип билем?<i aria-hidden="true"></i></summary><p class="a">Объекттен үзгүлтүксүз сүрөт жана видео жөнөтүп турабыз. Өзүбүздүн бригада курат, субподрядчиктерсиз, ошондуктан мөөнөт жана сапат үчүн биз жооп беребиз.</p></details><button class="btn ghost faq-more" type="button" id="faq-more" aria-expanded="false" hidden><span>Дагы суроолорду көрсөтүү</span> <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
       <div class="card cream c-ask rv">
         <div><span class="eyebrow">Суроо калдыбы?</span><h3>Түз<br>сураңыз</h3><p>Мессенджерде жооп беребиз же кайра чалабыз.</p></div>
         <div class="ask-btns"><a data-contact="whatsapp" href="https://wa.me/996500208487" target="_blank" rel="noopener" class="btn ink">WhatsApp</a><a data-contact="telegram" href="https://t.me/+996500208487" target="_blank" rel="noopener" class="btn ink">Telegram</a><a data-contact="phone" href="tel:+996500208487" class="btn ghost-ink">+996 500 20 84 87</a></div>
@@ -568,7 +588,7 @@ window.aknietTex = (() => {
  },
  "seo": {
   "siteName": "Акниет",
-  "description": "Бүт Кыргызстан боюнча ачкычка чейин барнхаус жана A-frame үйлөр: 1 м² — ${price}, орточо {months}, металл каркас, {warranty} кепилдик. Эскиз жана жылуу пол — белекке.",
+  "description": "Бүт Кыргызстан боюнча ачкычка чейин барнхаус жана A-frame үйлөр: 1 м² — ${price}, келишимде бекитилген баа, этап боюнча төлөм, орточо {months}, {warranty} кепилдик.",
   "monthsUnit": "ай,ай,ай",
   "yearsUnit": "жыл,жыл,жыл",
   "priceRange": "1 м² — ${price}",
@@ -592,6 +612,91 @@ window.aknietTex = (() => {
  "terraceKind": {
   "open": "ачык",
   "closed": "жабык"
+ },
+ "quiz": {
+  "title": "Үй тандоо",
+  "step": "{total} кадамдын {n}-кадамы",
+  "doneStep": "Тандоо даяр",
+  "back": "Артка",
+  "close": "Жабуу",
+  "q": [
+   {
+    "t": "Үй эмне үчүн керек?",
+    "o": [
+     "Жыл бою жашоо үчүн",
+     "Дача, дем алыш күндөрү эс алуу",
+     "Күнүмдүк ижарага берүү",
+     "Азырынча тандап жатам"
+    ]
+   },
+   {
+    "t": "Үйдө канча адам жашайт?",
+    "o": [
+     "1–2",
+     "3–4",
+     "5 жана андан көп"
+    ]
+   },
+   {
+    "t": "Кайсы стиль жагат?",
+    "o": [
+     "Барнхаус",
+     "A-frame",
+     "Азырынча билбейм"
+    ],
+    "h": [
+     "Түз дубалдар жана пайдалуу аянт көбүрөөк",
+     "Чатыры жерге чейин түшкөн үй-алачык",
+     "Эки вариантты тең көрсөтөбүз"
+    ]
+   },
+   {
+    "t": "Үйгө канча бюджет бар?",
+    "o": [
+     "$25 000ге чейин",
+     "$25 000 – 40 000",
+     "$40 000 – 60 000",
+     "$60 000дөн көп",
+     "Азырынча билбейм"
+    ]
+   },
+   {
+    "t": "Жер тилкеңиз барбы?",
+    "o": [
+     "Ооба, бар",
+     "Жакында болот",
+     "Азырынча жок"
+    ]
+   },
+   {
+    "t": "Курулушту качан баштагыңыз келет?",
+    "o": [
+     "Жакынкы айда",
+     "3 айдын ичинде",
+     "Кийинчерээк, азырынча карап жатам"
+    ]
+   }
+  ],
+  "result": "Сизге бул долбоорлор туура келет",
+  "resultNone": "Сизге ылайыктуу долбоор тандап беребиз",
+  "resultText": "Баалар болжолдуу, ачкычка чейин. Телефонуңузду калтырыңыз: пландарды, так сметаны жөнөтөбүз жана белекти бекитебиз — эскиздик долбоор жана жылуу пол.",
+  "beds": "уктоочу бөлмө: {n}",
+  "name": "Атыңыз",
+  "phone": "Телефон",
+  "via": "Кантип байланышуу ыңгайлуу",
+  "viaO": [
+   "Чалуу",
+   "WhatsApp",
+   "Telegram"
+  ],
+  "send": "Смета жана пландарды алуу",
+  "errName": "Атыңызды жазыңыз",
+  "errPhone": "Номерди толук жазыңыз, мисалы +996 500 20 84 87",
+  "fail": "Жөнөтүлгөн жок. Бизге чалыңыз же WhatsApp'ка жазыңыз.",
+  "consent": "Баскычты басуу менен жеке маалыматтарды иштетүүгө макулдук бересиз.",
+  "sentChip": "Өтүнмө кабыл алынды",
+  "sentTitle": "Рахмат! Тандоо менеджерде",
+  "sentText": "Иш күнү ичинде байланышып, пландарды жөнөтөбүз жана так сметаны эсептейбиз."
  }
 }</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -606,8 +711,8 @@ let THREE;
 // the scene loads after the page is shown, so three.js and the stone textures do not compete with the first paint
 await new Promise(ok => document.readyState === 'complete' ? ok() : addEventListener('load', ok, { once: true }));
 await new Promise(ok => (window.requestIdleCallback || setTimeout)(ok, { timeout: 1200 }));
-const stones = new Promise((ok, fail) => { const sc = document.createElement('script'); sc.src = '../assets/stone/stone-3d.js'; sc.onload = ok; sc.onerror = fail; document.head.append(sc); });
-try { [THREE] = await Promise.all([import('https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js'), stones]); }
+const stones = window.aknietSoftGL ? null : new Promise((ok, fail) => { const sc = document.createElement('script'); sc.src = '../assets/stone/stone-3d.js'; sc.onload = ok; sc.onerror = fail; document.head.append(sc); });
+try { if (window.aknietSoftGL) throw new Error('no GPU, the hero stays flat'); [THREE] = await Promise.all([import('https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js'), stones]); }
 catch (e) { document.documentElement.classList.add('no-webgl'); }
 
 if (THREE) {
