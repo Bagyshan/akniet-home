@@ -86,10 +86,12 @@
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><span class="eyebrow" style="opacity:.8">Цена под ключ</span><span class="arrow"><svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
       <div><div class="big-num">$<span class="count" data-to="440" data-cms="price_m2">440</span><small>/м²</small></div><p style="margin-top:10px;opacity:.85">Цена фиксируется в договоре и не растёт во время стройки</p></div>
     </a>
-    <div class="card photo c-photo rv" data-cursor="view">
-      <img src="https://images.pexels.com/photos/19737838/pexels-photo-19737838.jpeg?auto=compress&cs=tinysrgb&w=700" alt="Интерьер A-frame с панорамным окном" loading="lazy">
-      <div class="over"><span class="chip">Интерьер</span></div>
-    </div>
+    <!-- the latest case from the admin panel (the server fills it in); opens its window with photos and videos -->
+    <a href="projects/#case-1" class="card photo c-photo c-built rv" data-case="1" data-cursor="view">
+      <img src="https://images.pexels.com/photos/9209878/pexels-photo-9209878.jpeg?auto=compress&cs=tinysrgb&w=700" alt="Дом для отдыха у Иссык-Куля" loading="lazy">
+      <div class="top"><span class="chip">Построили</span></div>
+      <div class="over"><div><b class="built-title">Дом для отдыха у Иссык-Куля</b><span class="built-place">Иссык-Кульская область</span></div><span class="arrow"><svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
+    </a>
     <a data-contact="instagram" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener" class="card oak c-insta rv">
       <span class="eyebrow" style="opacity:.85">Instagram</span>
       <div><b><span class="count" data-to="12" data-cms="instagram_k">12</span>K+</b><p style="font-size:14px;margin-top:6px;font-weight:500">следят за стройками</p></div>
@@ -443,8 +445,6 @@
       <div><span class="eyebrow">Мы в соцсетях</span><p class="follow-text">Каждую стройку показываем от фундамента до ключей</p></div>
       <div class="socials">
         <a data-contact="instagram" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener">Instagram</a>
-        <a data-contact="tiktok" href="https://www.tiktok.com/@akniet_home" target="_blank" rel="noopener">TikTok</a>
-        <a data-contact="threads" href="https://www.threads.net/@akniet.home" target="_blank" rel="noopener">Threads</a>
       </div>
     </div>
   </div>
@@ -457,7 +457,7 @@
       <div class="foot-top">
         <p style="font-family:var(--f-head);font-weight:300;font-size:clamp(22px,2.2vw,32px);line-height:1.25;max-width:20ch">Барнхаусы и A&#8209;frame дома <span style="color:var(--gold)">под ключ</span></p>
         <div><h3>Навигация</h3><ul><li><a href="projects/">Проекты и кейсы</a></li><li><a href="technology/">Технологии</a></li><li><a href="extras/">Постройки</a></li><li><a href="invest/">Под аренду</a></li><li><a href="map/">Карта объектов</a></li><li><a href="#price">Цены</a></li><li><a href="#faq">Вопросы</a></li></ul></div>
-        <div><h3>Соцсети</h3><ul><li><a data-contact="instagram" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener">Instagram</a></li><li><a data-contact="tiktok" href="https://www.tiktok.com/@akniet_home" target="_blank" rel="noopener">TikTok</a></li><li><a data-contact="threads" href="https://www.threads.net/@akniet.home" target="_blank" rel="noopener">Threads</a></li></ul></div>
+        <div><h3>Соцсети</h3><ul><li><a data-contact="instagram" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener">Instagram</a></li></ul></div>
         <div><h3>Контакты</h3><ul><li><a data-contact="phone" href="tel:+996500208487">+996 500 20 84 87</a></li><li data-needs="phone2" hidden><a data-contact="phone2" href="tel:+996000000000">+996 000 00 00 00</a></li><li><a data-contact="whatsapp" href="https://wa.me/996500208487" target="_blank" rel="noopener">WhatsApp</a> · <a data-contact="telegram" href="https://t.me/+996500208487" target="_blank" rel="noopener">Telegram</a></li><li><a data-contact="email" href="mailto:akniethome305@gmail.com">akniethome305@gmail.com</a></li></ul></div>
         <div><h3>Офис</h3><address class="office"><span data-cms="address">г. Бишкек, ул. Осмонкула, 113</span><span data-cms="hours">Пн–Сб, 10:00–20:00</span><a data-contact="route" href="https://2gis.kg/bishkek/directions/points/%7C74.624823%2C42.883309" target="_blank" rel="noopener" class="route">Построить маршрут в 2ГИС ↗</a></address></div>
       </div>
@@ -727,7 +727,8 @@ window.aknietTex = (() => {
   "projectsUnit": "проект,проекта,проектов",
   "again": "Пройти заново",
   "hide": "Скрыть подборку"
- }
+ },
+ "case": {"built": "Построили", "ig": "Смотреть в Instagram", "videos": "Видео со стройки", "want": "Хочу такой же дом", "project": "Смотреть проект", "facts": ["Площадь", "Срок", "Сезон"], "photo": "Фото {n} из {total}", "prev": "Предыдущее фото", "next": "Следующее фото", "close": "Закрыть"}
 }</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>

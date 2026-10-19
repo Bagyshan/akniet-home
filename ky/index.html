@@ -87,10 +87,12 @@
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><span class="eyebrow" style="opacity:.8">Ачкычка чейин баасы</span><span class="arrow"><svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
       <div><div class="big-num">$<span class="count" data-to="440" data-cms="price_m2">440</span><small>/м²</small></div><p style="margin-top:10px;opacity:.85">Баа келишимде бекитилет жана курулуш учурунда өспөйт</p></div>
     </a>
-    <div class="card photo c-photo rv" data-cursor="view">
-      <img src="https://images.pexels.com/photos/19737838/pexels-photo-19737838.jpeg?auto=compress&cs=tinysrgb&w=700" alt="Панорамалык терезеси бар A-frame интерьери" loading="lazy">
-      <div class="over"><span class="chip">Интерьер</span></div>
-    </div>
+    <!-- the latest case from the admin panel (the server fills it in); opens its window with photos and videos -->
+    <a href="projects/#case-1" class="card photo c-photo c-built rv" data-case="1" data-cursor="view">
+      <img src="https://images.pexels.com/photos/9209878/pexels-photo-9209878.jpeg?auto=compress&cs=tinysrgb&w=700" alt="Ысык-Көлдөгү эс алуу үйү" loading="lazy">
+      <div class="top"><span class="chip">Курдук</span></div>
+      <div class="over"><div><b class="built-title">Ысык-Көлдөгү эс алуу үйү</b><span class="built-place">Ысык-Көл облусу</span></div><span class="arrow"><svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
+    </a>
     <a data-contact="instagram" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener" class="card oak c-insta rv">
       <span class="eyebrow" style="opacity:.85">Instagram</span>
       <div><b><span class="count" data-to="12" data-cms="instagram_k">12</span>K+</b><p style="font-size:14px;margin-top:6px;font-weight:500">курулуштарыбызды көрүп турат</p></div>
@@ -444,8 +446,6 @@
       <div><span class="eyebrow">Биз социалдык тармактарда</span><p class="follow-text">Ар бир курулушту пайдубалдан ачкычка чейин көрсөтөбүз</p></div>
       <div class="socials">
         <a data-contact="instagram" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener">Instagram</a>
-        <a data-contact="tiktok" href="https://www.tiktok.com/@akniet_home" target="_blank" rel="noopener">TikTok</a>
-        <a data-contact="threads" href="https://www.threads.net/@akniet.home" target="_blank" rel="noopener">Threads</a>
       </div>
     </div>
   </div>
@@ -458,7 +458,7 @@
       <div class="foot-top">
         <p style="font-family:var(--f-head);font-weight:300;font-size:clamp(22px,2.2vw,32px);line-height:1.25;max-width:20ch"><span style="color:var(--gold)">Ачкычка чейин</span> барнхаус жана A&#8209;frame үйлөр</p>
         <div><h3>Навигация</h3><ul><li><a href="projects/">Долбоорлор жана кейстер</a></li><li><a href="technology/">Технологиялар</a></li><li><a href="extras/">Курулуштар</a></li><li><a href="invest/">Ижарага</a></li><li><a href="map/">Объекттер картасы</a></li><li><a href="#price">Баалар</a></li><li><a href="#faq">Суроолор</a></li></ul></div>
-        <div><h3>Соцтармактар</h3><ul><li><a data-contact="instagram" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener">Instagram</a></li><li><a data-contact="tiktok" href="https://www.tiktok.com/@akniet_home" target="_blank" rel="noopener">TikTok</a></li><li><a data-contact="threads" href="https://www.threads.net/@akniet.home" target="_blank" rel="noopener">Threads</a></li></ul></div>
+        <div><h3>Соцтармактар</h3><ul><li><a data-contact="instagram" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener">Instagram</a></li></ul></div>
         <div><h3>Байланыш</h3><ul><li><a data-contact="phone" href="tel:+996500208487">+996 500 20 84 87</a></li><li data-needs="phone2" hidden><a data-contact="phone2" href="tel:+996000000000">+996 000 00 00 00</a></li><li><a data-contact="whatsapp" href="https://wa.me/996500208487" target="_blank" rel="noopener">WhatsApp</a> · <a data-contact="telegram" href="https://t.me/+996500208487" target="_blank" rel="noopener">Telegram</a></li><li><a data-contact="email" href="mailto:akniethome305@gmail.com">akniethome305@gmail.com</a></li></ul></div>
         <div><h3>Кеңсе</h3><address class="office"><span data-cms="address">Бишкек ш., Осмонкул көч., 113</span><span data-cms="hours">Дш–Иш, 10:00–20:00</span><a data-contact="route" href="https://2gis.kg/bishkek/directions/points/%7C74.624823%2C42.883309" target="_blank" rel="noopener" class="route">2ГИСте маршрут куруу ↗</a></address></div>
       </div>
@@ -733,6 +733,22 @@ window.aknietTex = (() => {
   "nights": "түн,түн,түн",
   "years": "жыл,жыл,жыл",
   "days": "сутка,сутка,сутка"
+ },
+ "case": {
+  "built": "Курдук",
+  "ig": "Instagram'да көрүү",
+  "videos": "Курулуштан видео",
+  "want": "Ушундай үй каалайм",
+  "project": "Долбоорду көрүү",
+  "facts": [
+   "Аянты",
+   "Мөөнөтү",
+   "Мезгил"
+  ],
+  "photo": "Сүрөт {n} / {total}",
+  "prev": "Мурунку сүрөт",
+  "next": "Кийинки сүрөт",
+  "close": "Жабуу"
  }
 }</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>

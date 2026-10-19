@@ -156,6 +156,11 @@ dialog.wide{width:min(1120px,calc(100% - 24px))}
 .ce .fld input:focus,.ce .fld select:focus,.ce .fld textarea:focus{border-color:var(--gold)}
 .ce-photo{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .ce-photo .thumb{width:160px;aspect-ratio:4/3;border-radius:12px;background:#555 center/cover;flex:none}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:10px}
+.gal:empty{display:none}
+.gal-it .thumb{aspect-ratio:4/3;border-radius:10px;background:#555 center/cover}
+.gal-b{display:flex;gap:4px;margin-top:6px}
+.gal-b .btn{flex:1;padding:0;min-width:0}
 .check{display:flex;gap:10px;align-items:center;min-height:44px;cursor:pointer}
 .check input{width:20px;height:20px;accent-color:var(--gold)}
 .ce-sec{border-top:1px solid var(--line);padding-top:16px;display:grid;gap:12px}
@@ -654,7 +659,7 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
   }
   const ROW = {
     projects: d => ({ img: d.image, title: `«${d.name}»`, meta: `${STYLE[d.style]} · ${area(d.area)} м²${d.terrace ? ` + ${d.terrace_type === 'closed' ? 'закрытая' : 'открытая'} терраса ${area(d.terrace)} м²` : ''} · спален: ${d.beds} · санузлов: ${d.baths} · этажей в схеме: ${d.plan.length}`, tags: [d.on_home && ['gold', 'на главной'], !d.name_ky || !d.text_ky ? ['warn', 'нет перевода'] : null] }),
-    cases: d => ({ img: d.image, title: d.title, meta: `${d.region} · ${d.area} · ${d.term}` + (d.project ? ` · проект: ${CAT.projects.find(p => p.id === d.project)?.data.name || '—'}` : ''), tags: [!d.title_ky || !d.story_ky ? ['warn', 'нет перевода'] : null] }),
+    cases: d => ({ img: d.image, title: d.title, meta: `${d.region} · ${d.area} · ${d.term}` + (d.photos?.length ? ` · фото: ${d.photos.length + 1}` : '') + (d.videos?.length ? ` · видео: ${d.videos.length}` : '') + (d.project ? ` · проект: ${CAT.projects.find(p => p.id === d.project)?.data.name || '—'}` : ''), tags: [!d.title_ky || !d.story_ky ? ['warn', 'нет перевода'] : null] }),
     extras: d => ({ img: d.image, title: d.name, meta: `${d.lead} · примеров работ: ${d.works.length}`, tags: [!d.name_ky || !d.text_ky ? ['warn', 'нет перевода'] : null] }),
     rentals: d => ({ img: d.image, title: d.title, meta: [d.place, `$${d.price_night} за сутки`, d.nights && `${d.nights} ночей в год`, d.invest && `вложения $${d.invest.toLocaleString('ru-RU')}`, rentCalc(d)].filter(Boolean).join(' · '), tags: [!d.title_ky ? ['warn', 'нет перевода'] : null] }),
     faq: d => ({ title: d.q, meta: d.a.length > 140 ? d.a.slice(0, 140) + '…' : d.a, tags: [!d.q_ky || !d.a_ky ? ['warn', 'нет перевода'] : null] }),
@@ -724,10 +729,46 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
     return el('div', { className: 'fld s4' }, el('label', { textContent: label }), el('div', { className: 'ce-photo' }, thumb, pick, del, file, state));
   }
 
+  // Instagram links, one per line (the server checks and tidies them)
+  function videosField() {
+    const t = el('textarea', { value: (draft.videos || []).join('\n'), placeholder: 'https://www.instagram.com/reel/…\nкаждая ссылка с новой строки', autocomplete: 'off' });
+    t.addEventListener('input', () => { draft.videos = t.value.split('\n').map(x => x.trim()).filter(Boolean); });
+    return el('div', { className: 'fld s4' }, el('label', { textContent: 'Видео из Instagram — до 8 ссылок, каждая с новой строки' }), t,
+      el('p', { className: 'muted', textContent: 'Ссылка на пост или рилс: в Instagram «…» → «Копировать ссылку». На сайте видео показывается как пост Instagram, его можно смотреть прямо на странице. Аккаунт должен быть открытым.' }));
+  }
+  // several photos with order: the case gallery
+  function photosField(label, max) {
+    draft.photos ||= [];
+    const box = el('div', { className: 'gal' }), state = el('span', { className: 'up-state' });
+    const file = el('input', { type: 'file', accept: 'image/jpeg,image/png,image/webp', multiple: true });
+    file.style.cssText = 'position:absolute;opacity:0;width:1px;height:1px';
+    const add = el('button', { type: 'button', className: 'btn sm', textContent: '+ Добавить фото' }); add.addEventListener('click', () => file.click());
+    const render = () => box.replaceChildren(...draft.photos.map((src, i) => {
+      const b = (t, title, fn, off) => { const x = el('button', { type: 'button', className: 'btn sm', textContent: t, title, disabled: !!off }); x.addEventListener('click', () => { fn(); render(); }); return x; };
+      return el('div', { className: 'gal-it' }, el('div', { className: 'thumb', style: `background-image:url("${src}")` }),
+        el('div', { className: 'gal-b' },
+          b('←', 'Раньше', () => { [draft.photos[i - 1], draft.photos[i]] = [draft.photos[i], draft.photos[i - 1]]; }, i === 0),
+          b('→', 'Позже', () => { [draft.photos[i + 1], draft.photos[i]] = [draft.photos[i], draft.photos[i + 1]]; }, i === draft.photos.length - 1),
+          b('×', 'Убрать', () => { draft.photos.splice(i, 1); })));
+    }));
+    file.addEventListener('change', async () => {
+      const files = [...file.files]; file.value = '';
+      for (const [n, f] of files.entries()) {
+        if (draft.photos.length >= max) { toast(`Не больше ${max} фото`, true); break; }
+        state.textContent = `Сжимаем ${n + 1} из ${files.length}…`;
+        try { draft.photos.push((await upload(f, 'gallery')).url); render(); }
+        catch (err) { toast(errText(err, 'Не удалось загрузить фото'), true); }
+      }
+      state.textContent = '';
+    });
+    render();
+    return el('div', { className: 'fld s4' }, el('label', { textContent: label }), box, el('div', { className: 'ce-photo' }, add, file, state));
+  }
+
   const BLANK = {
-    projects: () => ({ slug: '', style: 'barn', name: '', name_ky: '', area: null, terrace: 0, terrace_type: 'open', beds: 1, baths: 1, floors: '1', floors_ky: '', text: '', text_ky: '', price: null, image: null, on_home: false,
+    projects: () => ({ slug: '', style: 'barn', name: '', name_ky: '', area: null, terrace: 0, terrace_type: 'open', beds: 1, baths: 1, floors: '1', floors_ky: '', text: '', text_ky: '', price: null, image: null, on_home: false, videos: [],
       plan: [{ name: '1 этаж', name_ky: '1-кабат', w: 10, h: 8, void: null, image: null, rooms: [{ x: 0, y: 0, w: 6, h: 8, name: 'Кухня-гостиная', name_ky: 'Ашкана-конок бөлмө' }] }] }),
-    cases: () => ({ image: null, region: '', region_ky: '', title: '', title_ky: '', area: '', term: '', term_ky: '', season: '', season_ky: '', story: '', story_ky: '', project: null }),
+    cases: () => ({ image: null, region: '', region_ky: '', title: '', title_ky: '', area: '', term: '', term_ky: '', season: '', season_ky: '', story: '', story_ky: '', project: null, photos: [], videos: [] }),
     faq: () => ({ q: '', q_ky: '', a: '', a_ky: '' }),
     rentals: () => ({ image: null, title: '', title_ky: '', place: '', place_ky: '', area: null, project: null, price_night: null, nights: null, invest: null, story: '', story_ky: '' }),
     extras: () => ({ slug: '', name: '', name_ky: '', lead: '', lead_ky: '', text: '', text_ky: '', points: '', points_ky: '', image: null, works: [] }),
@@ -826,7 +867,9 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
       fld('По какому проекту', sel, 's2'),
       pair('Срок стройки', 'term', { max: 30, ph: '2 месяца' }),
       pair('Сезон', 'season', { max: 30, ph: 'Зима' }),
-      pair('История', 'story', { max: 600, area: true }))];
+      pair('История', 'story', { max: 600, area: true }),
+      photosField('Ещё фото — галерея в окне кейса (стройка, интерьер, вид с участка), до 12 штук. Первым показывается фото выше', 12),
+      videosField())];
   }
 
   function projectForm() {
@@ -864,7 +907,8 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
         fld('Цена под ключ, $', numInp('price', { ph: 'пусто — площадь × цена за м²' })),
         pair('Этажи (как в карточке)', 'floors', { max: 30, ph: '1 + антресоль' }),
         pair('Описание', 'text', { max: 400, area: true }),
-        el('label', { className: 'check s4' }, home, 'Показывать на главной (короткая карточка в «Готовых проектах»)')),
+        el('label', { className: 'check s4' }, home, 'Показывать на главной (короткая карточка в «Готовых проектах»)'),
+        videosField()),
       el('div', { className: 'ce-sec' },
         el('h2', {}, 'Планировка', addFloor),
         el('p', { className: 'muted', textContent: 'Размеры в метрах. Отметка «терр.» превращает комнату в террасу: она рисуется настилом и может выходить за контур дома (например, Y больше длины дома — терраса перед входом). Площадь и тип террасы для цены — поля «Терраса, м²» и «Терраса» выше. X и Y — где начинается комната от левого верхнего угла дома, ширина — по горизонтали, длина — по вертикали. Схема справа обновляется сразу и выглядит так же, как на сайте. Вместо схемы можно загрузить картинку этажа — тогда на сайте будет она, а комнаты останутся списком под фото проекта.' }),

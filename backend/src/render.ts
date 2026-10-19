@@ -62,7 +62,7 @@ const contactHref: Record<string, (v: string) => string> = {
   whatsapp: v => 'https://wa.me/' + digits(v),
   telegram: v => (isPhone(v) ? 'https://t.me/+' + digits(v) : 'https://t.me/' + v.replace(/^@/, '')),
   email: v => 'mailto:' + v,
-  instagram: v => v, tiktok: v => v, threads: v => v,
+  instagram: v => v,
 };
 const routeUrl = (lat: number, lon: number) => `https://2gis.kg/bishkek/directions/points/%7C${lon.toFixed(6)}%2C${lat.toFixed(6)}`;
 const DAYS: Record<string, string[]> = { 'Mo-Fr': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], 'Mo-Sa': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] };
@@ -206,7 +206,7 @@ function build(template: string, lang: Lang, page: Page, c: Content): string {
         openingHoursSpecification: [{ '@type': 'OpeningHoursSpecification', dayOfWeek: DAYS[c.work_days] || DAYS['Mo-Sa'], opens: c.work_from, closes: c.work_to }],
         areaServed: { '@type': 'Country', name: T.seo.country },
         priceRange: fill(T.seo.priceRange, { price }),
-        sameAs: [c.instagram, c.tiktok, c.threads].filter(Boolean),
+        sameAs: [c.instagram].filter(Boolean),
         makesOffer: [...T.seo.services.map((name: string) => [name, price]), ...(terracePrice.open ? [[T.seo.terraceOpenService, terracePrice.open]] : []), ...(terracePrice.closed ? [[T.seo.terraceClosedService, terracePrice.closed]] : [])].map(([name, p]) => ({
           '@type': 'Offer', itemOffered: { '@type': 'Service', name, areaServed: { '@type': 'Country', name: T.seo.country } },
           priceSpecification: { '@type': 'UnitPriceSpecification', price: p, priceCurrency: 'USD', unitText: 'м²', referenceQuantity: { '@type': 'QuantitativeValue', value: 1, unitCode: 'MTK' } },
@@ -373,16 +373,32 @@ function renderCatalog(document: any, lang: Lang, page: Page, c: Content, T: any
   else fillList(cases, c.cases, (card, k) => {
     setImage(card, '.pimg img', k.image, k.title);
     setText(card, '.pimg .chip', k.region);
-    const eyebrow = card.querySelector('.eyebrow'), more = card.querySelector('.more-link');
+    // «Подробнее» and the photo open the case window (site.js); the link keeps it reachable without scripts
+    card.querySelectorAll('[data-case]').forEach((e: any) => e.setAttribute('data-case', String(k.id)));
+    card.querySelector('.more-link[data-case]')?.setAttribute('href', '#case-' + k.id);
+    const eyebrow = card.querySelector('.eyebrow'), more = card.querySelector('.more-link.proj');
     if (k.project) {
       eyebrow.textContent = `${styleLabel(k.project)} «${k.project.name}»`;
-      more.setAttribute('href', '#' + k.project.slug);
-    } else { eyebrow.remove(); more.remove(); }
+      more?.setAttribute('href', '#' + k.project.slug);
+    } else { eyebrow.remove(); more?.remove(); }
     setText(card, 'h3', k.title);
     const dd = card.querySelectorAll('.case-facts dd');
     [k.area, k.term, k.season].forEach((v, i) => dd[i] && (dd[i].textContent = v));
     setText(card, '.body > p', k.story);
   });
+
+  // home hero: the latest built house (the last case added); without cases the tile leads to /projects/
+  const built = $('.c-built');
+  if (built) {
+    const k = [...c.cases].sort((a, b) => b.id - a.id)[0];
+    if (k) {
+      built.setAttribute('href', `${up}projects/#case-${k.id}`); built.setAttribute('data-case', String(k.id));
+      setImage(built, 'img', k.image, k.title);
+      setText(built, '.built-title', k.title); setText(built, '.built-place', k.region);
+    } else {
+      built.setAttribute('href', `${up}projects/`); built.removeAttribute('data-case');
+    }
+  }
 
   // extras: cards on the home page, sections and their links on /extras/
   const homeExtras = $('[data-list="home-extras"]');

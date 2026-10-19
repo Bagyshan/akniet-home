@@ -698,7 +698,45 @@ section[id],article[id],[id="gift"]{scroll-margin-top:96px}
 .case-facts div{background:rgba(255,248,236,.06);border-radius:12px;padding:8px 10px}
 .case-facts dt{font-size:11.5px;color:var(--dim)}
 .case-facts dd{margin:0;font-family:var(--f-head);font-size:15px;white-space:nowrap}
-.case .more-link{margin-top:auto}
+.case .more-link{margin-top:0}
+.case-links{margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.case-links .more-link.proj{color:var(--dim);font-weight:500}
+.case .pimg[data-case]{cursor:pointer}
+/* home hero: the latest built house */
+.c-built .over b{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;font-family:var(--f-head);font-weight:400;font-size:clamp(14px,1.05vw,17px);line-height:1.2;color:var(--cream)}
+.c-built .over span:not(.arrow){display:block;margin-top:4px;font-size:13px;color:rgba(255,248,236,.72)}
+.c-built .arrow{width:40px;height:40px}
+/* case window: gallery, story, Instagram videos */
+dialog.cdlg{width:min(980px,calc(100% - 24px))}
+.cdlg-in{max-height:calc(100dvh - 24px);overflow-y:auto;overscroll-behavior:contain}
+.cg{position:relative;background:#1a181b}
+.cg-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;outline:none}
+.cg-track::-webkit-scrollbar{display:none}
+.cg-track img{flex:0 0 100%;width:100%;aspect-ratio:16/10;max-height:62vh;object-fit:cover;scroll-snap-align:start}
+.cg-nav{position:absolute;top:50%;width:46px;height:46px;margin-top:-23px;border:0;border-radius:50%;background:rgba(255,248,236,.9);color:var(--ink);display:grid;place-items:center;cursor:pointer;box-shadow:0 6px 20px -6px rgba(0,0,0,.5)}
+.cg-nav svg{width:18px;height:18px}
+.cg-nav.prev{left:14px}.cg-nav.prev svg{transform:rotate(180deg)}
+.cg-nav.next{right:14px}
+.cg-count{position:absolute;left:14px;bottom:14px;padding:4px 10px;border-radius:999px;background:rgba(26,24,27,.7);font-size:13px;font-weight:600}
+.cg-thumbs{display:flex;gap:6px;padding:10px clamp(16px,2.6vw,36px) 0;overflow-x:auto;scrollbar-width:none}
+.cg-thumbs button{flex:none;width:72px;height:50px;padding:0;border:0;border-radius:10px;overflow:hidden;cursor:pointer;opacity:.5;transition:opacity .3s;box-shadow:inset 0 0 0 2px transparent}
+.cg-thumbs button[aria-current]{opacity:1;outline:2px solid var(--gold);outline-offset:-2px}
+.cg-thumbs img{width:100%;height:100%;object-fit:cover}
+.cdlg-body{display:grid;grid-template-columns:1fr auto;gap:18px 32px;align-items:end;padding:clamp(20px,2.6vw,36px)}
+.cdlg-info{display:flex;flex-direction:column;gap:14px;min-width:0}
+.cdlg-tags{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.cdlg-tags .eyebrow{color:var(--gold);opacity:1}
+.cdlg h3{font-size:clamp(24px,2.4vw,36px);line-height:1.12}
+.cdlg-story{color:rgba(255,248,236,.8);max-width:62ch}
+.cdlg-btns{display:flex;flex-direction:column;gap:8px}
+.cdlg-videos{padding:0 clamp(20px,2.6vw,36px) clamp(20px,2.6vw,36px)}
+.cdlg-videos h4,.plan-videos h4{font-family:var(--f-text);font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin:0 0 12px}
+.ig-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;align-items:start}
+.plan-videos .ig-list{grid-template-columns:1fr}
+/* the Instagram post before (blockquote) and after (iframe) its script runs */
+.ig-list .instagram-media{margin:0!important;min-width:0!important;width:100%!important;max-width:540px!important;border-radius:16px!important;border:0!important;box-shadow:none!important;background:#fff!important;overflow:hidden}
+.ig-list blockquote.instagram-media{display:grid;place-items:center;min-height:220px;padding:0;background:rgba(255,248,236,.06)!important}
+.ig-list blockquote.instagram-media a{color:var(--gold);font-weight:600}
 
 /* ---------- Map page ---------- */
 .kg-box.big{aspect-ratio:1.75}
@@ -809,6 +847,8 @@ section[id],article[id],[id="gift"]{scroll-margin-top:96px}
   .plan-fig{padding-top:64px}
   .plan-info{padding-top:20px}
   .plan-info>.chip,.plan-info h3{margin-right:0}
+  .cdlg-body{grid-template-columns:1fr}
+  .cg-nav{display:none}
 }
 @media (max-width:700px){
   :root{--r:22px;--gap:10px}

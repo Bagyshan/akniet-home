@@ -215,33 +215,33 @@
     <!-- cards: admin panel → Кейсы -->
     <div class="cases" data-list="cases">
       <article class="card case rv">
-        <div class="pimg"><img src="https://images.pexels.com/photos/9209878/pexels-photo-9209878.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=800" alt="Ысык-Көлдөгү эс алуу үйү" loading="lazy"><span class="chip">Ысык-Көл облусу</span></div>
+        <div class="pimg" data-case="1" data-cursor="view"><img src="https://images.pexels.com/photos/9209878/pexels-photo-9209878.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=800" alt="Ысык-Көлдөгү эс алуу үйү" loading="lazy"><span class="chip">Ысык-Көл облусу</span></div>
         <div class="body">
           <span class="eyebrow">A-frame «Карагай»</span>
           <h3>Ысык-Көлдөгү эс алуу үйү</h3>
           <dl class="case-facts"><div><dt>Аянты</dt><dd>68 м²</dd></div><div><dt>Мөөнөт</dt><dd>2 ай</dd></div><div><dt>Мезгил</dt><dd>Күз</dd></div></dl>
           <p>Үй-бүлө жыл бою келе турган үй каалаган. Курулушту күзүндө баштап, Жаңы жылды жаңы үйдө тосушту — белекке жылуу пол менен.</p>
-          <a href="#karagay" class="more-link">Долбоорду көрүү →</a>
+          <div class="case-links"><a href="#case-1" class="more-link" data-case="1">Кененирээк →</a><a href="#karagay" class="more-link proj">Долбоорду көрүү</a></div>
         </div>
       </article>
       <article class="card case rv">
-        <div class="pimg"><img src="https://images.pexels.com/photos/4626268/pexels-photo-4626268.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=800" alt="Шаардын сыртында жашоо үчүн барнхаус" loading="lazy"><span class="chip">Чүй облусу</span></div>
+        <div class="pimg" data-case="2" data-cursor="view"><img src="https://images.pexels.com/photos/4626268/pexels-photo-4626268.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=800" alt="Шаардын сыртында жашоо үчүн барнхаус" loading="lazy"><span class="chip">Чүй облусу</span></div>
         <div class="body">
           <span class="eyebrow">«Жайлоо» барнхаусу</span>
           <h3>Шаардын сыртында жашоо үчүн барнхаус</h3>
           <dl class="case-facts"><div><dt>Аянты</dt><dd>86 м²</dd></div><div><dt>Мөөнөт</dt><dd>2 ай</dd></div><div><dt>Мезгил</dt><dd>Кыш</dd></div></dl>
           <p>Кышында курдук: металл каркас сууктан коркпойт, ал эми жасалганы отурууну күтпөй эле дароо баштадык. Жазында үй-бүлө батирден көчүп келди.</p>
-          <a href="#jailoo" class="more-link">Долбоорду көрүү →</a>
+          <div class="case-links"><a href="#case-2" class="more-link" data-case="2">Кененирээк →</a><a href="#jailoo" class="more-link proj">Долбоорду көрүү</a></div>
         </div>
       </article>
       <article class="card case rv">
-        <div class="pimg"><img src="https://images.pexels.com/photos/19737830/pexels-photo-19737830.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=800" alt="Эс алуу базасы үчүн конок үйлөр" loading="lazy"><span class="chip">Нарын облусу</span></div>
+        <div class="pimg" data-case="3" data-cursor="view"><img src="https://images.pexels.com/photos/19737830/pexels-photo-19737830.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=800" alt="Эс алуу базасы үчүн конок үйлөр" loading="lazy"><span class="chip">Нарын облусу</span></div>
         <div class="body">
           <span class="eyebrow">A-frame «Тау»</span>
           <h3>Эс алуу базасы үчүн конок үйлөр</h3>
           <dl class="case-facts"><div><dt>Аянты</dt><dd>3 × 43 м²</dd></div><div><dt>Мөөнөт</dt><dd>1,5 айдан</dd></div><div><dt>Мезгил</dt><dd>Жай</dd></div></dl>
           <p>Эс алуу базасынын конокторуна үч компакттуу A-frame. Бирдей пландоо үйлөрдү катар курууга жана мезгилди өз убагында ачууга мүмкүндүк берди.</p>
-          <a href="#tau" class="more-link">Долбоорду көрүү →</a>
+          <div class="case-links"><a href="#case-3" class="more-link" data-case="3">Кененирээк →</a><a href="#tau" class="more-link proj">Долбоорду көрүү</a></div>
         </div>
       </article>
     </div>
@@ -259,6 +259,7 @@
       <ul class="plan-rooms"></ul>
       <div class="plan-price"><span>Ачкычка чейин, болжолдуу</span><b></b><small>Мөөнөтү — орточо <span data-cms="build_months_avg" data-unit="ай,ай,ай">2 ай</span></small></div>
       <a href="#contact" class="btn gold plan-go">Бул долбоорду эсептөө <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <div class="plan-videos" hidden><h4>Instagram'дагы видео</h4><div class="ig-list"></div></div>
     </div>
   </div>
 </dialog>
@@ -309,8 +310,6 @@
       <div><span class="eyebrow">Биз социалдык тармактарда</span><p class="follow-text">Ар бир курулушту пайдубалдан ачкычка чейин көрсөтөбүз</p></div>
       <div class="socials">
         <a data-contact="instagram" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener">Instagram</a>
-        <a data-contact="tiktok" href="https://www.tiktok.com/@akniet_home" target="_blank" rel="noopener">TikTok</a>
-        <a data-contact="threads" href="https://www.threads.net/@akniet.home" target="_blank" rel="noopener">Threads</a>
       </div>
     </div>
   </div>
@@ -323,7 +322,7 @@
       <div class="foot-top">
         <p style="font-family:var(--f-head);font-weight:300;font-size:clamp(22px,2.2vw,32px);line-height:1.25;max-width:20ch"><span style="color:var(--gold)">Ачкычка чейин</span> барнхаус жана A&#8209;frame үйлөр</p>
         <div><h3>Навигация</h3><ul><li><a href="../projects/" aria-current="page">Долбоорлор жана кейстер</a></li><li><a href="../technology/">Технологиялар</a></li><li><a href="../extras/">Курулуштар</a></li><li><a href="../invest/">Ижарага</a></li><li><a href="../map/">Объекттер картасы</a></li><li><a href="../#price">Баалар</a></li><li><a href="../#faq">Суроолор</a></li></ul></div>
-        <div><h3>Соцтармактар</h3><ul><li><a data-contact="instagram" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener">Instagram</a></li><li><a data-contact="tiktok" href="https://www.tiktok.com/@akniet_home" target="_blank" rel="noopener">TikTok</a></li><li><a data-contact="threads" href="https://www.threads.net/@akniet.home" target="_blank" rel="noopener">Threads</a></li></ul></div>
+        <div><h3>Соцтармактар</h3><ul><li><a data-contact="instagram" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener">Instagram</a></li></ul></div>
         <div><h3>Байланыш</h3><ul><li><a data-contact="phone" href="tel:+996500208487">+996 500 20 84 87</a></li><li data-needs="phone2" hidden><a data-contact="phone2" href="tel:+996000000000">+996 000 00 00 00</a></li><li><a data-contact="whatsapp" href="https://wa.me/996500208487" target="_blank" rel="noopener">WhatsApp</a> · <a data-contact="telegram" href="https://t.me/+996500208487" target="_blank" rel="noopener">Telegram</a></li><li><a data-contact="email" href="mailto:akniethome305@gmail.com">akniethome305@gmail.com</a></li></ul></div>
         <div><h3>Кеңсе</h3><address class="office"><span data-cms="address">Бишкек ш., Осмонкул көч., 113</span><span data-cms="hours">Дш–Иш, 10:00–20:00</span><a data-contact="route" href="https://2gis.kg/bishkek/directions/points/%7C74.624823%2C42.883309" target="_blank" rel="noopener" class="route">2ГИСте маршрут куруу ↗</a></address></div>
       </div>
@@ -513,6 +512,22 @@
   "nights": "түн,түн,түн",
   "years": "жыл,жыл,жыл",
   "days": "сутка,сутка,сутка"
+ },
+ "case": {
+  "built": "Курдук",
+  "ig": "Instagram'да көрүү",
+  "videos": "Курулуштан видео",
+  "want": "Ушундай үй каалайм",
+  "project": "Долбоорду көрүү",
+  "facts": [
+   "Аянты",
+   "Мөөнөтү",
+   "Мезгил"
+  ],
+  "photo": "Сүрөт {n} / {total}",
+  "prev": "Мурунку сүрөт",
+  "next": "Кийинки сүрөт",
+  "close": "Жабуу"
  }
 }</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>

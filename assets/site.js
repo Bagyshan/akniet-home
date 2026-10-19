@@ -20,7 +20,7 @@
     try { if (window.ym && window.aknietYM) window.ym(window.aknietYM, 'reachGoal', name, p); } catch {}
   };
   // phone, WhatsApp, Telegram, mail, route and social links all carry data-contact
-  const CONTACT_GOALS = { phone: 'contact_phone', phone2: 'contact_phone', whatsapp: 'contact_whatsapp', telegram: 'contact_telegram', email: 'contact_email', route: 'contact_route', instagram: 'contact_social', tiktok: 'contact_social', threads: 'contact_social' };
+  const CONTACT_GOALS = { phone: 'contact_phone', phone2: 'contact_phone', whatsapp: 'contact_whatsapp', telegram: 'contact_telegram', email: 'contact_email', route: 'contact_route', instagram: 'contact_social' };
   document.addEventListener('click', e => { const a = e.target.closest('[data-contact]'); if (a && CONTACT_GOALS[a.dataset.contact]) goal(CONTACT_GOALS[a.dataset.contact], { network: a.dataset.contact }); });
   const priceFrom = sum => fill(T.priceFrom, { sum });
 
@@ -333,6 +333,97 @@
     document.addEventListener('click', e => { const b = e.target.closest('[data-plan]'); if (b) openPlan(b.dataset.plan); });
   }
 
+  /* ---- Instagram posts and reels: the official embed; its script loads only when a window with videos opens ---- */
+  let igReady = null;
+  const igHTML = urls => urls.map(u => `<blockquote class="instagram-media" data-instgrm-permalink="${esc(u)}?utm_source=ig_embed" data-instgrm-version="14"><a href="${esc(u)}" target="_blank" rel="noopener">${esc(T.case?.ig || 'Instagram')} ↗</a></blockquote>`).join('');
+  function igProcess() {
+    igReady ||= new Promise(ok => { const s = document.createElement('script'); s.src = 'https://www.instagram.com/embed.js'; s.async = true; s.onload = s.onerror = ok; document.head.append(s); });
+    igReady.then(() => window.instgrm?.Embeds.process());
+  }
+  // videos under the floor plan
+  const planVideos = plan?.querySelector('.plan-videos');
+  if (planVideos) document.addEventListener('click', e => {
+    const b = e.target.closest('[data-plan]'), p = b && projectBy(b.dataset.plan); if (!p) return;
+    const v = p.videos || [];
+    planVideos.hidden = !v.length;
+    planVideos.querySelector('.ig-list').innerHTML = igHTML(v);
+    if (v.length) igProcess();
+  });
+
+  /* ---- a built house (case): photos, story, Instagram videos. Opens from any [data-case] and from a link ending in #case-<id> ---- */
+  let CASES = [];
+  const C = T.case;
+  const caseDlg = C && document.createElement('dialog');
+  if (caseDlg) {
+    caseDlg.className = 'plan cdlg';
+    caseDlg.setAttribute('aria-labelledby', 'cdlg-title');
+    caseDlg.innerHTML = `<button class="plan-close" type="button" aria-label="${esc(C.close)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button><div class="cdlg-in" data-lenis-prevent></div>`;
+    document.body.append(caseDlg);
+  }
+  const caseIn = caseDlg?.querySelector('.cdlg-in');
+  const ARR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg>';
+  function openCase(id) {
+    const k = CASES.find(x => String(x.id) === String(id)); if (!k || !caseDlg) return false;
+    const imgs = [k.image, ...(k.photos || [])].filter(Boolean), videos = k.videos || [];
+    const onProjects = !!document.querySelector('[data-list="projects"]'), root = document.documentElement.lang === 'ky' ? '/ky/' : '/';
+    const projHref = k.project && (onProjects ? '#' + k.project.slug : root + 'projects/#' + k.project.slug);
+    caseIn.innerHTML = `${imgs.length ? `<div class="cg"><div class="cg-track" tabindex="0" aria-label="${esc(k.title)}">${imgs.map((src, i) => `<img src="${esc(src)}" alt="${esc(fill(C.photo, { n: i + 1, total: imgs.length }))}" ${i ? 'loading="lazy"' : ''}>`).join('')}</div>`
+      + (imgs.length > 1 ? `<button type="button" class="cg-nav prev" aria-label="${esc(C.prev)}">${ARR}</button><button type="button" class="cg-nav next" aria-label="${esc(C.next)}">${ARR}</button><span class="cg-count">1 / ${imgs.length}</span>` : '')
+      + `</div>` + (imgs.length > 1 ? `<div class="cg-thumbs">${imgs.map((src, i) => `<button type="button" aria-label="${esc(fill(C.photo, { n: i + 1, total: imgs.length }))}"${i ? '' : ' aria-current="true"'}><img src="${esc(src)}" alt="" loading="lazy"></button>`).join('')}</div>` : '') : ''}
+      <div class="cdlg-body">
+        <div class="cdlg-info">
+          <div class="cdlg-tags"><span class="chip">${esc(k.region)}</span>${k.project ? `<span class="eyebrow">${esc(word(styleName(k.project)))} «${esc(k.project.name)}»</span>` : ''}</div>
+          <h3 id="cdlg-title">${esc(k.title)}</h3>
+          <dl class="plan-specs">${[k.area, k.term, k.season].map((v, i) => v ? `<div><dt>${esc(C.facts[i])}</dt><dd>${esc(v)}</dd></div>` : '').join('')}</dl>
+          <p class="cdlg-story">${esc(k.story)}</p>
+        </div>
+        <div class="cdlg-btns">
+          <a href="#contact" class="btn gold cdlg-go">${esc(C.want)} ${ARR}</a>
+          ${projHref ? `<a href="${esc(projHref)}" class="btn ghost cdlg-proj">${esc(C.project)}</a>` : ''}
+        </div>
+      </div>
+      ${videos.length ? `<div class="cdlg-videos"><h4>${esc(C.videos)}</h4><div class="ig-list">${igHTML(videos)}</div></div>` : ''}`;
+    caseIn.querySelector('.cdlg-go').dataset.lead = JSON.stringify({ type: k.project ? styleName(k.project) : 'Нужен совет', project: `Кейс: ${k.title}${k.project ? ` (проект «${k.project.name}»)` : ''}` });
+    // gallery: the strip scrolls (swipe on a phone), the arrows and thumbnails move it
+    const track = caseIn.querySelector('.cg-track'), thumbs = [...caseIn.querySelectorAll('.cg-thumbs button')], count = caseIn.querySelector('.cg-count');
+    const go = i => track.scrollTo({ left: Math.max(0, Math.min(imgs.length - 1, i)) * track.clientWidth, behavior: reduce ? 'auto' : 'smooth' });
+    const at = () => Math.round(track.scrollLeft / Math.max(1, track.clientWidth));
+    if (track && imgs.length > 1) {
+      caseIn.querySelector('.cg-nav.prev').addEventListener('click', () => go(at() - 1));
+      caseIn.querySelector('.cg-nav.next').addEventListener('click', () => go(at() + 1));
+      thumbs.forEach((b, i) => b.addEventListener('click', () => go(i)));
+      track.addEventListener('keydown', e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); go(at() + (e.key === 'ArrowRight' ? 1 : -1)); } });
+      track.addEventListener('scroll', () => { const i = at(); count.textContent = `${i + 1} / ${imgs.length}`; thumbs.forEach((b, j) => b.toggleAttribute('aria-current', i === j)); }, { passive: true });
+    }
+    // the link and the form are on this page or another one; either way the window closes first
+    caseIn.querySelectorAll('.cdlg-go, .cdlg-proj').forEach(a => a.addEventListener('click', closeCase));
+    goal('case_open', { case: k.id });
+    if (!caseDlg.open) { caseDlg.showModal(); caseDlg.append(cursorEl); lenis?.stop(); document.documentElement.style.overflow = 'hidden'; }
+    caseIn.scrollTop = 0;
+    history.replaceState(null, '', location.pathname + location.search + '#case-' + k.id);
+    if (videos.length) igProcess();
+    return true;
+  }
+  function closeCase() {
+    if (!caseDlg?.open) return;
+    caseDlg.close(); unlock();
+    if (/^#case-\d+$/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search);
+  }
+  if (caseDlg) {
+    caseDlg.addEventListener('close', () => { unlock(); if (/^#case-\d+$/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search); });
+    caseDlg.addEventListener('click', e => { if (e.target === caseDlg) closeCase(); });
+    caseDlg.querySelector('.plan-close').addEventListener('click', closeCase);
+    // without the data (a static copy) the link just leads to the cases on /projects/
+    document.addEventListener('click', e => { const a = e.target.closest('[data-case]'); if (a && openCase(a.dataset.case)) e.preventDefault(); });
+    addEventListener('hashchange', () => { const m = /^#case-(\d+)$/.exec(location.hash); if (m) openCase(m[1]); });
+  }
+  let caseHashDone = false;
+  function setCases(list) {
+    CASES = list || [];
+    if (caseHashDone) return; caseHashDone = true;
+    const m = /^#case-(\d+)$/.exec(location.hash); if (m) openCase(m[1]);
+  }
+
   /* ---- quiz «Подберём дом»: 6 questions → up to 3 projects from the catalog → a lead ---- */
   // Opens from any [data-quiz] button and from a link ending in #quiz (handy for ads and Instagram).
   // The answers reach the manager in Russian whatever the page language.
@@ -509,7 +600,7 @@
     whatsapp: v => 'https://wa.me/' + digits(v),
     telegram: v => /^[+\d\s()-]+$/.test(v) ? 'https://t.me/+' + digits(v) : 'https://t.me/' + v.replace(/^@/, ''),
     email: v => 'mailto:' + v,
-    instagram: v => v, tiktok: v => v, threads: v => v,
+    instagram: v => v,
   };
   // 2GIS route to the office; the start point is the visitor's location
   const routeUrl = (lat, lon) => `https://2gis.kg/bishkek/directions/points/%7C${(+lon).toFixed(6)}%2C${(+lat).toFixed(6)}`;
@@ -562,6 +653,7 @@
       if (g.caption) { f.querySelector('.chip').textContent = g.caption; img.alt = g.caption; }
     });
     if (c.projects) PROJECTS = c.projects;
+    if (c.cases) setCases(c.cases);
     if (c.points) { mapPoints = c.points; kgMap?.setPoints(mapPoints); drawList(); }
     if (hasGsap) ScrollTrigger.refresh();
   }

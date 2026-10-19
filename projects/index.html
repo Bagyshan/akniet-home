@@ -214,33 +214,33 @@
     <!-- cards: admin panel → Кейсы -->
     <div class="cases" data-list="cases">
       <article class="card case rv">
-        <div class="pimg"><img src="https://images.pexels.com/photos/9209878/pexels-photo-9209878.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=800" alt="Дом для отдыха у Иссык-Куля" loading="lazy"><span class="chip">Иссык-Кульская область</span></div>
+        <div class="pimg" data-case="1" data-cursor="view"><img src="https://images.pexels.com/photos/9209878/pexels-photo-9209878.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=800" alt="Дом для отдыха у Иссык-Куля" loading="lazy"><span class="chip">Иссык-Кульская область</span></div>
         <div class="body">
           <span class="eyebrow">A-frame «Карагай»</span>
           <h3>Дом для отдыха у Иссык-Куля</h3>
           <dl class="case-facts"><div><dt>Площадь</dt><dd>68 м²</dd></div><div><dt>Срок</dt><dd>2 месяца</dd></div><div><dt>Сезон</dt><dd>Осень</dd></div></dl>
           <p>Семья хотела дом, куда можно приезжать круглый год. Стройку начали осенью, а Новый год уже встречали в новом доме — с тёплыми полами в подарок.</p>
-          <a href="#karagay" class="more-link">Смотреть проект →</a>
+          <div class="case-links"><a href="#case-1" class="more-link" data-case="1">Подробнее →</a><a href="#karagay" class="more-link proj">Смотреть проект</a></div>
         </div>
       </article>
       <article class="card case rv">
-        <div class="pimg"><img src="https://images.pexels.com/photos/4626268/pexels-photo-4626268.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=800" alt="Барнхаус для жизни за городом" loading="lazy"><span class="chip">Чуйская область</span></div>
+        <div class="pimg" data-case="2" data-cursor="view"><img src="https://images.pexels.com/photos/4626268/pexels-photo-4626268.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=800" alt="Барнхаус для жизни за городом" loading="lazy"><span class="chip">Чуйская область</span></div>
         <div class="body">
           <span class="eyebrow">Барнхаус «Жайлау»</span>
           <h3>Барнхаус для жизни за городом</h3>
           <dl class="case-facts"><div><dt>Площадь</dt><dd>86 м²</dd></div><div><dt>Срок</dt><dd>2 месяца</dd></div><div><dt>Сезон</dt><dd>Зима</dd></div></dl>
           <p>Строили зимой: металлический каркас не боится мороза, а отделку начали сразу, без ожидания усадки. Весной семья переехала из квартиры.</p>
-          <a href="#jailoo" class="more-link">Смотреть проект →</a>
+          <div class="case-links"><a href="#case-2" class="more-link" data-case="2">Подробнее →</a><a href="#jailoo" class="more-link proj">Смотреть проект</a></div>
         </div>
       </article>
       <article class="card case rv">
-        <div class="pimg"><img src="https://images.pexels.com/photos/19737830/pexels-photo-19737830.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=800" alt="Гостевые дома для базы отдыха" loading="lazy"><span class="chip">Нарынская область</span></div>
+        <div class="pimg" data-case="3" data-cursor="view"><img src="https://images.pexels.com/photos/19737830/pexels-photo-19737830.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=800" alt="Гостевые дома для базы отдыха" loading="lazy"><span class="chip">Нарынская область</span></div>
         <div class="body">
           <span class="eyebrow">A-frame «Тау»</span>
           <h3>Гостевые дома для базы отдыха</h3>
           <dl class="case-facts"><div><dt>Площадь</dt><dd>3 × 43 м²</dd></div><div><dt>Срок</dt><dd>1,5 месяца</dd></div><div><dt>Сезон</dt><dd>Лето</dd></div></dl>
           <p>Три компактных A-frame для гостей базы отдыха. Одинаковая планировка позволила строить дома параллельно и открыть сезон вовремя.</p>
-          <a href="#tau" class="more-link">Смотреть проект →</a>
+          <div class="case-links"><a href="#case-3" class="more-link" data-case="3">Подробнее →</a><a href="#tau" class="more-link proj">Смотреть проект</a></div>
         </div>
       </article>
     </div>
@@ -258,6 +258,7 @@
       <ul class="plan-rooms"></ul>
       <div class="plan-price"><span>Под ключ, ориентировочно</span><b></b><small>Срок — в среднем <span data-cms="build_months_avg" data-unit="месяц,месяца,месяцев">2 месяца</span></small></div>
       <a href="#contact" class="btn gold plan-go">Рассчитать этот проект <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <div class="plan-videos" hidden><h4>Видео из Instagram</h4><div class="ig-list"></div></div>
     </div>
   </div>
 </dialog>
@@ -308,8 +309,6 @@
       <div><span class="eyebrow">Мы в соцсетях</span><p class="follow-text">Каждую стройку показываем от фундамента до ключей</p></div>
       <div class="socials">
         <a data-contact="instagram" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener">Instagram</a>
-        <a data-contact="tiktok" href="https://www.tiktok.com/@akniet_home" target="_blank" rel="noopener">TikTok</a>
-        <a data-contact="threads" href="https://www.threads.net/@akniet.home" target="_blank" rel="noopener">Threads</a>
       </div>
     </div>
   </div>
@@ -322,7 +321,7 @@
       <div class="foot-top">
         <p style="font-family:var(--f-head);font-weight:300;font-size:clamp(22px,2.2vw,32px);line-height:1.25;max-width:20ch">Барнхаусы и A&#8209;frame дома <span style="color:var(--gold)">под ключ</span></p>
         <div><h3>Навигация</h3><ul><li><a href="../projects/" aria-current="page">Проекты и кейсы</a></li><li><a href="../technology/">Технологии</a></li><li><a href="../extras/">Постройки</a></li><li><a href="../invest/">Под аренду</a></li><li><a href="../map/">Карта объектов</a></li><li><a href="../#price">Цены</a></li><li><a href="../#faq">Вопросы</a></li></ul></div>
-        <div><h3>Соцсети</h3><ul><li><a data-contact="instagram" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener">Instagram</a></li><li><a data-contact="tiktok" href="https://www.tiktok.com/@akniet_home" target="_blank" rel="noopener">TikTok</a></li><li><a data-contact="threads" href="https://www.threads.net/@akniet.home" target="_blank" rel="noopener">Threads</a></li></ul></div>
+        <div><h3>Соцсети</h3><ul><li><a data-contact="instagram" href="https://www.instagram.com/akniet.home/" target="_blank" rel="noopener">Instagram</a></li></ul></div>
         <div><h3>Контакты</h3><ul><li><a data-contact="phone" href="tel:+996500208487">+996 500 20 84 87</a></li><li data-needs="phone2" hidden><a data-contact="phone2" href="tel:+996000000000">+996 000 00 00 00</a></li><li><a data-contact="whatsapp" href="https://wa.me/996500208487" target="_blank" rel="noopener">WhatsApp</a> · <a data-contact="telegram" href="https://t.me/+996500208487" target="_blank" rel="noopener">Telegram</a></li><li><a data-contact="email" href="mailto:akniethome305@gmail.com">akniethome305@gmail.com</a></li></ul></div>
         <div><h3>Офис</h3><address class="office"><span data-cms="address">г. Бишкек, ул. Осмонкула, 113</span><span data-cms="hours">Пн–Сб, 10:00–20:00</span><a data-contact="route" href="https://2gis.kg/bishkek/directions/points/%7C74.624823%2C42.883309" target="_blank" rel="noopener" class="route">Построить маршрут в 2ГИС ↗</a></address></div>
       </div>
@@ -505,7 +504,8 @@
   "projectsUnit": "проект,проекта,проектов",
   "again": "Пройти заново",
   "hide": "Скрыть подборку"
- }
+ },
+ "case": {"built": "Построили", "ig": "Смотреть в Instagram", "videos": "Видео со стройки", "want": "Хочу такой же дом", "project": "Смотреть проект", "facts": ["Площадь", "Срок", "Сезон"], "photo": "Фото {n} из {total}", "prev": "Предыдущее фото", "next": "Следующее фото", "close": "Закрыть"}
 }</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>

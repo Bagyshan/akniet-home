@@ -16,11 +16,14 @@ export type Project = {
   slug: string; style: 'af' | 'barn'; name: string; name_ky: string | null; area: number; terrace: number; terrace_type: TerraceType; beds: number; baths: number;
   floors: string; floors_ky: string | null; text: string; text_ky: string | null; price: number | null;
   image: string | null; on_home: boolean; plan: Floor[];
+  videos: string[]; // Instagram posts / reels, shown in the plan window
 };
 export type Case = {
   image: string | null; region: string; region_ky: string | null; title: string; title_ky: string | null;
   area: string; term: string; term_ky: string | null; season: string; season_ky: string | null; story: string; story_ky: string | null;
   project: number | null; // id of the project the case was built from
+  photos: string[]; // gallery in the case window, after the main photo
+  videos: string[]; // Instagram posts / reels
 };
 // {price} {terrace_open_price} {terrace_closed_price} {months} {months_min} {warranty} in an answer become the values from the admin «Основное» tab
 // A client's house let by the day (page /invest/): what it earns. Income and payback are counted on the page from these numbers
@@ -40,6 +43,9 @@ type Item<T> = { id: number; position: number; data: T };
 // Photos uploaded through the admin panel, plus the stock demo photos the site started with
 const IMAGE_RE = /^(\/uploads\/[a-f0-9]{32}\.webp|https:\/\/images\.pexels\.com\/photos\/\d+\/[\w.-]+\?[\w=&]+)$/;
 const SLUG_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+// an Instagram post, reel or IGTV; kept as https://www.instagram.com/<p|reel|tv>/<code>/ (the embed needs exactly that)
+const IG_RE = /^https?:\/\/(?:www\.)?instagram\.com\/(?:[\w.]+\/)?(p|reels?|tv)\/([\w-]{5,40})\/?(?:[?#].*)?$/i;
+export const MAX_VIDEOS = 8, MAX_PHOTOS = 12;
 
 /* ---- validation: returns [clean data, errors] ---- */
 class Check {
@@ -59,6 +65,30 @@ class Check {
     const n = typeof v === 'number' ? v : typeof v === 'string' ? Number(v.replace(',', '.')) : NaN;
     if (!Number.isFinite(n) || n < min || n > max || (int && !Number.isInteger(n))) { this.errors.push(`${label}: ${int ? 'целое ' : ''}число от ${min} до ${max}`); return min; }
     return Math.round(n * 100) / 100;
+  }
+  // Instagram links: an array, or one per line
+  videos(key: string, label: string) {
+    const v = this.b[key];
+    const list = (Array.isArray(v) ? v : typeof v === 'string' ? v.split('\n') : []).map(x => String(x ?? '').trim()).filter(Boolean);
+    if (list.length > MAX_VIDEOS) this.errors.push(`${label}: не больше ${MAX_VIDEOS} ссылок`);
+    const out: string[] = [];
+    for (const u of list.slice(0, MAX_VIDEOS)) {
+      const m = IG_RE.exec(u);
+      if (!m) { this.errors.push(`${label}: «${u.slice(0, 60)}» — нужна ссылка на пост или рилс Instagram, например https://www.instagram.com/reel/…`); continue; }
+      const url = `https://www.instagram.com/${m[1].toLowerCase().startsWith('reel') ? 'reel' : m[1].toLowerCase()}/${m[2]}/`;
+      if (!out.includes(url)) out.push(url);
+    }
+    return out;
+  }
+  photos(key: string, label: string) {
+    const v = Array.isArray(this.b[key]) ? (this.b[key] as unknown[]) : [];
+    if (v.length > MAX_PHOTOS) this.errors.push(`${label}: не больше ${MAX_PHOTOS} фото`);
+    const out: string[] = [];
+    for (const x of v.slice(0, MAX_PHOTOS)) {
+      if (typeof x === 'string' && IMAGE_RE.test(x)) out.push(x);
+      else this.errors.push(`${label}: загрузите фото через админку`);
+    }
+    return out;
   }
   image(key: string, label: string) {
     const v = this.b[key];
@@ -112,6 +142,7 @@ export function cleanProject(b: Record<string, unknown>): [Project, string[]] {
     text: c.text('text', 'Описание', 400), text_ky: c.ky('text_ky', 'Описание', 400),
     price: c.num('price', 'Цена под ключ, $', 1000, 1e7, { optional: true }),
     image: c.image('image', 'Фото'), on_home: b.on_home === true, plan: [],
+    videos: c.videos('videos', 'Видео из Instagram'),
   };
   const plan = Array.isArray(b.plan) ? b.plan : [];
   if (!plan.length) c.errors.push('Планировка: добавьте хотя бы один этаж');
@@ -131,6 +162,8 @@ export function cleanCase(b: Record<string, unknown>): [Case, string[]] {
     season: c.text('season', 'Сезон', 30), season_ky: c.ky('season_ky', 'Сезон', 30),
     story: c.text('story', 'История', 600), story_ky: c.ky('story_ky', 'История', 600),
     project: c.num('project', 'Проект', 1, 1e9, { int: true, optional: true }),
+    photos: c.photos('photos', 'Галерея'),
+    videos: c.videos('videos', 'Видео из Instagram'),
   };
   return [k, c.errors];
 }
@@ -220,21 +253,21 @@ export async function reorder(kind: Kind, ids: number[]) {
 const pick = (d: Record<string, any>, f: string, lang: Lang) => (lang === 'ky' && d[f + '_ky']) || d[f];
 
 export type PageProject = Omit<Project, `${string}_ky` | 'plan'> & { id: number; plan: (Omit<Floor, 'name_ky' | 'rooms'> & { rooms: Omit<Room, 'name_ky'>[] })[] };
-export type PageCase = Omit<Case, `${string}_ky` | 'project'> & { project: { slug: string; name: string; style: Project['style'] } | null };
+export type PageCase = Omit<Case, `${string}_ky` | 'project'> & { id: number; project: { slug: string; name: string; style: Project['style'] } | null };
 export type PageRental = Omit<Rental, `${string}_ky` | 'project'> & { project: { slug: string; name: string; style: Project['style'] } | null };
 
 export async function readCatalogFor(lang: Lang) {
   const [projects, cases, faq, extras, rentals] = await Promise.all([listItems<Project>('projects'), listItems<Case>('cases'), listItems<Faq>('faq'), listItems<Extra>('extras'), listItems<Rental>('rentals')]);
   const ps: PageProject[] = projects.map(({ id, data: d }) => ({
     id, slug: d.slug, style: d.style, name: pick(d, 'name', lang), area: d.area, terrace: d.terrace || 0, terrace_type: d.terrace_type === 'closed' ? 'closed' : 'open', beds: d.beds, baths: d.baths,
-    floors: pick(d, 'floors', lang), text: pick(d, 'text', lang), price: d.price, image: d.image, on_home: d.on_home,
+    floors: pick(d, 'floors', lang), text: pick(d, 'text', lang), price: d.price, image: d.image, on_home: d.on_home, videos: d.videos ?? [],
     plan: d.plan.map(f => ({ name: pick(f, 'name', lang), w: f.w, h: f.h, void: f.void, image: f.image, rooms: f.rooms.map(r => ({ x: r.x, y: r.y, w: r.w, h: r.h, name: pick(r, 'name', lang), ...(r.terrace ? { terrace: true } : {}) })) })),
   }));
   const byId = new Map(ps.map(p => [p.id, p]));
-  const cs: PageCase[] = cases.map(({ data: d }) => {
+  const cs: PageCase[] = cases.map(({ id, data: d }) => {
     const p = d.project ? byId.get(d.project) : undefined;
     return {
-      image: d.image, region: pick(d, 'region', lang), title: pick(d, 'title', lang), area: d.area, term: pick(d, 'term', lang),
+      id, image: d.image, photos: d.photos ?? [], videos: d.videos ?? [], region: pick(d, 'region', lang), title: pick(d, 'title', lang), area: d.area, term: pick(d, 'term', lang),
       season: pick(d, 'season', lang), story: pick(d, 'story', lang), project: p ? { slug: p.slug, name: p.name, style: p.style } : null,
     };
   });

@@ -22,8 +22,6 @@ export const CONTENT_FIELDS = {
   telegram:  { group: 'contacts', label: 'Telegram', type: 'telegram', default: '+996 500 20 84 87', hint: 'Номер или @username' },
   email:     { group: 'contacts', label: 'Почта', type: 'email', default: 'akniethome305@gmail.com' },
   instagram: { group: 'contacts', label: 'Instagram', type: 'url', default: 'https://www.instagram.com/akniet.home/' },
-  tiktok:    { group: 'contacts', label: 'TikTok', type: 'url', default: 'https://www.tiktok.com/@akniet_home' },
-  threads:   { group: 'contacts', label: 'Threads', type: 'url', default: 'https://www.threads.net/@akniet.home' },
 
   address:    { group: 'contacts', label: 'Адрес офиса (рус)', type: 'text', default: 'г. Бишкек, ул. Осмонкула, 113' },
   address_ky: { group: 'contacts', label: 'Адрес офиса (кыр)', type: 'text', default: 'Бишкек ш., Осмонкул көч., 113' },
