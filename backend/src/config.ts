@@ -30,5 +30,7 @@ export const config = {
     token: env('TELEGRAM_BOT_TOKEN', ''),
     chatId: env('TELEGRAM_CHAT_ID', ''),
     webhookSecret: env('TELEGRAM_WEBHOOK_SECRET', ''),
+    // Bot API address; changed only in tests (a local stand-in for Telegram)
+    api: env('TELEGRAM_API', 'https://api.telegram.org').replace(/\/$/, ''),
   },
 };

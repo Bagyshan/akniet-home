@@ -5,7 +5,7 @@ import { admin } from './routes/admin.js';
 import { content } from './routes/content.js';
 import { leads } from './routes/leads.js';
 import { telegram } from './routes/telegram.js';
-import { telegramEnabled } from './telegram.js';
+import { setupWebhook, telegramEnabled } from './telegram.js';
 import { isPage, renderPage, robotsTxt, sitemapXml } from './render.js';
 import { isLang } from './slots.js';
 
@@ -49,4 +49,5 @@ app.use((err: Error & { status?: number; type?: string }, _req: Request, res: Re
 
 await migrate();
 const server = app.listen(config.port, () => console.log(`backend on :${config.port}, telegram ${telegramEnabled ? 'on' : 'stub'}`));
+setupWebhook();
 for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => server.close(() => pool.end().then(() => process.exit(0))));

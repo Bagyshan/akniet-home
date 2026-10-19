@@ -6,7 +6,7 @@ import { cleanPoint, deletePoint, listPoints, savePoint } from '../points.js';
 import { SLOT_SECTIONS, cleanSlot, deleteSlot, isSection, readSlots, writeSlot } from '../slots.js';
 import { isUploadKind, saveImage } from '../uploads.js';
 import { invalidatePages } from '../render.js';
-import { telegramEnabled } from '../telegram.js';
+import { syncLeadMessage, telegramEnabled } from '../telegram.js';
 
 const STATUSES = ['new', 'in_work', 'done', 'spam'];
 
@@ -63,8 +63,16 @@ admin.get('/leads', async (req, res) => {
 admin.patch('/leads/:id', async (req, res) => {
   const status = req.body?.status;
   if (!STATUSES.includes(status)) return res.status(422).json({ ok: false, errors: ['status'] });
-  const { rowCount } = await pool.query('UPDATE leads SET status = $1 WHERE id = $2', [status, Number(req.params.id)]);
-  res.status(rowCount ? 200 : 404).json({ ok: Boolean(rowCount) });
+  const id = Number(req.params.id);
+  // back to «Новая» frees the lead: the «Беру» button comes back in Telegram
+  const { rowCount } = await pool.query(
+    `UPDATE leads SET status = $1, status_at = now(),
+       taken_by = CASE WHEN $1 = 'new' THEN NULL ELSE taken_by END, taken_by_id = CASE WHEN $1 = 'new' THEN NULL ELSE taken_by_id END
+     WHERE id = $2 AND status <> $1`, [status, id]);
+  // nothing updated: either the status is already the same, or there is no such lead
+  if (!rowCount && !(await pool.query('SELECT 1 FROM leads WHERE id = $1', [id])).rowCount) return res.status(404).json({ ok: false });
+  res.json({ ok: true });
+  if (rowCount) syncLeadMessage(id).catch(e => console.error(`lead #${id}: telegram message not updated`, e));
 });
 
 // ---- numbered slots: materials 1–10, gallery 1–6 ----

@@ -48,6 +48,6 @@ leads.post('/', async (req, res) => {
 
   // the visitor does not wait for Telegram; the response is already sent, so errors only get logged
   notifyLead({ id, ...lead })
-    .then(async sent => { if (sent) await pool.query('UPDATE leads SET telegram_sent = true WHERE id = $1', [id]); })
+    .then(async mid => { if (mid) await pool.query('UPDATE leads SET telegram_sent = true, tg_message_id = $2 WHERE id = $1', [id, mid]); })
     .catch(e => console.error(`lead #${id}: telegram status not saved`, e));
 });

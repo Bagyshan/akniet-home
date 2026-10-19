@@ -397,7 +397,8 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
         ...(l.source === 'catalog' ? [el('span', { className: 'pdf-tag', textContent: 'Отправить PDF в WhatsApp' })] : []),
         ...(l.page ? [el('span', { className: 'd src', textContent: 'Страница: ' + pageName(l.page) + (l.source ? ' · ' + SOURCES[l.source] : '') })] : []),
         l.message || ''),
-      el('div', { className: 'st' }, sel, el('div', { className: 'tg', textContent: l.telegram_sent ? 'отправлено в Telegram' : 'в Telegram не отправлено' })));
+      el('div', { className: 'st' }, sel, el('div', { className: 'tg', textContent: l.telegram_sent ? 'отправлено в Telegram' : 'в Telegram не отправлено' }),
+        ...(l.taken_by && l.status !== 'new' ? [el('div', { className: 'tg', textContent: 'Взял(а): ' + l.taken_by })] : [])));
     row.dataset.status = l.status;
     sel.addEventListener('change', async () => {
       try { await api('/api/admin/leads/' + l.id, { method: 'PATCH', body: JSON.stringify({ status: sel.value }) }); row.dataset.status = sel.value; toast('Статус сохранён'); }

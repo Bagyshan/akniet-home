@@ -145,15 +145,20 @@ node scripts/build-ky.mjs --extract  # строки без перевода в �
 
 ## Telegram-бот
 
-1. Создать бота у [@BotFather](https://t.me/BotFather), токен — в `TELEGRAM_BOT_TOKEN`.
-2. Добавить бота в чат менеджеров, узнать id чата (например, через `https://api.telegram.org/bot<токен>/getUpdates` после любого сообщения в чате) — в `TELEGRAM_CHAT_ID`.
-3. `docker compose up -d backend`. В админке индикатор сменится на «Telegram подключён».
+1. Создать бота у [@BotFather](https://t.me/BotFather) (`/newbot`), токен — в `TELEGRAM_BOT_TOKEN`.
+2. Создать группу продавцов, включить «История чата для новых участников: видна», добавить бота.
+3. `docker compose up -d backend` — при запуске backend сам подключает webhook (`https://<SITE_URL>/api/telegram/webhook`).
+4. Отправить в группе `/chatid@<username_бота>` — бот ответит id группы. Вписать его в `TELEGRAM_CHAT_ID` и снова `docker compose up -d backend`.
 
+Каждая заявка приходит в группу с кнопками:
+- **✋ Беру** — заявка переходит в «В работе», в сообщении видно имя продавца; второй продавец взять её уже не сможет.
+- **✅ Готово** — заявка закрыта. Пока заявка в работе, закрыть её может только тот, кто взял.
+- **📋 Скопировать номер** — копирует телефон клиента (нужен Telegram, обновлённый после октября 2024).
+
+Статус, поменянный в админке, обновляет сообщение в группе; «Новая» в админке снова показывает кнопку «Беру».
 Пока переменные пустые, заявки только сохраняются в БД (в логах backend: `[telegram stub]`).
-
-Для команд бота есть заготовка webhook `POST /api/telegram/webhook` (`backend/src/routes/telegram.ts`).
-Подключение: задать `TELEGRAM_WEBHOOK_SECRET` и вызвать
-`https://api.telegram.org/bot<токен>/setWebhook?url=https://<домен>/api/telegram/webhook&secret_token=<секрет>`.
+Кнопки работают только на сервере с публичным https-адресом (`SITE_URL`). `TELEGRAM_WEBHOOK_SECRET` можно не задавать — секрет выводится из токена.
+После подключения webhook адрес `getUpdates` больше не работает — id группы узнавайте командой `/chatid`.
 
 ## API
 
