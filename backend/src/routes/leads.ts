@@ -4,6 +4,7 @@ import { notifyLead } from '../telegram.js';
 
 const HOUSE_TYPES = ['Барнхаус', 'A-frame', 'Нужен совет'];
 const CONTACT_VIA = ['Звонок', 'WhatsApp', 'Telegram'];
+const SOURCES = ['form', 'quiz', 'catalog'];
 
 const str = (v: unknown, max: number) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 
@@ -32,12 +33,15 @@ leads.post('/', async (req, res) => {
     terrace: terrace > 0 && terrace < 1000 ? terrace : null,
     terrace_type: terrace > 0 && (b.terrace_type === 'open' || b.terrace_type === 'closed') ? b.terrace_type : null,
     message: str(b.msg, 2000) || null,
+    // the page the visitor was on: a site path only (/projects/, /ky/invest/), never a full URL
+    page: /^\/[\w\-/]*$/.test(str(b.page, 200)) ? str(b.page, 200) : null,
+    source: SOURCES.includes(b.source) ? b.source : null,
   };
 
   const { rows } = await pool.query<{ id: number }>(
-    `INSERT INTO leads (name, phone, house_type, contact_via, project, area, terrace, terrace_type, message, lang)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`,
-    [lead.name, lead.phone, lead.house_type, lead.contact_via, lead.project, lead.area, lead.terrace, lead.terrace_type, lead.message, lead.lang],
+    `INSERT INTO leads (name, phone, house_type, contact_via, project, area, terrace, terrace_type, message, lang, page, source)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id`,
+    [lead.name, lead.phone, lead.house_type, lead.contact_via, lead.project, lead.area, lead.terrace, lead.terrace_type, lead.message, lead.lang, lead.page, lead.source],
   );
   const id = Number(rows[0].id);
   res.status(201).json({ ok: true, id });

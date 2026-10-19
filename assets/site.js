@@ -138,7 +138,7 @@
       $id('f-phone').classList.toggle('invalid', !okP);
       if (!okN || !okP) return form.querySelector('.invalid input').focus();
       // заявка: { project, area, name, phone, type, via, msg, website(honeypot) } → backend → БД + Telegram
-      const lead = { ...Object.fromEntries(new FormData(form)), lang: document.documentElement.lang }, btn = form.querySelector('button[type="submit"]'), err = $id('form-err');
+      const lead = { ...Object.fromEntries(new FormData(form)), lang: document.documentElement.lang, page: location.pathname, source: 'form' }, btn = form.querySelector('button[type="submit"]'), err = $id('form-err');
       const done = () => { goal('lead_form', { via: lead.via, type: lead.type, from: lead.project ? 'project' : 'form' }); $id('sent-title').textContent = SENT[lead.via] || SENT['Звонок']; form.classList.add('sent'); };
       if (location.protocol === 'file:') return done(); // local preview without a server
       btn.disabled = true; err.hidden = true;
@@ -412,7 +412,7 @@
         if (!okN || !okP) return f.querySelector('.invalid input').focus();
         const via = f.elements.via.value, btn = f.querySelector('button[type="submit"]'), err = f.querySelector('.form-err');
         const lead = { name: nameIn.value, phone: phoneIn.value, via, type: ['Барнхаус', 'A-frame', 'Нужен совет'][answers[2]],
-          project: 'Квиз: ' + (picks.map(p => `«${p.name}»`).join(', ') || '—'), msg: QUIZ_RU.map(([k, o], j) => `${k}: ${o[answers[j]]}`).join('\n'), lang: document.documentElement.lang };
+          project: 'Квиз: ' + (picks.map(p => `«${p.name}»`).join(', ') || '—'), msg: QUIZ_RU.map(([k, o], j) => `${k}: ${o[answers[j]]}`).join('\n'), lang: document.documentElement.lang, page: location.pathname, source: 'quiz' };
         const done = () => {
           goal('lead_quiz', { via });
           quizSave({ answers, sent: true });
@@ -481,7 +481,7 @@
       if (!okN || !okP) return f.querySelector('.invalid input').focus();
       const lang = document.documentElement.lang, btn = f.querySelector('button[type="submit"]'), err = f.querySelector('.form-err');
       const lead = { name: nameIn.value, phone: phoneIn.value, via: 'WhatsApp', type: 'Нужен совет', project: 'Каталог проектов в WhatsApp',
-        msg: 'Отправить каталог: ' + location.origin + (lang === 'ky' ? '/ky/catalog/' : '/catalog/'), lang };
+        msg: 'Отправить каталог: ' + location.origin + (lang === 'ky' ? '/ky/catalog/' : '/catalog/'), lang, page: location.pathname, source: 'catalog' };
       const done = () => { goal('lead_catalog'); f.classList.add('done'); f.querySelector('.cat-sent').hidden = false; };
       if (location.protocol === 'file:') return done();
       btn.disabled = true; err.hidden = true;

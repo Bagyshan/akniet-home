@@ -48,6 +48,8 @@ h2{font:400 18px/1.2 var(--f-head);margin:0}
 
 /* leads */
 .leads{display:grid;gap:8px}
+.lead .pdf-tag{display:inline-block;margin-bottom:6px;padding:3px 10px;border-radius:999px;background:#d5a039;color:#312d32;font-size:12px;font-weight:600}
+.lead .src{display:block;margin-bottom:4px}
 .lead{display:grid;grid-template-columns:130px 1.1fr 1fr 1.6fr 150px;gap:14px;align-items:start;padding:14px 16px;border-radius:16px;background:rgba(24,22,25,.45);box-shadow:inset 0 0 0 1px var(--line)}
 .lead .d{font-size:12.5px;color:var(--dim)}
 .lead b{display:block;font-weight:600}
@@ -381,6 +383,9 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
   const STATUS = { new: 'Новая', in_work: 'В работе', done: 'Готово', spam: 'Спам' };
   const fmtDate = s => new Date(s).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
   let filter = '', offset = 0;
+  const PAGES = { '': 'Главная', projects: 'Проекты', technology: 'Технологии', extras: 'Постройки', invest: 'Под аренду', map: 'Карта объектов', catalog: 'Каталог' };
+  const SOURCES = { form: 'форма', quiz: 'квиз', catalog: 'каталог в WhatsApp' };
+  const pageName = p => PAGES[p.replace(/^\/(ky\/)?/, '').split('/')[0]] ?? p;
   function leadRow(l) {
     const sel = el('select', { 'aria-label': 'Статус заявки №' + l.id });
     for (const [v, t] of Object.entries(STATUS)) sel.append(el('option', { value: v, textContent: t, selected: v === l.status }));
@@ -388,7 +393,10 @@ code{font-size:12.5px;padding:1px 6px;border-radius:6px;background:rgba(255,248,
       el('div', { className: 'd' }, '№' + l.id, el('br'), fmtDate(l.created_at)),
       el('div', {}, el('b', { textContent: l.name }, ...(l.lang === 'ky' ? [el('span', { className: 'lang-tag', textContent: 'КЫР', title: 'Заявка с кыргызской версии сайта' })] : [])), el('a', { href: 'tel:' + l.phone.replace(/[^\d+]/g, ''), textContent: l.phone })),
       el('div', {}, el('b', { textContent: l.house_type || '—' }), el('span', { className: 'd', textContent: (l.contact_via || '') + (l.project ? ' · ' + l.project : '') + (l.area ? ', ' + l.area + ' м²' : '') + (l.terrace ? ` + ${l.terrace_type === 'closed' ? 'закрытая ' : l.terrace_type === 'open' ? 'открытая ' : ''}терраса ${l.terrace} м²` : '') })),
-      el('div', { className: 'm', textContent: l.message || '' }),
+      el('div', { className: 'm' },
+        ...(l.source === 'catalog' ? [el('span', { className: 'pdf-tag', textContent: 'Отправить PDF в WhatsApp' })] : []),
+        ...(l.page ? [el('span', { className: 'd src', textContent: 'Страница: ' + pageName(l.page) + (l.source ? ' · ' + SOURCES[l.source] : '') })] : []),
+        l.message || ''),
       el('div', { className: 'st' }, sel, el('div', { className: 'tg', textContent: l.telegram_sent ? 'отправлено в Telegram' : 'в Telegram не отправлено' })));
     row.dataset.status = l.status;
     sel.addEventListener('change', async () => {
