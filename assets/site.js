@@ -57,6 +57,17 @@
   const header = $id('header'); let lastY = 0;
   const onScroll = y => { header.classList.toggle('hidden', y > lastY && y > 500 && !document.body.classList.contains('menu-open')); lastY = y; };
   lenis ? lenis.on('scroll', e => onScroll(e.scroll)) : addEventListener('scroll', () => onScroll(scrollY), { passive: true });
+  // keep everything inside the bar: tighten links → drop the phone → fold the links into the menu, until it fits
+  const hEnd = header.lastElementChild;
+  const fitHeader = () => {
+    header.classList.remove('fit-1', 'fit-2', 'fit-3');
+    for (const step of ['fit-1', 'fit-2', 'fit-3']) {
+      const hr = header.getBoundingClientRect(), er = hEnd.getBoundingClientRect();
+      if (er.right <= hr.right - 6) break;
+      header.classList.add(step);
+    }
+  };
+  fitHeader(); addEventListener('resize', fitHeader); document.fonts?.ready.then(fitHeader);
 
   /* ---- mobile menu sheet ---- */
   const menuBtn = $id('menu-btn');
