@@ -123,6 +123,7 @@ p{margin:0}
 .sheet .sheet-contacts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
 .sheet .sheet-contacts a{justify-content:center;font-family:var(--f-text);font-size:15px;font-weight:600;background:rgba(255,248,236,.07)}
 .sheet .sheet-contacts a:first-child{grid-column:1/-1;background:var(--gold);color:var(--ink)}
+.sheet .sheet-contacts a[data-contact="phone2"]{grid-column:1/-1}
 
 /* ---------- Bento base ---------- */
 section{padding:var(--gap) 0}

@@ -55,9 +55,10 @@ const nf = (n: number) => Number(n).toLocaleString('ru-RU');
 const digits = (v: string) => String(v).replace(/\D/g, '');
 const fill = (tpl: string, vars: Record<string, string | number>) => tpl.replace(/\{(\w+)\}/g, (_, k) => String(vars[k]));
 const isPhone = (v: string) => /^[+\d\s()-]+$/.test(v);
-const CONTACT_DEFAULTS: Record<string, string> = { phone: '+996 500 20 84 87', whatsapp: '+996 500 20 84 87', telegram: '+996 500 20 84 87', email: 'akniethome305@gmail.com' };
+const CONTACT_DEFAULTS: Record<string, string> = { phone: '+996 500 20 84 87', phone2: '+996 000 00 00 00', whatsapp: '+996 500 20 84 87', telegram: '+996 500 20 84 87', email: 'akniethome305@gmail.com' };
 const contactHref: Record<string, (v: string) => string> = {
   phone: v => 'tel:+' + digits(v),
+  phone2: v => 'tel:+' + digits(v),
   whatsapp: v => 'https://wa.me/' + digits(v),
   telegram: v => (isPhone(v) ? 'https://t.me/+' + digits(v) : 'https://t.me/' + v.replace(/^@/, '')),
   email: v => 'mailto:' + v,
@@ -95,7 +96,7 @@ function build(template: string, lang: Lang, page: Page, c: Content): string {
   // blocks about the terrace stay hidden until a terrace price is set in the admin panel; the same for each kind
   // and for the company figures (years on the market, houses built) while they are empty
   const needs: Record<string, boolean> = { terrace: !!(terracePrice.open || terracePrice.closed), terrace_open: !!terracePrice.open, terrace_closed: !!terracePrice.closed,
-    houses_built: +c.houses_built > 0, years_on_market: +c.years_on_market > 0, rentals: c.rentals.length > 0 };
+    houses_built: +c.houses_built > 0, years_on_market: +c.years_on_market > 0, rentals: c.rentals.length > 0, phone2: !!c.phone2 };
   for (const e of $$('[data-needs]')) needs[e.dataset.needs] ? e.removeAttribute('hidden') : e.setAttribute('hidden', '');
 
   /* ---- content ---- */

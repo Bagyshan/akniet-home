@@ -17,6 +17,7 @@ export const CONTENT_FIELDS = {
   instagram_k:      { group: 'main', label: 'Подписчиков в Instagram, тыс.', type: 'number', default: 12 },
 
   phone:     { group: 'contacts', label: 'Телефон', type: 'phone', default: '+996 500 20 84 87', hint: 'Как показывать на сайте, например +996 500 20 84 87' },
+  phone2:    { group: 'contacts', label: 'Второй телефон', type: 'phone', default: null, hint: 'Необязательно. Показывается в контактах, подвале, меню на телефоне и в каталоге. Пусто — не показывается' },
   whatsapp:  { group: 'contacts', label: 'WhatsApp', type: 'phone', default: '+996 500 20 84 87' },
   telegram:  { group: 'contacts', label: 'Telegram', type: 'telegram', default: '+996 500 20 84 87', hint: 'Номер или @username' },
   email:     { group: 'contacts', label: 'Почта', type: 'email', default: 'akniethome305@gmail.com' },

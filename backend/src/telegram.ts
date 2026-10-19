@@ -91,7 +91,7 @@ export async function syncLeadMessage(id: number): Promise<void> {
 export async function setupWebhook(): Promise<void> {
   if (!token) return;
   if (!config.siteUrl.startsWith('https://') || /localhost|127\.0\.0\.1/.test(config.siteUrl)) {
-    console.log(`telegram: webhook not set — ${config.siteUrl} is not a public https address, the buttons under leads will not answer`);
+    console.log(`telegram: webhook not set — ${config.siteUrl} is not a public https address (check SITE_URL / DOMAIN in .env), the buttons under leads will not answer`);
     return;
   }
   // Telegram may be unreachable right after a restart: a few more tries, a minute apart

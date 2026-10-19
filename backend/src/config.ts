@@ -4,6 +4,15 @@ const env = (name: string, fallback?: string): string => {
   return v;
 };
 
+// SITE_URL must be a full address (https://akniet-home.kg); anything else (a typo, a stray word) falls back to https://DOMAIN
+function siteUrl(): string {
+  const raw = (process.env.SITE_URL ?? '').trim();
+  if (/^https?:\/\/[\w.-]+(:\d+)?\/?$/.test(raw)) return raw.replace(/\/$/, '');
+  const fallback = 'https://' + env('DOMAIN', 'localhost').trim();
+  if (raw) console.warn(`SITE_URL="${raw}" is not an address like https://akniet-home.kg — using ${fallback}`);
+  return fallback;
+}
+
 export const config = {
   port: Number(env('PORT', '3000')),
   // shared with nginx, which serves it at /uploads/
@@ -11,7 +20,7 @@ export const config = {
   // page templates for server rendering (index.html, ky/index.html)
   siteDir: env('SITE_DIR', '/app/site'),
   // absolute address of the site, for canonical / hreflang / sitemap
-  siteUrl: (process.env.SITE_URL || 'https://' + env('DOMAIN', 'localhost')).replace(/\/$/, ''),
+  siteUrl: siteUrl(),
   seo: {
     googleVerification: env('GOOGLE_SITE_VERIFICATION', ''),
     yandexVerification: env('YANDEX_VERIFICATION', ''),

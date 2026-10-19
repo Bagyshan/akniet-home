@@ -20,7 +20,7 @@
     try { if (window.ym && window.aknietYM) window.ym(window.aknietYM, 'reachGoal', name, p); } catch {}
   };
   // phone, WhatsApp, Telegram, mail, route and social links all carry data-contact
-  const CONTACT_GOALS = { phone: 'contact_phone', whatsapp: 'contact_whatsapp', telegram: 'contact_telegram', email: 'contact_email', route: 'contact_route', instagram: 'contact_social', tiktok: 'contact_social', threads: 'contact_social' };
+  const CONTACT_GOALS = { phone: 'contact_phone', phone2: 'contact_phone', whatsapp: 'contact_whatsapp', telegram: 'contact_telegram', email: 'contact_email', route: 'contact_route', instagram: 'contact_social', tiktok: 'contact_social', threads: 'contact_social' };
   document.addEventListener('click', e => { const a = e.target.closest('[data-contact]'); if (a && CONTACT_GOALS[a.dataset.contact]) goal(CONTACT_GOALS[a.dataset.contact], { network: a.dataset.contact }); });
   const priceFrom = sum => fill(T.priceFrom, { sum });
 
@@ -502,9 +502,10 @@
   const numRu = n => String(n).replace('.', ',');
   const digits = v => String(v).replace(/\D/g, '');
   // contact values as shown in the HTML; their text is swapped inside every [data-contact] link
-  const CONTACT_DEFAULTS = { phone: '+996 500 20 84 87', whatsapp: '+996 500 20 84 87', telegram: '+996 500 20 84 87', email: 'akniethome305@gmail.com' };
+  const CONTACT_DEFAULTS = { phone: '+996 500 20 84 87', phone2: '+996 000 00 00 00', whatsapp: '+996 500 20 84 87', telegram: '+996 500 20 84 87', email: 'akniethome305@gmail.com' };
   const contactHref = {
     phone: v => 'tel:+' + digits(v),
+    phone2: v => 'tel:+' + digits(v),
     whatsapp: v => 'https://wa.me/' + digits(v),
     telegram: v => /^[+\d\s()-]+$/.test(v) ? 'https://t.me/+' + digits(v) : 'https://t.me/' + v.replace(/^@/, ''),
     email: v => 'mailto:' + v,
@@ -527,7 +528,7 @@
     if (+c.price_m2 > 0) PRICE_M2 = +c.price_m2;
     TERRACE.open = +c.price_terrace_open_m2 > 0 ? +c.price_terrace_open_m2 : 0;
     TERRACE.closed = +c.price_terrace_closed_m2 > 0 ? +c.price_terrace_closed_m2 : 0;
-    const needs = { terrace: !!(TERRACE.open || TERRACE.closed), terrace_open: !!TERRACE.open, terrace_closed: !!TERRACE.closed, houses_built: +c.houses_built > 0, years_on_market: +c.years_on_market > 0, rentals: !!c.rentals?.length };
+    const needs = { terrace: !!(TERRACE.open || TERRACE.closed), terrace_open: !!TERRACE.open, terrace_closed: !!TERRACE.closed, houses_built: +c.houses_built > 0, years_on_market: +c.years_on_market > 0, rentals: !!c.rentals?.length, phone2: !!c.phone2 };
     document.querySelectorAll('[data-needs]').forEach(e => { e.hidden = !needs[e.dataset.needs]; });
     // a kind without a price can not be picked
     [['ct1', 'open', 'ct2'], ['ct2', 'closed', 'ct1']].forEach(([id, kind, other]) => { const r = $id(id); if (!r) return; r.disabled = !TERRACE[kind]; if (r.disabled && r.checked) $id(other).checked = true; });
