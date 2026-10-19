@@ -44,7 +44,7 @@ type Item<T> = { id: number; position: number; data: T };
 const IMAGE_RE = /^(\/uploads\/[a-f0-9]{32}\.webp|https:\/\/images\.pexels\.com\/photos\/\d+\/[\w.-]+\?[\w=&]+)$/;
 const SLUG_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 // an Instagram post, reel or IGTV; kept as https://www.instagram.com/<p|reel|tv>/<code>/ (the embed needs exactly that)
-const IG_RE = /^https?:\/\/(?:www\.)?instagram\.com\/(?:[\w.]+\/)?(p|reels?|tv)\/([\w-]{5,40})\/?(?:[?#].*)?$/i;
+const IG_RE = /^https?:\/\/(?:www\.)?instagram\.com\/(?:[\w.]+\/)?(p|reels?|tv)\/([\w-]{1,60})\/?(?:[?#].*)?$/i;
 export const MAX_VIDEOS = 8, MAX_PHOTOS = 12;
 
 /* ---- validation: returns [clean data, errors] ---- */

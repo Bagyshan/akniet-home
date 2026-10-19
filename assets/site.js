@@ -335,10 +335,17 @@
 
   /* ---- Instagram posts and reels: the official embed; its script loads only when a window with videos opens ---- */
   let igReady = null;
-  const igHTML = urls => urls.map(u => `<blockquote class="instagram-media" data-instgrm-permalink="${esc(u)}?utm_source=ig_embed" data-instgrm-version="14"><a href="${esc(u)}" target="_blank" rel="noopener">${esc(T.case?.ig || 'Instagram')} ↗</a></blockquote>`).join('');
+  // each post has a card underneath: it shows when Instagram gives no preview (a private or deleted post,
+  // embedding turned off in the account, or the browser blocks Instagram) — then the visitor opens the post itself
+  const IG_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor"/></svg>';
+  const igHTML = urls => urls.map(u => `<div class="ig-item"><a class="ig-card" href="${esc(u)}" target="_blank" rel="noopener">${IG_ICON}<span><b>${esc(T.case?.igTitle || 'Instagram')}</b><small>${esc(T.case?.ig || 'Instagram')} ↗</small></span></a>`
+    + `<blockquote class="instagram-media" data-instgrm-permalink="${esc(u)}?utm_source=ig_embed" data-instgrm-version="14"><a href="${esc(u)}" target="_blank" rel="noopener">${esc(T.case?.ig || 'Instagram')}</a></blockquote></div>`).join('');
   function igProcess() {
     igReady ||= new Promise(ok => { const s = document.createElement('script'); s.src = 'https://www.instagram.com/embed.js'; s.async = true; s.onload = s.onerror = ok; document.head.append(s); });
     igReady.then(() => window.instgrm?.Embeds.process());
+    // a preview that drew itself has a real height; the rest keep only the card
+    const check = () => document.querySelectorAll('.ig-item').forEach(it => { const f = it.querySelector('iframe'); it.classList.toggle('ok', !!f && f.classList.contains('instagram-media-rendered') && +f.getAttribute('height') > 80); });
+    [1500, 4000, 9000].forEach(t => setTimeout(check, t));
   }
   // videos under the floor plan
   const planVideos = plan?.querySelector('.plan-videos');
