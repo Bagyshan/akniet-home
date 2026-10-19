@@ -632,6 +632,9 @@
   ScrollTrigger.batch('.rv', { start: 'top 90%', onEnter: els => gsap.to(els, { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out', stagger: 0.07, overwrite: true,
     onComplete: () => els.forEach(el => { el.classList.add('in'); gsap.set(el, { clearProps: 'opacity,transform' }); }) }) });
 
+  // section marks: the hairline draws across as the section comes in
+  document.querySelectorAll('.sec-mark').forEach(el => ScrollTrigger.create({ trigger: el, start: 'top 88%', once: true, onEnter: () => el.classList.add('drawn') }));
+
   // count-up numbers
   document.querySelectorAll('.count').forEach(el => {
     const pad = el.textContent.length, o = { v: 0 };

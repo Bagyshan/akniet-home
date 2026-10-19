@@ -112,6 +112,7 @@
 <!-- ============ WHY US ============ -->
 <section id="why">
   <div class="wrap">
+    <div class="sec-mark"><span>Преимущества</span></div>
     <div class="sec-title"><h2 class="rv">Почему с нами <span>выгодно</span></h2><p class="rv">Вы заранее знаете цену, срок и результат — и платите только за то, что уже построено.</p></div>
     <div class="why-grid">
       <div class="card soft why rv"><span class="tk-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 12h5M10 16h5"/></svg></span><div><h3>Фиксированная цена</h3><p>Стоимость прописываем в договоре — она не вырастет во время стройки. Никаких «непредвиденных» доплат.</p></div></div>
@@ -129,6 +130,7 @@
 <!-- TODO: демо-кейсы — заменить на реальные типовые проекты (фото, площади, планировки) -->
 <section id="projects">
   <div class="wrap">
+    <div class="sec-mark"><span>Проекты</span></div>
     <div class="sec-title"><h2 class="rv">Готовые <span>проекты</span></h2><p class="rv">Готовые планировки с ценой под ключ — от компактного A-frame до семейного барнхауса. Любой проект доработаем под ваш участок или спроектируем дом с нуля.</p></div>
     <!-- cards: the projects marked «на главной» in the admin panel (the server fills them in) -->
     <div class="proj-grid swipe" data-list="home-projects">
@@ -179,8 +181,9 @@
 </section>
 
 <!-- ============ TURNKEY ============ -->
-<section id="turnkey">
+<section class="band" id="turnkey">
   <div class="wrap">
+    <div class="sec-mark"><span>Под ключ</span></div>
     <div class="sec-title"><h2 class="rv">Что входит<br>в дом <span>под ключ</span></h2><p class="rv">Один договор и фиксированная цена — от проекта и фундамента до душевой и тёплого пола. Искать отдельных подрядчиков не нужно.</p></div>
     <div class="bento tk">
       <div class="card tk-list rv">
@@ -213,6 +216,7 @@
 <!-- ============ PRICE CALCULATOR ============ -->
 <section id="price">
   <div class="wrap">
+    <div class="sec-mark"><span>Стоимость</span></div>
     <div class="sec-title"><h2 class="rv">Сколько стоит<br><span>ваш дом</span></h2><p class="rv">$<span data-cms="price_m2">440</span> за м² под ключ — всё из списка выше. Выберите стиль и площадь, чтобы увидеть ориентир.</p></div>
     <div class="bento">
       <div class="card soft c-calc rv">
@@ -265,6 +269,7 @@
 <!-- ============ TECHNOLOGY (short; details on /technology/) ============ -->
 <section id="tech">
   <div class="wrap">
+    <div class="sec-mark"><span>Технология</span></div>
     <div class="bento">
       <a href="technology/#metal-frame" class="card walnut c-tech rv">
         <div class="row"><span class="eyebrow">Технологии</span><span class="arrow"><svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
@@ -290,6 +295,7 @@
 <!-- ============ EXTRAS (short; details on /extras/) ============ -->
 <section id="extras">
   <div class="wrap">
+    <div class="sec-mark"><span>Не только дома</span></div>
     <div class="sec-title"><h2 class="rv">Не только <span>дома</span></h2><p class="rv">Бани, модульные дома, беседки, детские и спортивные площадки. Цену обсуждаем индивидуально — после короткой бесплатной консультации.</p></div>
     <!-- cards: admin panel → Постройки (the server fills them in) -->
     <div class="ex-grid swipe" data-list="home-extras">
@@ -319,7 +325,8 @@
 
 <!-- ============ PROCESS ============ -->
 <section id="process">
-  <div class="wrap bento" style="margin-top:clamp(40px,5vw,80px)">
+  <div class="wrap bento">
+    <div class="sec-mark"><span>Этапы стройки</span></div>
     <div class="card slate c-process rv" style="--bg:url(assets/stone/slate-floor.webp)">
       <div class="head"><h2>Как проходит<br><span>стройка</span></h2><p style="max-width:36ch;color:var(--dim)">Платите по этапам и получаете фотоотчёты — всегда знаете, что происходит на объекте.</p></div>
       <div class="steps" id="steps">
@@ -336,7 +343,8 @@
 
 <!-- ============ TRUST / GEOGRAPHY ============ -->
 <section id="trust">
-  <div class="wrap bento" style="margin-top:clamp(40px,5vw,80px)">
+  <div class="wrap bento">
+    <div class="sec-mark"><span>Опыт и география</span></div>
     <a href="map/" class="card c-map-link rv" data-cursor="view">
       <img src="assets/map/relief-preview.webp" alt="" width="1200" height="634" loading="lazy" decoding="async">
       <div class="map-head">
@@ -355,7 +363,8 @@
 
 <!-- ============ INVEST (short; details on /invest/) ============ -->
 <section id="invest">
-  <div class="wrap bento" style="margin-top:clamp(40px,5vw,80px)">
+  <div class="wrap bento">
+    <div class="sec-mark"><span>Под аренду</span></div>
     <div class="card walnut c-invest rv">
       <div><span class="eyebrow">Инвесторам</span><h2>Дом под посуточную <span>аренду</span></h2><p>Строим гостевые дома, глэмпинги и базы отдыха. Посчитайте, за сколько суток аренды окупится дом, и выберите проект.</p></div>
       <div class="btns"><a href="#price" class="btn gold" data-rent>Рассчитать окупаемость <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></a><a href="invest/" class="btn ghost">Подробнее для инвесторов</a></div>
@@ -373,8 +382,9 @@
 </section>
 
 <!-- ============ FAQ ============ -->
-<section id="faq">
+<section class="band" id="faq">
   <div class="wrap">
+    <div class="sec-mark"><span>Вопросы</span></div>
     <div class="sec-title"><h2 class="rv">Частые <span>вопросы</span></h2><p class="rv">Всё, что обычно спрашивают перед стройкой. Не нашли свой вопрос — напишите, ответим за пару минут.</p></div>
     <div class="bento">
       <div class="faq rv" data-list="faq"><details><summary>Сколько стоит дом под ключ?<i aria-hidden="true"></i></summary><p class="a">$<span data-cms="price_m2">440</span> за м². В цену входит всё из раздела «Под ключ»: архитектурный проект, фундамент, несущий металлический каркас, утепление, кровля, фасад, окна и двери, отделка, сантехника, электрика, оснащение санузла и тёплые полы. Точную смету считаем бесплатно под ваш проект и участок.</p></details><details><summary>Может ли цена вырасти во время стройки?<i aria-hidden="true"></i></summary><p class="a">Нет. Стоимость фиксируем в договоре, и она не меняется до сдачи дома. Если вы сами захотите что-то добавить — например, увеличить террасу, — согласуем это отдельно и заранее.</p></details><details><summary>Как проходит оплата?<i aria-hidden="true"></i></summary><p class="a">По этапам: вы платите частями по мере готовности — фундамент, каркас, кровля, отделка. Всю сумму вперёд отдавать не нужно. Точный график платежей прописываем в договоре.</p></details><details><summary>Сколько времени занимает стройка?<i aria-hidden="true"></i></summary><p class="a">В среднем <span data-cms="build_months_avg" data-unit="месяц,месяца,месяцев">2 месяца</span> от фундамента до ключей, самые быстрые дома — от <span data-cms="build_months_min" data-unit="месяца,месяцев,месяцев,месяца">1,5 месяца</span>. Точный срок фиксируем в договоре.</p></details><details><summary>Можно ли строить зимой?<i aria-hidden="true"></i></summary><p class="a">Да, мы строим в любое время года. Не нужно ждать весны — можно начать, как только готов проект.</p></details><details><summary>В каких регионах вы строите?<i aria-hidden="true"></i></summary><p class="a">По всему Кыргызстану: Бишкек и Чуйская область, Иссык-Куль, Нарын, Талас, Ош, Джалал-Абад и Баткен.</p></details><details><summary>Можно изменить готовый проект или сделать свой?<i aria-hidden="true"></i></summary><p class="a">Да. Любой типовой проект можно доработать — добавить спальню, террасу, поменять окна. Или спроектируем дом с нуля под ваш участок и образ жизни; эскизный проект — в подарок.</p></details><details><summary>Не будет ли холодно зимой?<i aria-hidden="true"></i></summary><p class="a">Стены, пол и кровля утеплены двухслойным базальтом плотностью 70: зимой тепло, летом прохладно. Плюс тёплые полы — их мы дарим.</p></details><details><summary>Какой фундамент вы делаете?<i aria-hidden="true"></i></summary><p class="a">Бетонные сваи или ленточный фундамент — выбираем после оценки вашего грунта.</p></details><details><summary>Почему каркас из металла, а не из дерева?<i aria-hidden="true"></i></summary><p class="a">Металл не даёт усадки, не гниёт и не ведёт геометрию: стены остаются ровными, окна и двери не перекашивает, а отделку можно делать сразу, без ожидания усадки. Дерево мы оставляем там, где оно лучше всего, — в отделке, на фасаде и террасе.</p></details><details><summary>Какая гарантия?<i aria-hidden="true"></i></summary><p class="a">Официальная гарантия на дом — <span data-cms="warranty_years" data-unit="год,года,лет">5 лет</span>. Несущий каркас всегда из металла: дом не «смещается» и служит более 40 лет.</p></details><details><summary>Что за подарок и как его получить?<i aria-hidden="true"></i></summary><p class="a">Эскизный проект и тёплый пол — для всех, кто заказывает строительство под ключ, без ограничения по сроку. Просто оставьте заявку.</p></details><details><summary>Как я узнаю, что происходит на стройке?<i aria-hidden="true"></i></summary><p class="a">Регулярно присылаем фото и видео с объекта. Строит наша собственная бригада, без субподрядчиков, поэтому за сроки и качество отвечаем мы.</p></details><button class="btn ghost faq-more" type="button" id="faq-more" aria-expanded="false" hidden><span>Показать ещё вопросы</span> <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
@@ -388,7 +398,8 @@
 
 <!-- ============ CONTACT ============ -->
 <section id="contact">
-  <div class="wrap bento" style="margin-top:clamp(40px,5vw,80px)">
+  <div class="wrap bento">
+    <div class="sec-mark"><span>Заявка</span></div>
     <div class="card cream c-form rv">
       <h2>Рассчитаем<br>ваш <span>дом</span></h2>
       <p class="lead">Оставьте контакты — свяжемся в течение рабочего дня, ответим на вопросы и бесплатно рассчитаем смету.</p>
